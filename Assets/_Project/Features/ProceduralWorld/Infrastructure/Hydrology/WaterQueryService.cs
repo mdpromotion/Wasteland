@@ -1,13 +1,16 @@
 ﻿using UnityEngine;
 using _Project.Features.ProceduralWorld.Application.Chunks;
-using _Project.Features.ProceduralWorld.Application.Interfaces;
-using _Project.Features.ProceduralWorld.Domain;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using _Project.Features.ProceduralWorld.Domain.Hydrology;
 using _Project.Features.ProceduralWorld.Infrastructure.Chunks;
 
 namespace _Project.Features.ProceduralWorld.Infrastructure.Hydrology
 {
+    public interface IWaterQuery
+    {
+        bool TryGetWaterState(Vector3 worldPosition, out WaterSample sample);
+    }
+    
     public sealed class WaterQueryService : IWaterQuery
     {
         private readonly ChunkGrid _grid;
