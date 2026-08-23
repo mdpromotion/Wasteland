@@ -4,18 +4,28 @@ namespace _Project.Features.ProceduralWorld.Domain.World
 {
     public interface IWorldSettings
     {
+        int Seed { get; }
+        int Octaves { get; }
+        float Scale { get; }
+        float Persistence { get; }
+        float Lacunarity { get; }
+        float RedistributionPower { get; }
+    }
+    
+    public interface IWorldSettingsController
+    {
         void SetSeed(int seed);
     }
     
-    public class WorldSettings : IWorldSettings
+    public sealed class WorldSettings : IWorldSettings, IWorldSettingsController
     {
         public int Seed { get; private set; }
-        
-        public readonly int Octaves;
-        public readonly float Scale;
-        public readonly float Persistence;
-        public readonly float Lacunarity;
-        public readonly float RedistributionPower;
+
+        public int Octaves { get; }
+        public float Scale { get; }
+        public float Persistence { get; }
+        public float Lacunarity { get; }
+        public float RedistributionPower { get; }
 
         public WorldSettings(WorldSettingsConfig config)
         {

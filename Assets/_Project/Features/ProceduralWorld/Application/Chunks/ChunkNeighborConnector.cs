@@ -5,21 +5,16 @@ using UnityEngine;
 
 namespace _Project.Features.ProceduralWorld.Application.Chunks
 {
-    public class ChunkNeighborConnector : IChunkNeighborConnector
+    public sealed class ChunkNeighborConnector
     {
         private readonly ILandscapeFactory _factory;
-
-
-        public ChunkNeighborConnector(
-            ILandscapeFactory factory)
+        
+        public ChunkNeighborConnector(ILandscapeFactory factory)
         {
             _factory = factory;
         }
-
-
-        public void Connect(
-            IChunkLookup chunks,
-            ChunkCoordinate coordinate)
+        
+        public void Connect(IChunkLookup chunks, ChunkCoordinate coordinate)
         {
             Terrain self = Get(chunks, coordinate);
 
@@ -81,11 +76,7 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
             }
         }
 
-
-
-        public void Disconnect(
-            IChunkLookup chunks,
-            ChunkCoordinate coordinate)
+        public void Disconnect(IChunkLookup chunks, ChunkCoordinate coordinate)
         {
             Terrain left = Get(chunks, coordinate, -1, 0);
             Terrain top = Get(chunks, coordinate, 0, 1);
@@ -137,27 +128,10 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
             }
         }
 
-
-
-        private static Terrain Get(
-            IChunkLookup chunks,
-            ChunkCoordinate coordinate)
-        {
-            return chunks.Get(coordinate)?.Terrain;
-        }
-
-
-
-        private static Terrain Get(
-            IChunkLookup chunks,
-            ChunkCoordinate origin,
-            int dx,
-            int dy)
-        {
-            return chunks.Get(
-                new ChunkCoordinate(
-                    origin.X + dx,
-                    origin.Y + dy))?.Terrain;
-        }
+        private static Terrain Get(IChunkLookup chunks, ChunkCoordinate coordinate)
+            => chunks.Get(coordinate)?.Terrain;
+        
+        private static Terrain Get(IChunkLookup chunks, ChunkCoordinate origin, int dx, int dy)
+            => chunks.Get(new ChunkCoordinate(origin.X + dx, origin.Y + dy))?.Terrain;
     }
 }

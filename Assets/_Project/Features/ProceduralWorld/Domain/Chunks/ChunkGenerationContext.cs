@@ -5,9 +5,7 @@
         public readonly ChunkCoordinate Coordinate;
 
         public readonly int Resolution;
-
-
-
+        
         public ChunkGenerationContext(
             ChunkCoordinate coordinate,
             int resolution)

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using _Project.Features.Core.Infrastructure;
 using _Project.Features.ProceduralWorld.Application.Interfaces;
+using _Project.Features.ProceduralWorld.Domain;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 
 namespace _Project.Features.ProceduralWorld.Application.Chunks.Generation
@@ -35,98 +36,58 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks.Generation
             _frameBudget = frameBudget;
 
 
-            _comparison =
-                (a, b) =>
-                    _comparer.Compare(
-                        a.State.Context.Coordinate,
-                        b.State.Context.Coordinate);
+            _comparison = (a, b) => _comparer.Compare(a.State.Context.Coordinate, b.State.Context.Coordinate);
         }
 
 
 
-        public void Enqueue(
-            ChunkGenerationRequest request)
+        public void Enqueue(ChunkGenerationRequest request)
         {
-            if (_queued.ContainsKey(
-                    request.Coordinate))
-            {
+            if (_queued.ContainsKey(request.Coordinate))
                 return;
-            }
-
-
-            LinkedListNode<ChunkGenerationRequest> node =
-                _queue.AddLast(request);
-
-
-
-            _queued.Add(
-                request.Coordinate,
-                node);
+            
+            LinkedListNode<ChunkGenerationRequest> node = _queue.AddLast(request);
+            
+            _queued.Add(request.Coordinate, node);
         }
 
 
 
-        public void Tick(
-            Action<ChunkGenerationResult> apply,
-            Action<ChunkCoordinate> completed)
+        public void Tick(Action<ChunkGenerationResult> apply, Action<ChunkCoordinate> completed)
         {
             Schedule();
-
-
-            Complete(
-                apply,
-                completed);
+            
+            Complete(apply, completed);
         }
 
 
 
         private void Schedule()
         {
-            while (_running.Count < MaxJobs &&
-                   _queue.First != null)
+            while (_running.Count < MaxJobs && _queue.First != null)
             {
-                LinkedListNode<ChunkGenerationRequest> node =
-                    _queue.First;
-
-
-
+                LinkedListNode<ChunkGenerationRequest> node = _queue.First;
+                
                 _queue.RemoveFirst();
-
-
-                _queued.Remove(
-                    node.Value.Coordinate);
-
-
-
-                GenerationTask task =
-                    _pipeline.Schedule(
-                        node.Value);
-
-
-
+                _queued.Remove(node.Value.Coordinate);
+                
+                GenerationTask task = _pipeline.Schedule(node.Value);
+                
                 _running.Add(task);
-
-
+                
                 _needsSort = true;
             }
-
-
-
+            
             if (_needsSort)
             {
-                _running.Sort(
-                    _comparison);
-
-
+                _running.Sort(_comparison);
                 _needsSort = false;
             }
         }
 
 
 
-        private void Complete(
-            Action<ChunkGenerationResult> apply,
-            Action<ChunkCoordinate> completed)
+        private void Complete(Action<ChunkGenerationResult> apply, Action<ChunkCoordinate> completed)
         {
             for (int i = 0; i < _running.Count;)
             {
@@ -138,11 +99,8 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks.Generation
                     continue;
                 }
                 
-                if (!_frameBudget.TryBeginOperation(
-                        out IFrameBudgetOperation operation))
-                {
+                if (!_frameBudget.TryBeginOperation( out IFrameBudgetOperation operation))
                     break;
-                }
 
                 using (operation)
                 {
@@ -164,8 +122,7 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks.Generation
                     ChunkGenerationResult result = new ChunkGenerationResult(task.State);
 
                     apply(result);
-
-
+                    
                     completed(coordinate);
 
                     RemoveTask(i);
@@ -175,50 +132,33 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks.Generation
 
 
 
-        private void RemoveTask(
-            int index)
+        private void RemoveTask(int index)
         {
-            int last =
-                _running.Count - 1;
-
-
-
-            _running[index] =
-                _running[last];
-
-
-
+            int last = _running.Count - 1;
+            
+            _running[index] = _running[last];
+            
             _running.RemoveAt(last);
         }
 
 
 
-        public void Cancel(
-            ChunkCoordinate coordinate)
+        public void Cancel(ChunkCoordinate coordinate)
         {
-            if(_queued.TryGetValue(
-                    coordinate,
-                    out LinkedListNode<ChunkGenerationRequest> node))
+            if (_queued.TryGetValue(coordinate, out LinkedListNode<ChunkGenerationRequest> node))
             {
                 _queue.Remove(node);
-
-
-                _queued.Remove(
-                    coordinate);
-
-
+                
+                _queued.Remove(coordinate);
+                
                 return;
             }
 
-
-
-            foreach(GenerationTask task in _running)
+            foreach (GenerationTask task in _running)
             {
-                if(task.State.Context.Coordinate.Equals(
-                       coordinate))
+                if(task.State.Context.Coordinate.Equals(coordinate))
                 {
                     task.Cancelled = true;
-
                     return;
                 }
             }
@@ -231,7 +171,6 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks.Generation
             foreach(GenerationTask task in _running)
             {
                 task.Handle.Complete();
-                
                 task.State.DisposeAll();
             }
 

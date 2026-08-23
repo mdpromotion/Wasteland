@@ -14,7 +14,7 @@ namespace _Project.Features.ProceduralWorld.Application.Landscape
     {
         private readonly ILandscapeFactory _factory;
         private readonly ITerrainWriter _writer;
-        private readonly IChunkNeighborConnector _neighborConnector;
+        private readonly ChunkNeighborConnector _neighborConnector;
         private readonly ChunkRepository _repository;
         private readonly WaterSurfaceApplier _waterSurfaceApplier;
         private readonly VegetationApplier _vegetationApplier;
@@ -23,7 +23,7 @@ namespace _Project.Features.ProceduralWorld.Application.Landscape
         public LandscapeApplier(
             ILandscapeFactory factory,
             ITerrainWriter writer,
-            IChunkNeighborConnector neighborConnector,
+            ChunkNeighborConnector neighborConnector,
             ChunkRepository repository,
             WaterSurfaceApplier waterSurfaceApplier,
             VegetationApplier vegetationApplier,
