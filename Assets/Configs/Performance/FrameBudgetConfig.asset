@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: FrameBudgetConfig
   m_EditorClassIdentifier: Assembly-CSharp::_Project.Features.Core.Infrastructure.FrameBudgetConfig
   lowFpsThreshold: 30
-  highFpsThreshold: 60
+  highFpsThreshold: 120
   minOperationsPerFrame: 0
   maxOperationsPerFrame: 4
-  fpsSmoothing: 0.1
+  fpsSmoothingDown: 0.5
+  fpsSmoothingUp: 0.05
+  lagDropRatio: 0.6
