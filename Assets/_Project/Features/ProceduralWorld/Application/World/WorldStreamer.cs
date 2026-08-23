@@ -4,8 +4,6 @@ using _Project.Features.Core.Infrastructure;
 using _Project.Features.Graphics.Domain;
 using _Project.Features.Player.Domain;
 using _Project.Features.ProceduralWorld.Application.Chunks;
-using _Project.Features.ProceduralWorld.Application.Interfaces;
-using _Project.Features.ProceduralWorld.Domain;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using VContainer.Unity;
 

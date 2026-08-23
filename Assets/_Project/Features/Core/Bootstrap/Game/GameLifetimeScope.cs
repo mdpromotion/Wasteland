@@ -16,7 +16,6 @@ using _Project.Features.Player.Infrastructure;
 using _Project.Features.Player.Presentation;
 using _Project.Features.ProceduralWorld.Application.Chunks;
 using _Project.Features.ProceduralWorld.Application.Chunks.Generation;
-using _Project.Features.ProceduralWorld.Application.Interfaces;
 using _Project.Features.ProceduralWorld.Application.World;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using _Project.Features.ProceduralWorld.Domain.Hydrology;

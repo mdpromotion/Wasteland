@@ -1,10 +1,14 @@
-using _Project.Features.ProceduralWorld.Application.Interfaces;
 using _Project.Features.ProceduralWorld.Domain.Landscape;
 using Unity.Collections;
 using UnityEngine;
 
 namespace _Project.Features.ProceduralWorld.Infrastructure
 {
+    public interface ITerrainWriter
+    {
+        void Write(Terrain terrain, LandscapeData data);
+    }
+    
     public class UnityTerrainWriter : ITerrainWriter
     {
         private float[,] _buffer;

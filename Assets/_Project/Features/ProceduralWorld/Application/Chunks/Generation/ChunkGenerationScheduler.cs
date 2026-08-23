@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using _Project.Features.Core.Infrastructure;
-using _Project.Features.ProceduralWorld.Application.Interfaces;
 using _Project.Features.ProceduralWorld.Domain;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 
