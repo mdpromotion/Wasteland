@@ -279,7 +279,6 @@ namespace _Project.Features.Core.Bootstrap.Game
                     container.Resolve<ChunkGrid>(),
                     container.Resolve<IPlayerReadOnly>(),
                     container.Resolve<GraphicsState>(),
-                    container.Resolve<IEnumerable<IGenerationCacheEvictor>>(),
                     container.Resolve<WorldRebaseService>()),
                 Lifetime.Singleton)
                 .As<IInitializable>()

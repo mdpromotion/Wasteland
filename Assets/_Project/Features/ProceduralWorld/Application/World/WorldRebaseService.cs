@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using _Project.Features.ProceduralWorld.Application.Chunks;
-using _Project.Features.ProceduralWorld.Domain;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using _Project.Features.ProceduralWorld.Domain.World;
 using _Project.Features.ProceduralWorld.Infrastructure.Chunks;
+using _Project.Features.ProceduralWorld.Presentation.World;
 using UnityEngine;
 
 namespace _Project.Features.ProceduralWorld.Application.World
@@ -15,16 +15,20 @@ namespace _Project.Features.ProceduralWorld.Application.World
         private readonly IChunkLookup _repository;
         private readonly WorldRebaseSettings _settings;
         private readonly IWorldRebaseParticipant[] _participants;
+        
+        private readonly IWorldRebaseApplier _applier;
 
         public WorldRebaseService(
             ChunkGrid grid,
             IChunkLookup repository,
             WorldRebaseSettings settings,
-            IEnumerable<IWorldRebaseParticipant> participants)
+            IEnumerable<IWorldRebaseParticipant> participants,
+            IWorldRebaseApplier applier)
         {
             _grid = grid;
             _repository = repository;
             _settings = settings;
+            _applier = applier;
             
             _participants = participants.OrderBy(p => p.Order).ToArray();
         }
@@ -47,10 +51,7 @@ namespace _Project.Features.ProceduralWorld.Application.World
             
             foreach (ChunkInstance chunk in _repository.All)
             {
-                if (chunk.Terrain)
-                {
-                    chunk.Terrain.transform.position += delta;
-                }
+                _applier.MoveChunkTo(chunk, delta);
             }
             
             for (int i = 0; i < _participants.Length; i++)
@@ -58,7 +59,7 @@ namespace _Project.Features.ProceduralWorld.Application.World
                 _participants[i].OnWorldRebased(delta);
             }
             
-            Physics.SyncTransforms();
+            _applier.SyncTransforms();
 
             _grid.SetOriginCoordinate(center);
         }
