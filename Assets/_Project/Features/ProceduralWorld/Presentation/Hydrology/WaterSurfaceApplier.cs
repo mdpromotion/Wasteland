@@ -1,12 +1,19 @@
-﻿using System.Collections.Generic;
-using _Project.Features.ProceduralWorld.Domain;
+﻿using System;
+using System.Collections.Generic;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using _Project.Features.ProceduralWorld.Domain.Hydrology;
+using _Project.Features.ProceduralWorld.Infrastructure.Hydrology;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
-namespace _Project.Features.ProceduralWorld.Infrastructure.Hydrology
+namespace _Project.Features.ProceduralWorld.Presentation.Hydrology
 {
-    public sealed class WaterSurfaceApplier : System.IDisposable
+    public interface IWaterSurfaceApplier
+    {
+        void Apply(ChunkGenerationState state, Terrain terrain);
+    }
+    
+    public sealed class WaterSurfaceApplier : IWaterSurfaceApplier, System.IDisposable
     {
         private static readonly int MaskHeightTexId = Shader.PropertyToID("_MaskHeightTex");
         private const string WaterChildName = "Water";

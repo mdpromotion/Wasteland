@@ -26,6 +26,7 @@ using _Project.Features.ProceduralWorld.Infrastructure.Interfaces;
 using _Project.Features.ProceduralWorld.Infrastructure.Landscape;
 using _Project.Features.ProceduralWorld.Infrastructure.Vegetation;
 using _Project.Features.ProceduralWorld.Infrastructure.Vegetation.Configs;
+using _Project.Features.ProceduralWorld.Presentation.Hydrology;
 using _Project.Features.ProceduralWorld.Presentation.Landscape;
 using _Project.Features.ProceduralWorld.Presentation.Vegetation;
 using _Project.Features.ProceduralWorld.Presentation.World;
@@ -199,7 +200,8 @@ namespace _Project.Features.Core.Bootstrap.Game
                         container.Resolve<ChunkGrid>(),
                         chunkPrefab.terrainData.size.y,
                         waterMaterial),
-                    Lifetime.Singleton);
+                    Lifetime.Singleton)
+                .As<IWaterSurfaceApplier>();
 
             builder.Register<VegetationApplier>(Lifetime.Singleton);
 
