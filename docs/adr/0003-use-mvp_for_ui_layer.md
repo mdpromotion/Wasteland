@@ -10,6 +10,10 @@ Accepted
 
 With Clean Architecture adopted in ADR 0002, we need a specific pattern for organizing the UI layer that keeps UI components free from business logic while enabling rapid prototyping without excessive boilerplate.
 
+### Why not MVVM or other approaches?
+
+The UI was not expected to reach a level of complexity that would require more elaborate patterns. For simplicity of implementation, MVP was chosen as the foundation for the UI-presentation layer of the project.
+
 ## Decision
 
 We decided to use the MVP (Model-View-Presenter) pattern, where the **View** is a passive executor, the **Presenter** contains UI logic and communicates with the Application layer, and the **Model** stores some state.
