@@ -18,38 +18,21 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
         }
 
 
-        public bool TryGet(
-            ChunkCoordinate coordinate,
-            out ChunkInstance chunk)
+        public bool TryGet(ChunkCoordinate coordinate, out ChunkInstance chunk)
+            => _chunks.TryGetValue(coordinate, out chunk);
+
+
+        public ChunkInstance Get(ChunkCoordinate coordinate)
+            => _chunks.GetValueOrDefault(coordinate);
+
+
+        public void Add(ChunkInstance chunk)
         {
-            return _chunks.TryGetValue(
-                coordinate,
-                out chunk);
+            _chunks.Add(chunk.Coordinate, chunk);
         }
 
 
-        public ChunkInstance Get(
-            ChunkCoordinate coordinate)
-        {
-            return _chunks.TryGetValue(
-                coordinate,
-                out ChunkInstance chunk)
-                ? chunk
-                : null;
-        }
-
-
-        public void Add(
-            ChunkInstance chunk)
-        {
-            _chunks.Add(
-                chunk.Coordinate,
-                chunk);
-        }
-
-
-        public void Remove(
-            ChunkCoordinate coordinate)
+        public void Remove(ChunkCoordinate coordinate)
         {
             _chunks.Remove(coordinate);
         }

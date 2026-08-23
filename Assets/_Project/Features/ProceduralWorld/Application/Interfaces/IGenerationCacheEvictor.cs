@@ -4,8 +4,6 @@ namespace _Project.Features.ProceduralWorld.Application.Interfaces
 {
     public interface IGenerationCacheEvictor
     {
-        void EvictOutside(
-            ChunkCoordinate center,
-            int viewDistance);
+        void EvictOutside(ChunkCoordinate center, int viewDistance);
     }
 }

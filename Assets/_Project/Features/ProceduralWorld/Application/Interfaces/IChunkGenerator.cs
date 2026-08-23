@@ -5,7 +5,6 @@ namespace _Project.Features.ProceduralWorld.Application.Interfaces
 {
     public interface IChunkGenerator
     {
-        GenerationTask Schedule(
-            ChunkGenerationRequest request);
+        GenerationTask Schedule(ChunkGenerationRequest request);
     }
 }
