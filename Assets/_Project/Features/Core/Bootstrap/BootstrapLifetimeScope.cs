@@ -49,7 +49,7 @@ namespace _Project.Features.Core.Bootstrap
             
             builder.Register<WorldSettings>(Lifetime.Singleton)
                 .As<IWorldSettings>()
-                .AsSelf();
+                .As<IWorldSettingsController>();
             
             builder.Register<InputSystem_Actions>(Lifetime.Singleton);
 

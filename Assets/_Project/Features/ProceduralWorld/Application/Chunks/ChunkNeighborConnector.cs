@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace _Project.Features.ProceduralWorld.Application.Chunks
 {
-    public class ChunkNeighborConnector : IChunkNeighborConnector
+    public sealed class ChunkNeighborConnector
     {
         private readonly ILandscapeFactory _factory;
         

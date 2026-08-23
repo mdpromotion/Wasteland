@@ -36,14 +36,14 @@ namespace _Project.Features.UI.Menus.MainMenu
         
         private LoadSceneController _loadSceneController;
         private SceneTransitionService _sceneTransitionService;
-        private IWorldSettings _worldSettings;
+        private IWorldSettingsController _worldSettings;
 
         private bool _isLoading;
         private bool _isWorldMenuVisible;
         private bool _isSettingsMenuVisible;
 
         [Inject]
-        public void Construct(LoadSceneController loadSceneController, SceneTransitionService sceneTransitionService, IWorldSettings worldSettings)
+        public void Construct(LoadSceneController loadSceneController, SceneTransitionService sceneTransitionService, IWorldSettingsController worldSettings)
         {
             _loadSceneController = loadSceneController;
             _sceneTransitionService = sceneTransitionService;

@@ -1,11 +1,18 @@
 using System;
 using System.Collections.Generic;
-using _Project.Features.ProceduralWorld.Application.Interfaces;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using _Project.Features.ProceduralWorld.Infrastructure.Chunks;
 
 namespace _Project.Features.ProceduralWorld.Application.Chunks
 {
+    public interface IChunkLookup
+    {
+        bool Contains(ChunkCoordinate coordinate);
+        bool TryGet(ChunkCoordinate coordinate, out ChunkInstance chunk);
+        ChunkInstance Get(ChunkCoordinate coordinate);
+        IEnumerable<ChunkInstance> All { get; }
+    }
+    
     public class ChunkRepository : IChunkLookup, IDisposable
     {
         private readonly Dictionary<ChunkCoordinate, ChunkInstance> _chunks = new();

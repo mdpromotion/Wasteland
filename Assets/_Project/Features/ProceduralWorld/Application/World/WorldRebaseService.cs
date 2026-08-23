@@ -12,13 +12,13 @@ namespace _Project.Features.ProceduralWorld.Application.World
     public sealed class WorldRebaseService
     {
         private readonly ChunkGrid _grid;
-        private readonly ChunkRepository _repository;
+        private readonly IChunkLookup _repository;
         private readonly WorldRebaseSettings _settings;
         private readonly IWorldRebaseParticipant[] _participants;
 
         public WorldRebaseService(
             ChunkGrid grid,
-            ChunkRepository repository,
+            IChunkLookup repository,
             WorldRebaseSettings settings,
             IEnumerable<IWorldRebaseParticipant> participants)
         {

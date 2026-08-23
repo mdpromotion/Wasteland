@@ -190,8 +190,8 @@ namespace _Project.Features.Core.Bootstrap.Game
             builder.Register<MacroRegionCache>(Lifetime.Singleton);
 
             builder.Register<ChunkRepository>(Lifetime.Singleton)
-                .AsSelf()
-                .As<IChunkLookup>();
+                .As<IChunkLookup>()
+                .AsSelf();
 
             // Appliers
             builder.Register(
@@ -210,8 +210,7 @@ namespace _Project.Features.Core.Bootstrap.Game
             builder.Register<UnityTerrainWriter>(Lifetime.Singleton)
                 .As<ITerrainWriter>();
 
-            builder.Register<ChunkNeighborConnector>(Lifetime.Singleton)
-                .As<IChunkNeighborConnector>();
+            builder.Register<ChunkNeighborConnector>(Lifetime.Singleton);
 
             builder.Register(
                     container => new LandscapeChunkFactory(
@@ -225,7 +224,7 @@ namespace _Project.Features.Core.Bootstrap.Game
                     container => new LandscapeApplier(
                         container.Resolve<ILandscapeFactory>(),
                         container.Resolve<ITerrainWriter>(),
-                        container.Resolve<IChunkNeighborConnector>(),
+                        container.Resolve<ChunkNeighborConnector>(),
                         container.Resolve<ChunkRepository>(),
                         container.Resolve<WaterSurfaceApplier>(),
                         container.Resolve<VegetationApplier>(),
