@@ -8,9 +8,14 @@ using _Project.Features.ProceduralWorld.Infrastructure.Interfaces;
 using _Project.Features.ProceduralWorld.Presentation.Vegetation;
 using UnityEngine;
 
-namespace _Project.Features.ProceduralWorld.Application.Landscape
+namespace _Project.Features.ProceduralWorld.Presentation.Landscape
 {
-    public class LandscapeApplier
+    public interface ILandscapeApplier
+    {
+        void Apply(ChunkGenerationResult result);
+    }
+    
+    public class LandscapeApplier : ILandscapeApplier
     {
         private readonly ILandscapeFactory _factory;
         private readonly ITerrainWriter _writer;

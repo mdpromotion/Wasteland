@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using _Project.Features.ProceduralWorld.Application.Chunks.Generation;
-using _Project.Features.ProceduralWorld.Application.Landscape;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using _Project.Features.ProceduralWorld.Infrastructure.Chunks;
 using _Project.Features.ProceduralWorld.Infrastructure.Interfaces;
+using _Project.Features.ProceduralWorld.Presentation.Landscape;
 using VContainer.Unity;
 
 namespace _Project.Features.ProceduralWorld.Application.Chunks
@@ -33,7 +33,7 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
         public ChunkManager(
             ChunkGenerationScheduler scheduler,
             ChunkRepository repository,
-            LandscapeApplier applier,
+            ILandscapeApplier applier,
             ILandscapeFactory factory,
             ChunkNeighborConnector neighborConnector)
         {

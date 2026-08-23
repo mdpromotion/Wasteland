@@ -17,7 +17,6 @@ using _Project.Features.Player.Presentation;
 using _Project.Features.ProceduralWorld.Application.Chunks;
 using _Project.Features.ProceduralWorld.Application.Chunks.Generation;
 using _Project.Features.ProceduralWorld.Application.Interfaces;
-using _Project.Features.ProceduralWorld.Application.Landscape;
 using _Project.Features.ProceduralWorld.Application.World;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using _Project.Features.ProceduralWorld.Domain.Hydrology;
@@ -28,6 +27,7 @@ using _Project.Features.ProceduralWorld.Infrastructure.Interfaces;
 using _Project.Features.ProceduralWorld.Infrastructure.Landscape;
 using _Project.Features.ProceduralWorld.Infrastructure.Vegetation;
 using _Project.Features.ProceduralWorld.Infrastructure.Vegetation.Configs;
+using _Project.Features.ProceduralWorld.Presentation.Landscape;
 using _Project.Features.ProceduralWorld.Presentation.Vegetation;
 using _Project.Features.Shared.Application;
 using _Project.Features.Sound.Application;
@@ -229,7 +229,8 @@ namespace _Project.Features.Core.Bootstrap.Game
                         container.Resolve<WaterSurfaceApplier>(),
                         container.Resolve<VegetationApplier>(),
                         chunksParent),
-                    Lifetime.Singleton);
+                    Lifetime.Singleton)
+                .As<ILandscapeApplier>();
 
             // Generation pipeline
             builder.Register<LandscapeGenerator>(Lifetime.Singleton)
