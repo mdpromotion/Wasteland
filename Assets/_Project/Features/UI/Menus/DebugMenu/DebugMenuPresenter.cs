@@ -1,3 +1,4 @@
+using _Project.Features.Core.Infrastructure;
 using _Project.Features.UI.Infrastructure;
 using UnityEngine;
 using VContainer;

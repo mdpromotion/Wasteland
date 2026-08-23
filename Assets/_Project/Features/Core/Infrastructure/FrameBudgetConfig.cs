@@ -5,40 +5,47 @@ namespace _Project.Features.Core.Infrastructure
     [CreateAssetMenu(fileName = "FrameBudgetConfig", menuName = "Project/Frame Budget Config")]
     public sealed class FrameBudgetConfig : ScriptableObject
     {
-        [Tooltip("Target FPS used as the reference for the frame budget.")]
         [Min(1f)]
-        [SerializeField] private float targetFrameRate = 60f;
-
-        [Tooltip("Fraction of the target frame time available for budgeted work.")]
-        [Range(0.01f, 0.5f)]
-        [SerializeField] private float budgetRatio = 0.2f;
-
-        [Tooltip("Minimum time budget allowed per frame, in milliseconds.")]
-        [Min(0f)]
-        [SerializeField] private float minBudgetMilliseconds = 0.25f;
-
-        [Tooltip("Maximum time budget allowed per frame, in milliseconds.")]
-        [Min(0f)]
-        [SerializeField] private float maxBudgetMilliseconds = 2f;
-
-        [Tooltip("How quickly the budget adapts to changes in frame time.")]
+        [SerializeField] private float lowFpsThreshold = 30f;
+        
+        [Min(1f)]
+        [SerializeField] private float highFpsThreshold = 60f;
+        
+        [Min(0)]
+        [SerializeField] private int minOperationsPerFrame = 0;
+        
+        [Min(0)]
+        [SerializeField] private int maxOperationsPerFrame = 4;
+        
         [Range(0.001f, 1f)]
-        [SerializeField] private float smoothing = 0.1f;
+        [SerializeField] private float fpsSmoothingDown = 0.5f;
+        
+        [Range(0.001f, 1f)]
+        [SerializeField] private float fpsSmoothingUp = 0.05f;
+        
+        [Range(0.1f, 0.95f)]
+        [SerializeField] private float lagDropRatio = 0.6f;
 
 
-        public float TargetFrameRate =>
-            targetFrameRate;
+        public float LowFpsThreshold =>
+            lowFpsThreshold;
 
-        public float BudgetRatio =>
-            budgetRatio;
+        public float HighFpsThreshold =>
+            highFpsThreshold;
 
-        public float MinBudgetMilliseconds =>
-            minBudgetMilliseconds;
+        public int MinOperationsPerFrame =>
+            minOperationsPerFrame;
 
-        public float MaxBudgetMilliseconds =>
-            maxBudgetMilliseconds;
+        public int MaxOperationsPerFrame =>
+            maxOperationsPerFrame;
 
-        public float Smoothing =>
-            smoothing;
+        public float FpsSmoothingDown =>
+            fpsSmoothingDown;
+
+        public float FpsSmoothingUp =>
+            fpsSmoothingUp;
+
+        public float LagDropRatio =>
+            lagDropRatio;
     }
 }

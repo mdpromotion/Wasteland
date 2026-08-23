@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34937667117d444cb7f8821abfae752b, type: 3}
   m_Name: FrameBudgetConfig
   m_EditorClassIdentifier: Assembly-CSharp::_Project.Features.Core.Infrastructure.FrameBudgetConfig
-  targetFrameRate: 60
-  budgetRatio: 0.2
-  minBudgetMilliseconds: 0.25
-  maxBudgetMilliseconds: 2
-  smoothing: 0.1
+  lowFpsThreshold: 30
+  highFpsThreshold: 60
+  minOperationsPerFrame: 0
+  maxOperationsPerFrame: 4
+  fpsSmoothing: 0.1

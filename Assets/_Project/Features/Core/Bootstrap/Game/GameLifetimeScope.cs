@@ -228,7 +228,7 @@ namespace _Project.Features.Core.Bootstrap.Game
                         container.Resolve<ITerrainWriter>(),
                         container.Resolve<ChunkNeighborConnector>(),
                         container.Resolve<ChunkRepository>(),
-                        container.Resolve<WaterSurfaceApplier>(),
+                        container.Resolve<IWaterSurfaceApplier>(),
                         container.Resolve<VegetationApplier>(),
                         chunksParent),
                     Lifetime.Singleton)

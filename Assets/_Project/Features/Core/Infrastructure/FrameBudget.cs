@@ -1,139 +1,122 @@
-﻿using System.Diagnostics;
+﻿using System;
 using UnityEngine;
 using VContainer.Unity;
 
 namespace _Project.Features.Core.Infrastructure
 {
+    public interface IFrameBudget
+    {
+        bool TryBeginOperation(out IFrameBudgetOperation operation);
+    }
+
+    public interface IFrameBudgetOperation : IDisposable
+    {
+    }
+
     public sealed class FrameBudget : IFrameBudget, ITickable
     {
-        private readonly FrameBudgetConfig _config;
+        private static readonly IFrameBudgetOperation NoOpOperation = new Operation();
 
-        private float _smoothedFrameTime;
-        private float _budgetMilliseconds;
-        private float _spentMilliseconds;
+        private readonly FrameBudgetConfig _config;
+        private readonly IFPSCounter _fpsCounter;
+
+        private float _smoothedFps;
+        private int _allowedOperations;
+        private int _spentOperations;
 
         public FrameBudget(
-            FrameBudgetConfig config)
+            FrameBudgetConfig config,
+            IFPSCounter fpsCounter)
         {
             _config = config;
+            _fpsCounter = fpsCounter;
 
-            _smoothedFrameTime =
-                1f / _config.TargetFrameRate;
+            _smoothedFps = _config.HighFpsThreshold;
+            _allowedOperations = _config.MaxOperationsPerFrame;
         }
-
 
         public void Tick()
         {
-            float frameTime =
-                Time.unscaledDeltaTime;
+            UpdateSmoothedFps();
 
-            _smoothedFrameTime =
-                Mathf.Lerp(
-                    _smoothedFrameTime,
-                    frameTime,
-                    _config.Smoothing);
-
-            _spentMilliseconds = 0f;
-
-            _budgetMilliseconds =
-                CalculateBudget();
+            _spentOperations = 0;
+            _allowedOperations = CalculateAllowedOperations();
         }
 
-
-        public bool TryBeginOperation(
-            out IFrameBudgetOperation operation)
+        public bool TryBeginOperation(out IFrameBudgetOperation operation)
         {
-            if (_spentMilliseconds >= _budgetMilliseconds)
+            if (_spentOperations >= _allowedOperations)
             {
                 operation = null;
-
                 return false;
             }
 
-            operation =
-                new Operation(this);
+            _spentOperations++;
+            operation = NoOpOperation;
 
             return true;
         }
 
-
-        private float CalculateBudget()
+        private void UpdateSmoothedFps()
         {
-            float targetFrameTime =
-                1f / _config.TargetFrameRate;
+            float rawFps = _fpsCounter.InstantFps;
 
-            float budget =
-                targetFrameTime *
-                _config.BudgetRatio *
-                1000f;
-            
-            float overload =
-                Mathf.Max(
-                    0f,
-                    _smoothedFrameTime -
-                    targetFrameTime);
+            if (rawFps <= 0f)
+                return;
 
-            if (overload > 0f)
-            {
-                float factor =
-                    targetFrameTime /
-                    _smoothedFrameTime;
+            float smoothing = rawFps < _smoothedFps
+                ? _config.FpsSmoothingDown
+                : _config.FpsSmoothingUp;
 
-                budget *= factor;
-            }
+            _smoothedFps = Mathf.Lerp(
+                _smoothedFps,
+                rawFps,
+                smoothing);
+        }
+
+        private bool IsLagSpike()
+        {
+            float average = _fpsCounter.AverageFps;
+
+            if (average <= 0f)
+                return false;
+
+            float threshold = average * _config.LagDropRatio;
+
+            return _fpsCounter.InstantFps < threshold;
+        }
+
+        private int CalculateAllowedOperations()
+        {
+            if (IsLagSpike())
+                return _config.MinOperationsPerFrame;
+
+            float lowFps = _config.LowFpsThreshold;
+
+            float highFps = Mathf.Max(
+                _config.HighFpsThreshold,
+                _fpsCounter.PeakFps);
+
+            float t = Mathf.InverseLerp(
+                lowFps,
+                highFps,
+                _smoothedFps);
+
+            float operations = Mathf.Lerp(
+                _config.MinOperationsPerFrame,
+                _config.MaxOperationsPerFrame,
+                t);
 
             return Mathf.Clamp(
-                budget,
-                _config.MinBudgetMilliseconds,
-                _config.MaxBudgetMilliseconds);
+                Mathf.RoundToInt(operations),
+                _config.MinOperationsPerFrame,
+                _config.MaxOperationsPerFrame);
         }
 
-
-        private void Record(
-            double milliseconds)
+        private sealed class Operation : IFrameBudgetOperation
         {
-            _spentMilliseconds +=
-                (float)milliseconds;
-        }
-
-
-        private sealed class Operation :
-            IFrameBudgetOperation
-        {
-            private readonly FrameBudget _owner;
-            private readonly long _startTimestamp;
-
-            private bool _disposed;
-
-
-            public Operation(
-                FrameBudget owner)
-            {
-                _owner = owner;
-
-                _startTimestamp =
-                    Stopwatch.GetTimestamp();
-            }
-
-
             public void Dispose()
             {
-                if (_disposed)
-                {
-                    return;
-                }
-
-                _disposed = true;
-
-                long elapsed =
-                    Stopwatch.GetTimestamp() -
-                    _startTimestamp;
-
-                double milliseconds =
-                    elapsed * 1000.0 /
-                    Stopwatch.Frequency;
-
-                _owner.Record(milliseconds);
             }
         }
     }
