@@ -1,4 +1,4 @@
-# Wasteland
+# Wasteland ![Unity Tests](https://github.com/mdpromotion/Wasteland/actions/workflows/tests.yml/badge.svg)
 
 [English Version](#-english-version) | [Русская версия](#-русская-версия)
 
