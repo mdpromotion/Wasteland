@@ -1,31 +1,37 @@
 using _Project.Features.ProceduralWorld.Application.Chunks;
-using _Project.Features.ProceduralWorld.Application.Interfaces;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using _Project.Features.ProceduralWorld.Domain.Landscape;
+using _Project.Features.ProceduralWorld.Infrastructure;
 using _Project.Features.ProceduralWorld.Infrastructure.Chunks;
 using _Project.Features.ProceduralWorld.Infrastructure.Hydrology;
 using _Project.Features.ProceduralWorld.Infrastructure.Interfaces;
+using _Project.Features.ProceduralWorld.Presentation.Hydrology;
 using _Project.Features.ProceduralWorld.Presentation.Vegetation;
 using UnityEngine;
 
-namespace _Project.Features.ProceduralWorld.Application.Landscape
+namespace _Project.Features.ProceduralWorld.Presentation.Landscape
 {
-    public class LandscapeApplier
+    public interface ILandscapeApplier
+    {
+        void Apply(ChunkGenerationResult result);
+    }
+    
+    public class LandscapeApplier : ILandscapeApplier
     {
         private readonly ILandscapeFactory _factory;
         private readonly ITerrainWriter _writer;
-        private readonly IChunkNeighborConnector _neighborConnector;
+        private readonly ChunkNeighborConnector _neighborConnector;
         private readonly ChunkRepository _repository;
-        private readonly WaterSurfaceApplier _waterSurfaceApplier;
+        private readonly IWaterSurfaceApplier _waterSurfaceApplier;
         private readonly VegetationApplier _vegetationApplier;
         private readonly Transform _parent;
 
         public LandscapeApplier(
             ILandscapeFactory factory,
             ITerrainWriter writer,
-            IChunkNeighborConnector neighborConnector,
+            ChunkNeighborConnector neighborConnector,
             ChunkRepository repository,
-            WaterSurfaceApplier waterSurfaceApplier,
+            IWaterSurfaceApplier waterSurfaceApplier,
             VegetationApplier vegetationApplier,
             Transform parent)
         {

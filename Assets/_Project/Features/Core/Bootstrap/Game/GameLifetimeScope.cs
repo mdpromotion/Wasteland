@@ -16,8 +16,6 @@ using _Project.Features.Player.Infrastructure;
 using _Project.Features.Player.Presentation;
 using _Project.Features.ProceduralWorld.Application.Chunks;
 using _Project.Features.ProceduralWorld.Application.Chunks.Generation;
-using _Project.Features.ProceduralWorld.Application.Interfaces;
-using _Project.Features.ProceduralWorld.Application.Landscape;
 using _Project.Features.ProceduralWorld.Application.World;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using _Project.Features.ProceduralWorld.Domain.Hydrology;
@@ -28,7 +26,10 @@ using _Project.Features.ProceduralWorld.Infrastructure.Interfaces;
 using _Project.Features.ProceduralWorld.Infrastructure.Landscape;
 using _Project.Features.ProceduralWorld.Infrastructure.Vegetation;
 using _Project.Features.ProceduralWorld.Infrastructure.Vegetation.Configs;
+using _Project.Features.ProceduralWorld.Presentation.Hydrology;
+using _Project.Features.ProceduralWorld.Presentation.Landscape;
 using _Project.Features.ProceduralWorld.Presentation.Vegetation;
+using _Project.Features.ProceduralWorld.Presentation.World;
 using _Project.Features.Shared.Application;
 using _Project.Features.Sound.Application;
 using _Project.Features.Sound.Infrastructure;
@@ -190,8 +191,8 @@ namespace _Project.Features.Core.Bootstrap.Game
             builder.Register<MacroRegionCache>(Lifetime.Singleton);
 
             builder.Register<ChunkRepository>(Lifetime.Singleton)
-                .AsSelf()
-                .As<IChunkLookup>();
+                .As<IChunkLookup>()
+                .AsSelf();
 
             // Appliers
             builder.Register(
@@ -199,7 +200,8 @@ namespace _Project.Features.Core.Bootstrap.Game
                         container.Resolve<ChunkGrid>(),
                         chunkPrefab.terrainData.size.y,
                         waterMaterial),
-                    Lifetime.Singleton);
+                    Lifetime.Singleton)
+                .As<IWaterSurfaceApplier>();
 
             builder.Register<VegetationApplier>(Lifetime.Singleton);
 
@@ -210,8 +212,7 @@ namespace _Project.Features.Core.Bootstrap.Game
             builder.Register<UnityTerrainWriter>(Lifetime.Singleton)
                 .As<ITerrainWriter>();
 
-            builder.Register<ChunkNeighborConnector>(Lifetime.Singleton)
-                .As<IChunkNeighborConnector>();
+            builder.Register<ChunkNeighborConnector>(Lifetime.Singleton);
 
             builder.Register(
                     container => new LandscapeChunkFactory(
@@ -225,12 +226,16 @@ namespace _Project.Features.Core.Bootstrap.Game
                     container => new LandscapeApplier(
                         container.Resolve<ILandscapeFactory>(),
                         container.Resolve<ITerrainWriter>(),
-                        container.Resolve<IChunkNeighborConnector>(),
+                        container.Resolve<ChunkNeighborConnector>(),
                         container.Resolve<ChunkRepository>(),
                         container.Resolve<WaterSurfaceApplier>(),
                         container.Resolve<VegetationApplier>(),
                         chunksParent),
-                    Lifetime.Singleton);
+                    Lifetime.Singleton)
+                .As<ILandscapeApplier>();
+
+            builder.Register<WorldRebaseApplier>(Lifetime.Singleton)
+                .As<IWorldRebaseApplier>();
 
             // Generation pipeline
             builder.Register<LandscapeGenerator>(Lifetime.Singleton)
@@ -280,7 +285,6 @@ namespace _Project.Features.Core.Bootstrap.Game
                     container.Resolve<ChunkGrid>(),
                     container.Resolve<IPlayerReadOnly>(),
                     container.Resolve<GraphicsState>(),
-                    container.Resolve<IEnumerable<IGenerationCacheEvictor>>(),
                     container.Resolve<WorldRebaseService>()),
                 Lifetime.Singleton)
                 .As<IInitializable>()

@@ -6,8 +6,7 @@ namespace _Project.Features.ProceduralWorld.Domain.Chunks
     {
         public ChunkGenerationState State { get; }
 
-        public ChunkGenerationResult(
-            ChunkGenerationState state)
+        public ChunkGenerationResult(ChunkGenerationState state)
         {
             State = state;
         }

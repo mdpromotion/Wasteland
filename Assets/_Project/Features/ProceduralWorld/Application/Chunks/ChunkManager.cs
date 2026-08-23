@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using _Project.Features.ProceduralWorld.Application.Chunks.Generation;
-using _Project.Features.ProceduralWorld.Application.Interfaces;
-using _Project.Features.ProceduralWorld.Application.Landscape;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using _Project.Features.ProceduralWorld.Infrastructure.Chunks;
 using _Project.Features.ProceduralWorld.Infrastructure.Interfaces;
+using _Project.Features.ProceduralWorld.Presentation.Landscape;
 using VContainer.Unity;
 
 namespace _Project.Features.ProceduralWorld.Application.Chunks
@@ -21,7 +20,7 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
         private readonly ChunkRepository _repository;
 
         private readonly ILandscapeFactory _factory;
-        private readonly IChunkNeighborConnector _neighborConnector;
+        private readonly ChunkNeighborConnector _neighborConnector;
         
         private readonly HashSet<ChunkCoordinate> _loading = new();
         
@@ -34,9 +33,9 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
         public ChunkManager(
             ChunkGenerationScheduler scheduler,
             ChunkRepository repository,
-            LandscapeApplier applier,
+            ILandscapeApplier applier,
             ILandscapeFactory factory,
-            IChunkNeighborConnector neighborConnector)
+            ChunkNeighborConnector neighborConnector)
         {
             _scheduler = scheduler;
             _repository = repository;
@@ -52,27 +51,18 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
  
             _completedAction = FinishLoading;
         }
-
-
-
-
+        
         public void Tick()
         {
-            _scheduler.Tick(
-                _applyAction,
-                _completedAction);
+            _scheduler.Tick(_applyAction, _completedAction);
         }
-
-
-
+        
         public void Dispose()
         {
             _scheduler.CompleteAll();
 
             _repository.Dispose();
         }
-
-
 
         public void QueueLoad(
             ChunkCoordinate coordinate)
@@ -83,14 +73,10 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
             if(!_loading.Add(coordinate))
                 return;
 
-            _scheduler.Enqueue(
-                new ChunkGenerationRequest(
-                    coordinate,
-                    257));
+            _scheduler.Enqueue( new ChunkGenerationRequest(coordinate, 257));
         }
         
-        public void CancelLoad(
-            ChunkCoordinate coordinate)
+        public void CancelLoad(ChunkCoordinate coordinate)
         {
             _loading.Remove(coordinate);
 
@@ -99,8 +85,7 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
                 coordinate);
         }
         
-        private void FinishLoading(
-            ChunkCoordinate coordinate)
+        private void FinishLoading(ChunkCoordinate coordinate)
         {
             _loading.Remove(
                 coordinate);

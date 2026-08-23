@@ -4,8 +4,6 @@ using _Project.Features.Core.Infrastructure;
 using _Project.Features.Graphics.Domain;
 using _Project.Features.Player.Domain;
 using _Project.Features.ProceduralWorld.Application.Chunks;
-using _Project.Features.ProceduralWorld.Application.Interfaces;
-using _Project.Features.ProceduralWorld.Domain;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using VContainer.Unity;
 
@@ -17,8 +15,6 @@ namespace _Project.Features.ProceduralWorld.Application.World
         private readonly ChunkGrid _chunkGrid;
         private readonly IPlayerReadOnly _player;
         private readonly GraphicsState _graphicsState;
-
-        private readonly IReadOnlyList<IGenerationCacheEvictor> _cacheEvictors;
 
         private readonly HashSet<ChunkCoordinate> _activeChunks = new();
         private readonly HashSet<ChunkCoordinate> _requiredChunks = new();
@@ -39,24 +35,14 @@ namespace _Project.Features.ProceduralWorld.Application.World
             ChunkGrid chunkGrid,
             IPlayerReadOnly player,
             GraphicsState state,
-            IEnumerable<IGenerationCacheEvictor> cacheEvictors,
             WorldRebaseService worldRebaseService)
         {
             _chunkManager = chunkManager;
             _chunkGrid = chunkGrid;
             _player = player;
             _graphicsState = state;
-
-            List<IGenerationCacheEvictor> evictors = new();
-
-            foreach (IGenerationCacheEvictor evictor in cacheEvictors)
-            {
-                evictors.Add(evictor);
-            }
             
             _worldRebaseService = worldRebaseService;
-            
-            _cacheEvictors = evictors;
         }
         
         public void Initialize()
@@ -144,13 +130,6 @@ namespace _Project.Features.ProceduralWorld.Application.World
             foreach (ChunkCoordinate coordinate in _requiredChunks)
             {
                 _activeChunks.Add(coordinate);
-            }
-
-            foreach (var t in _cacheEvictors)
-            {
-                t.EvictOutside(
-                    center,
-                    _viewDistance);
             }
         }
 

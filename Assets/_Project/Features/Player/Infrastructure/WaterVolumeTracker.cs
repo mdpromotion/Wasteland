@@ -2,8 +2,8 @@
 using UnityEngine;
 using VContainer;
 using _Project.Features.Player.Domain;
-using _Project.Features.ProceduralWorld.Application.Interfaces;
 using _Project.Features.ProceduralWorld.Domain.Hydrology;
+using _Project.Features.ProceduralWorld.Infrastructure.Hydrology;
 
 namespace _Project.Features.Player.Infrastructure
 {

@@ -15,12 +15,12 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Vegetation
     public class VegetationGenerator : IGenerationStage
     {
         private readonly VegetationSettingsProvider _settingsProvider;
-        private readonly WorldSettings _worldSettings;
+        private readonly IWorldSettings _worldSettings;
         
         private List<(VegetationSpeciesType Species, VegetationGenerationParams Params)> _speciesInPriorityOrder;
         private bool _isPrioritized = false;
         
-        public VegetationGenerator(VegetationSettingsProvider settingsProvider, WorldSettings worldSettings)
+        public VegetationGenerator(VegetationSettingsProvider settingsProvider, IWorldSettings worldSettings)
         {
             _worldSettings = worldSettings;
             _settingsProvider = settingsProvider;

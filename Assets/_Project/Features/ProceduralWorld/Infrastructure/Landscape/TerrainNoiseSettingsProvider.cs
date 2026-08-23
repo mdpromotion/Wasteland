@@ -11,7 +11,7 @@
         public sealed class TerrainNoiseSettingsProvider :
             IDisposable
         {
-            private readonly WorldSettings _worldSettings;
+            private readonly IWorldSettings _worldSettings;
 
             private readonly Dictionary<int, NativeArray<float2>> _octaveOffsetsCache = new();
 
@@ -20,7 +20,7 @@
 
 
             public TerrainNoiseSettingsProvider(
-                WorldSettings worldSettings)
+                IWorldSettings worldSettings)
             {
                 _worldSettings = worldSettings;
             }
