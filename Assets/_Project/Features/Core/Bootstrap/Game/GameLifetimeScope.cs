@@ -29,6 +29,7 @@ using _Project.Features.ProceduralWorld.Infrastructure.Vegetation;
 using _Project.Features.ProceduralWorld.Infrastructure.Vegetation.Configs;
 using _Project.Features.ProceduralWorld.Presentation.Landscape;
 using _Project.Features.ProceduralWorld.Presentation.Vegetation;
+using _Project.Features.ProceduralWorld.Presentation.World;
 using _Project.Features.Shared.Application;
 using _Project.Features.Sound.Application;
 using _Project.Features.Sound.Infrastructure;
@@ -231,6 +232,9 @@ namespace _Project.Features.Core.Bootstrap.Game
                         chunksParent),
                     Lifetime.Singleton)
                 .As<ILandscapeApplier>();
+
+            builder.Register<WorldRebaseApplier>(Lifetime.Singleton)
+                .As<IWorldRebaseApplier>();
 
             // Generation pipeline
             builder.Register<LandscapeGenerator>(Lifetime.Singleton)
