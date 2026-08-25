@@ -9,6 +9,15 @@ using UnityEngine;
 
 namespace _Project.Features.ProceduralWorld.Application.World
 {
+    /// <summary>
+    /// Repositions the local Unity world origin when the streaming center moves too far
+    /// from the current chunk-grid origin.
+    /// </summary>
+    /// <remarks>
+    /// Rebasing preserves logical chunk coordinates while shifting loaded Unity objects
+    /// by an equal and opposite world-space offset. Participants are notified in their
+    /// configured order before transforms are synchronized and the grid origin is updated.
+    /// </remarks>
     public sealed class WorldRebaseService
     {
         private readonly ChunkGrid _grid;

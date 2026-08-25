@@ -5,6 +5,9 @@ using _Project.Features.ProceduralWorld.Infrastructure.Chunks;
 
 namespace _Project.Features.ProceduralWorld.Application.Chunks
 {
+    /// <summary>
+    /// Provides read access to currently loaded chunks.
+    /// </summary>
     public interface IChunkLookup
     {
         bool Contains(ChunkCoordinate coordinate);
@@ -12,7 +15,14 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
         ChunkInstance Get(ChunkCoordinate coordinate);
         IEnumerable<ChunkInstance> All { get; }
     }
-    
+
+    /// <summary>
+    /// Stores the currently loaded chunk instances indexed by logical chunk coordinate.
+    /// </summary>
+    /// <remarks>
+    /// The repository tracks loaded chunks only. It does not own generation scheduling
+    /// or determine which chunks should be active.
+    /// </remarks>
     public class ChunkRepository : IChunkLookup, IDisposable
     {
         private readonly Dictionary<ChunkCoordinate, ChunkInstance> _chunks = new();
