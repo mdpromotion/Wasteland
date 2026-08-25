@@ -4,6 +4,14 @@ using UnityEngine;
 
 namespace _Project.Features.ProceduralWorld.Application.Chunks
 {
+    /// <summary>
+    /// Maintains Unity Terrain neighbour links for a chunk and its adjacent chunks.
+    /// </summary>
+    /// <remarks>
+    /// When a chunk is connected or disconnected, the neighbouring terrains are also
+    /// updated so that every affected Terrain has a consistent four-direction neighbour
+    /// configuration.
+    /// </remarks>
     public sealed class ChunkNeighborConnector
     {
         private readonly ILandscapeFactory _factory;
@@ -13,6 +21,12 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
             _factory = factory;
         }
         
+        /// <summary>
+        /// Connects the specified chunk to all currently loaded cardinal neighbours and
+        /// refreshes the neighbour links of those adjacent terrains.
+        /// </summary>
+        /// <param name="chunks">Lookup containing currently loaded chunks.</param>
+        /// <param name="coordinate">Coordinate of the chunk being connected.</param>
         public void Connect(IChunkLookup chunks, ChunkCoordinate coordinate)
         {
             Terrain self = Get(chunks, coordinate);
@@ -75,6 +89,10 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
             }
         }
 
+        /// <summary>
+        /// Removes the specified chunk from the neighbor configuration of its adjacent
+        /// loaded terrains.
+        /// </summary>
         public void Disconnect(IChunkLookup chunks, ChunkCoordinate coordinate)
         {
             Terrain left = Get(chunks, coordinate, -1, 0);

@@ -13,7 +13,16 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
     {
         bool IsReady { get; }
     }
-    
+
+    /// <summary>
+    /// Coordinates chunk generation, application, storage, neighbour connections,
+    /// and unloading for the procedural world.
+    /// </summary>
+    /// <remarks>
+    /// The manager does not perform generation itself. It schedules requests through
+    /// <see cref="ChunkGenerationScheduler"/>, applies completed results, and keeps
+    /// generated chunks synchronized with the chunk repository.
+    /// </remarks>
     public class ChunkManager : IChunkManager, ITickable, IDisposable
     {
         private readonly ChunkGenerationScheduler _scheduler;
@@ -52,6 +61,9 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
             _completedAction = FinishLoading;
         }
         
+        /// <summary>
+        /// Advances generation scheduling and applies completed generation results.
+        /// </summary>
         public void Tick()
         {
             _scheduler.Tick(_applyAction, _completedAction);
@@ -64,6 +76,10 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
             _repository.Dispose();
         }
 
+        /// <summary>
+        /// Queues a chunk for generation unless it is already loaded or being generated.
+        /// </summary>
+        /// <param name="coordinate">Logical coordinate of the requested chunk.</param>
         public void QueueLoad(
             ChunkCoordinate coordinate)
         {
@@ -76,6 +92,9 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
             _scheduler.Enqueue( new ChunkGenerationRequest(coordinate, 257));
         }
         
+        /// <summary>
+        /// Cancels a queued or currently running generation request for the specified chunk.
+        /// </summary>
         public void CancelLoad(ChunkCoordinate coordinate)
         {
             _loading.Remove(coordinate);
@@ -96,6 +115,10 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
             }
         }
         
+        /// <summary>
+        /// Removes a loaded chunk, disconnects its terrain neighbours, releases its generated
+        /// data, and returns its Unity terrain representation to the landscape factory.
+        /// </summary>
         public void Unload(ChunkCoordinate coordinate)
         {
             if (!_repository.TryGet(coordinate, out ChunkInstance chunk))

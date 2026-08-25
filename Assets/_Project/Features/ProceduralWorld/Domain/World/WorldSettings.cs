@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace _Project.Features.ProceduralWorld.Domain.World
 {
+    /// <summary>
+    /// Read-only procedural generation settings used by the world generation pipeline.
+    /// </summary>
     public interface IWorldSettings
     {
         int Seed { get; }
@@ -12,11 +15,22 @@ namespace _Project.Features.ProceduralWorld.Domain.World
         float RedistributionPower { get; }
     }
     
+    /// <summary>
+    /// Controls runtime-modifiable world settings.
+    /// </summary>
     public interface IWorldSettingsController
     {
         void SetSeed(int seed);
     }
     
+    /// <summary>
+    /// Runtime representation of the procedural world generation settings.
+    /// </summary>
+    /// <remarks>
+    /// Immutable generation parameters are copied from <see cref="WorldSettingsConfig"/>
+    /// when the runtime settings object is created. The seed is the only setting exposed
+    /// for runtime mutation through <see cref="IWorldSettingsController"/>.
+    /// </remarks>
     public sealed class WorldSettings : IWorldSettings, IWorldSettingsController
     {
         public int Seed { get; private set; }

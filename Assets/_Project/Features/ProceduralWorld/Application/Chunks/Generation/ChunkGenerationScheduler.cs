@@ -6,6 +6,14 @@ using _Project.Features.ProceduralWorld.Domain.Chunks;
 
 namespace _Project.Features.ProceduralWorld.Application.Chunks.Generation
 {
+    /// <summary>
+    /// Schedules, prioritizes, completes, and cancels asynchronous chunk generation tasks.
+    /// </summary>
+    /// <remarks>
+    /// The scheduler limits the number of concurrently running generation tasks,
+    /// prioritizes running tasks by distance from the current streaming center,
+    /// and applies completed results within the configured frame budget.
+    /// </remarks>
     public class ChunkGenerationScheduler
     {
         private readonly IChunkGenerator _pipeline;
@@ -26,7 +34,6 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks.Generation
         
         private readonly IFrameBudget _frameBudget;
 
-
         public ChunkGenerationScheduler(
             IChunkGenerator pipeline,
             IFrameBudget frameBudget)
@@ -39,7 +46,9 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks.Generation
         }
 
 
-
+        /// <summary>
+        /// Adds a chunk generation request unless that coordinate is already queued.
+        /// </summary>
         public void Enqueue(ChunkGenerationRequest request)
         {
             if (_queued.ContainsKey(request.Coordinate))
@@ -49,17 +58,16 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks.Generation
             
             _queued.Add(request.Coordinate, node);
         }
-
-
-
+        
+        /// <summary>
+        /// Starts queued generation work and processes completed tasks within the current frame budget.
+        /// </summary>
         public void Tick(Action<ChunkGenerationResult> apply, Action<ChunkCoordinate> completed)
         {
             Schedule();
             
             Complete(apply, completed);
         }
-
-
 
         private void Schedule()
         {
@@ -83,8 +91,6 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks.Generation
                 _needsSort = false;
             }
         }
-
-
 
         private void Complete(Action<ChunkGenerationResult> apply, Action<ChunkCoordinate> completed)
         {
@@ -128,9 +134,7 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks.Generation
                 }
             }
         }
-
-
-
+        
         private void RemoveTask(int index)
         {
             int last = _running.Count - 1;
@@ -139,9 +143,14 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks.Generation
             
             _running.RemoveAt(last);
         }
-
-
-
+        
+        /// <summary>
+        /// Removes a queued request or marks a running task as canceled.
+        /// </summary>
+        /// <remarks>
+        /// A running Job is not forcibly aborted. Its result is discarded after the Job completes
+        /// and its generated state is disposed.
+        /// </remarks>
         public void Cancel(ChunkCoordinate coordinate)
         {
             if (_queued.TryGetValue(coordinate, out LinkedListNode<ChunkGenerationRequest> node))
@@ -163,8 +172,9 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks.Generation
             }
         }
 
-
-
+        /// <summary>
+        /// Completes all running jobs, disposes their generation state, and clears queued work.
+        /// </summary>
         public void CompleteAll()
         {
             foreach(GenerationTask task in _running)

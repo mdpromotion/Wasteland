@@ -9,6 +9,15 @@ using VContainer.Unity;
 
 namespace _Project.Features.ProceduralWorld.Application.World
 {
+    /// <summary>
+    /// Maintains the set of chunks required around the player's current chunk position.
+    /// </summary>
+    /// <remarks>
+    /// The streamer derives the current chunk from the player's world position,
+    /// requests a square area determined by the graphics view distance, prioritizes
+    /// loading by distance from the center, and unloads chunks outside the required set.
+    /// It also triggers world rebasing before refreshing the streaming area.
+    /// </remarks>
     public class WorldStreamer : IInitializable, ITickable, IDisposable
     {
         private readonly ChunkManager _chunkManager;
@@ -51,17 +60,22 @@ namespace _Project.Features.ProceduralWorld.Application.World
             _viewDistance = _graphicsState.ViewDistance;
         }
 
+        /// <summary>
+        /// Updates the streaming view distance and refreshes the active chunk set.
+        /// </summary>
         public void OnGraphicsChanged()
         {
             _viewDistance = _graphicsState.ViewDistance;
             Refresh(_currentCenter);
         }
-
-
+        
+        /// <summary>
+        /// Updates the streaming center from the player's current world position and
+        /// refreshes the required chunk set when the center changes.
+        /// </summary>
         public void Tick()
         {
-            ChunkCoordinate center =
-                _chunkGrid.ToChunkCoordinate(_player.Position);
+            ChunkCoordinate center = _chunkGrid.ToChunkCoordinate(_player.Position);
 
             _worldRebaseService.TryRebase(center);
 
@@ -75,11 +89,16 @@ namespace _Project.Features.ProceduralWorld.Application.World
 
             Refresh(center);
         }
-
-
-
-        private void Refresh(
-            ChunkCoordinate center)
+        
+        /// <summary>
+        /// Reconciles the currently active chunk set with the chunks required around
+        /// the specified center coordinate.
+        /// </summary>
+        /// <remarks>
+        /// Required chunks are queued in distance order. Chunks no longer required are
+        /// canceled and unloaded.
+        /// </remarks>
+        private void Refresh(ChunkCoordinate center)
         {
             _requiredChunks.Clear();
             _ordered.Clear();
@@ -98,31 +117,24 @@ namespace _Project.Features.ProceduralWorld.Application.World
                 }
             }
 
-            Utils.SortByDistance(
-                _ordered,
-                center);
+            Utils.SortByDistance(_ordered, center);
 
             foreach (ChunkCoordinate coordinate in _ordered)
             {
                 if (_activeChunks.Contains(coordinate))
                     continue;
 
-                _chunkManager.QueueLoad(
-                    coordinate);
+                _chunkManager.QueueLoad(coordinate);
             }
 
             foreach (ChunkCoordinate coordinate in _activeChunks)
             {
                 if (_requiredChunks.Contains(coordinate))
                     continue;
-
-
-                _chunkManager.CancelLoad(
-                    coordinate);
-
-
-                _chunkManager.Unload(
-                    coordinate);
+                
+                _chunkManager.CancelLoad(coordinate);
+                
+                _chunkManager.Unload(coordinate);
             }
 
             _activeChunks.Clear();

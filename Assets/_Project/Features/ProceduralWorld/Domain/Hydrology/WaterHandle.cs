@@ -2,6 +2,13 @@
 
 namespace _Project.Features.ProceduralWorld.Domain.Hydrology
 {
+    /// <summary>
+    /// Holds the Unity objects associated with a generated water representation.
+    /// </summary>
+    /// <remarks>
+    /// The handle groups the scene objects and per-renderer state required to update
+    /// a water surface without repeatedly looking them up on the generated GameObject.
+    /// </remarks>
     public sealed class WaterHandle
     {
         public readonly Transform Root;
