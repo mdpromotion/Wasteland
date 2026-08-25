@@ -3,6 +3,13 @@ using Unity.Collections;
 
 namespace _Project.Features.ProceduralWorld.Domain.Landscape
 {
+    /// <summary>
+    /// Native terrain height data generated for a single chunk.
+    /// </summary>
+    /// <remarks>
+    /// The height samples are stored in a flat NativeArray and are later converted
+    /// to Unity Terrain data by the infrastructure layer.
+    /// </remarks>
     public sealed class LandscapeData
     {
         public ChunkCoordinate Coordinate { get; }
