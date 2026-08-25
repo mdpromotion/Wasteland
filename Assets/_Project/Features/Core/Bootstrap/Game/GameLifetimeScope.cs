@@ -109,6 +109,10 @@ namespace _Project.Features.Core.Bootstrap.Game
             builder.RegisterComponentInHierarchy<FpsPlayerMotor>()
                 .As<IFpsPlayerMotor>();
             
+            builder.Register<PlayerEnvironmentState>(Lifetime.Singleton)
+                .As<IPlayerEnvironmentState>()
+                .AsSelf();
+            
             builder.Register<PlayerController>(Lifetime.Singleton)
                 .As<IFixedTickable>()
                 .As<IPlayerController>();
