@@ -2,6 +2,9 @@
 
 namespace _Project.Features.ProceduralWorld.Domain.Vegetation
 {
+    /// <summary>
+    /// Native vegetation instances belonging to a single species category.
+    /// </summary>
     public sealed class VegetationLayerData
     {
         public VegetationSpeciesType Species { get; }
