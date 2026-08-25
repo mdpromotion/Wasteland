@@ -11,6 +11,7 @@ using _Project.Features.GameTime.Presentation;
 using _Project.Features.Graphics.Domain;
 using _Project.Features.Graphics.Presentation;
 using _Project.Features.Player.Application;
+using _Project.Features.Player.Application.UseCases;
 using _Project.Features.Player.Domain;
 using _Project.Features.Player.Infrastructure;
 using _Project.Features.Player.Presentation;
@@ -108,6 +109,10 @@ namespace _Project.Features.Core.Bootstrap.Game
 
             builder.RegisterComponentInHierarchy<FpsPlayerMotor>()
                 .As<IFpsPlayerMotor>();
+            
+            builder.Register<PlayerEnvironmentState>(Lifetime.Singleton)
+                .As<IPlayerEnvironmentState>()
+                .AsSelf();
             
             builder.Register<PlayerController>(Lifetime.Singleton)
                 .As<IFixedTickable>()

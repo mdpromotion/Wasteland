@@ -1,7 +1,7 @@
 ﻿using _Project.Features.Player.Infrastructure;
 using UnityEngine;
 
-namespace _Project.Features.Player.Application
+namespace _Project.Features.Player.Application.UseCases
 {
     public sealed class SwimmingMovementUseCase : IMovementMode
     {
