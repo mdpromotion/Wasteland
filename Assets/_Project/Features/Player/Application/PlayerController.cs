@@ -1,6 +1,7 @@
 using System;
 using _Project.Features.Core.Domain;
 using _Project.Features.Core.Presentation;
+using _Project.Features.Player.Application.UseCases;
 using _Project.Features.Player.Presentation;
 using UnityEngine;
 using VContainer.Unity;

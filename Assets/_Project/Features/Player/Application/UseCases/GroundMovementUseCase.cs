@@ -1,11 +1,9 @@
-﻿using _Project.Features.Core;
-using _Project.Features.Core.Presentation;
+﻿using _Project.Features.Core.Presentation;
 using _Project.Features.Player.Domain;
 using _Project.Features.Player.Infrastructure;
-using _Project.Features.Player.Presentation;
 using UnityEngine;
 
-namespace _Project.Features.Player.Application
+namespace _Project.Features.Player.Application.UseCases
 {
     public sealed class GroundMovementUseCase : IMovementMode
     {
