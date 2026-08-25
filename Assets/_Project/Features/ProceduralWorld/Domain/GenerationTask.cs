@@ -27,5 +27,13 @@ namespace _Project.Features.ProceduralWorld.Domain
         /// Indicates that the generated result must be discarded when the job completes.
         /// </summary>
         public bool Cancelled;
+        
+        public GenerationTask(
+            JobHandle handle,
+            ChunkGenerationState state)
+        {
+            Handle = handle;
+            State = state;
+        }
     }
 }
