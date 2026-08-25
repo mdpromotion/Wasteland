@@ -3,11 +3,34 @@ using Unity.Mathematics;
 
 namespace _Project.Features.ProceduralWorld.Domain.Hydrology
 {
+    /// <summary>
+    /// Native data produced and consumed by macro-scale hydrology generation
+    /// for a single macro region.
+    /// </summary>
+    /// <remarks>
+    /// The data includes padded terrain and hydrology fields so generation can
+    /// account for neighboring areas before extracting chunk-local results.
+    /// </remarks>
     public sealed class MacroRegionData
     {
+        /// <summary>
+        /// Logical coordinate of this macro region.
+        /// </summary>
         public MacroRegionCoordinate Coordinate { get; }
+        
+        /// <summary>
+        /// Size of the region including padding, measured in cells.
+        /// </summary>
         public int PaddedSize { get; }
+        
+        /// <summary>
+        /// World-space size of a single macro-grid cell.
+        /// </summary>
         public float CellSize { get; }
+        
+        /// <summary>
+        /// Absolute world-space origin of the macro region.
+        /// </summary>
         public double2 WorldOrigin { get; }
 
         public NativeArray<float> Heights;
@@ -43,6 +66,9 @@ namespace _Project.Features.ProceduralWorld.Domain.Hydrology
             RiverStrengthSmoothed = new NativeArray<float>(count, Allocator.Persistent);
         }
 
+        /// <summary>
+        /// Releases all Native containers owned by this macro-region data.
+        /// </summary>
         public void Dispose()
         {
             if (_disposed)
