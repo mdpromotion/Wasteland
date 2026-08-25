@@ -8,6 +8,13 @@ using UnityEngine;
 
 namespace _Project.Features.ProceduralWorld.Infrastructure
 {
+    /// <summary>
+    /// Creates, pools, configures, and releases Unity Terrain instances used by generated chunks.
+    /// </summary>
+    /// <remarks>
+    /// Terrain instances are reused through an internal pool to avoid repeated GameObject
+    /// allocation during chunk streaming. Pool capacity follows the current graphics view distance.
+    /// </remarks>
     public class LandscapeChunkFactory : ILandscapeFactory, System.IDisposable
     {
         private readonly Terrain _prefab;
@@ -62,6 +69,13 @@ namespace _Project.Features.ProceduralWorld.Infrastructure
             terrain.SetNeighbors(left, top, right, bottom);
         }
 
+        /// <summary>
+        /// Creates or reuses a Terrain instance for the specified logical chunk coordinate.
+        /// </summary>
+        /// <remarks>
+        /// Reused Terrain instances are reconfigured and repositioned rather than instantiated again.
+        /// The returned Terrain is enabled for rendering and collision.
+        /// </remarks>
         public Terrain Create(
             ChunkCoordinate coordinate,
             Transform parent)
@@ -131,6 +145,10 @@ namespace _Project.Features.ProceduralWorld.Infrastructure
                 handle.Collider.enabled = true;
         }
 
+        /// <summary>
+        /// Hides a Terrain, disables its collider, clears generated tree instances, and returns
+        /// it to the pool or destroys it when the pool is full.
+        /// </summary>
         public void Release(Terrain terrain)
         {
             terrain.drawHeightmap = false;
@@ -177,6 +195,12 @@ namespace _Project.Features.ProceduralWorld.Infrastructure
             };
         }
         
+        /// <summary>
+        /// Unsubscribes from graphics changes and clears the internal terrain pool and handle cache.
+        /// </summary>
+        /// <remarks>
+        /// This method does not explicitly destroy pooled Terrain GameObjects.
+        /// </remarks>
         public void Dispose()
         {
             if (_graphicsState != null)
