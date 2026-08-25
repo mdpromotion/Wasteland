@@ -23,7 +23,7 @@ namespace _Project.Features.Player.Presentation
 
         private IPlayerReadOnly _player;
         private IPlayerController _controller;
-        private IWaterState _water;
+        private IPlayerEnvironmentState _environmentState;
         private IPlayerInputReader _input;
         private IPlayerStanceState _stance;
         private ISoundService _soundService;
@@ -36,14 +36,14 @@ namespace _Project.Features.Player.Presentation
         public void Construct(
             IPlayerReadOnly player,
             IPlayerController controller,
-            IWaterState water,
+            IPlayerEnvironmentState environmentState,
             IPlayerInputReader input,
             IPlayerStanceState stance,
             ISoundService soundService)
         {
             _player = player;
             _controller = controller;
-            _water = water;
+            _environmentState = environmentState;
             _input = input;
             _stance = stance;
             _soundService = soundService;
@@ -69,10 +69,10 @@ namespace _Project.Features.Player.Presentation
 
         private void FixedUpdate()
         {
-            if (_player == null || _controller == null || _water == null || _input == null || _soundService == null)
+            if (_player == null || _controller == null || _input == null || _soundService == null)
                 return;
 
-            bool clearGroundStep = _controller.IsGrounded && !_water.IsInWater;
+            bool clearGroundStep = _environmentState.IsGrounded && !_environmentState.IsInWater;
 
             if (!clearGroundStep)
             {
