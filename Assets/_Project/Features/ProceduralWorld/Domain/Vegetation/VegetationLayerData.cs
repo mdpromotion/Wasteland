@@ -18,7 +18,7 @@ namespace _Project.Features.ProceduralWorld.Domain.Vegetation
 
         public void Dispose()
         {
-            if (Instances is { IsCreated: true, Length: > 0 })
+            if (Instances.IsCreated)
                 Instances.Dispose();
         }
     }

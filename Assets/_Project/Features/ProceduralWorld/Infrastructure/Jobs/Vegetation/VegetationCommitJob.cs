@@ -12,21 +12,24 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Jobs.Vegetation
 
         private NativeArray<byte> _occupancy;
 
-        [ReadOnly] private NativeList<VegetationInstanceData> _candidates;
+        [ReadOnly] private readonly NativeArray<VegetationInstanceData> _candidates;
+        [ReadOnly] private readonly NativeArray<byte> _candidateMask;
 
-        [WriteOnly] private NativeList<VegetationInstanceData> _accepted;
+        private NativeList<VegetationInstanceData> _accepted;
 
         public VegetationCommitJob(
             int resolution,
             float occupancyRadius,
             NativeArray<byte> occupancy,
-            NativeList<VegetationInstanceData> candidates,
+            NativeArray<VegetationInstanceData> candidates,
+            NativeArray<byte> candidateMask,
             NativeList<VegetationInstanceData> accepted)
         {
             _resolution = resolution;
             _occupancyRadius = occupancyRadius;
             _occupancy = occupancy;
             _candidates = candidates;
+            _candidateMask = candidateMask;
             _accepted = accepted;
         }
 
@@ -34,16 +37,19 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Jobs.Vegetation
         {
             for (int i = 0; i < _candidates.Length; i++)
             {
+                if (_candidateMask[i] == 0)
+                    continue;
+
                 VegetationInstanceData candidate = _candidates[i];
 
-                int cellX = (int)candidate.Position.x;
-                int cellZ = (int)candidate.Position.z;
+                int cellX = i % _resolution;
+                int cellZ = i / _resolution;
 
-                if (IsAreaFree(cellX, cellZ))
-                {
-                    MarkArea(cellX, cellZ);
-                    _accepted.Add(candidate);
-                }
+                if (!IsAreaFree(cellX, cellZ))
+                    continue;
+
+                MarkArea(cellX, cellZ);
+                _accepted.Add(candidate);
             }
         }
 
@@ -59,9 +65,7 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Jobs.Vegetation
                 for (int x = minX; x <= maxX; x++)
                 {
                     if (_occupancy[z * _resolution + x] != 0)
-                    {
                         return false;
-                    }
                 }
             }
 
@@ -78,9 +82,7 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Jobs.Vegetation
             for (int z = minZ; z <= maxZ; z++)
             {
                 for (int x = minX; x <= maxX; x++)
-                {
                     _occupancy[z * _resolution + x] = 1;
-                }
             }
         }
     }
