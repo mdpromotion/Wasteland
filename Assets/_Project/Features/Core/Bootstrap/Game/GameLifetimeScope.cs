@@ -4,6 +4,7 @@ using _Project.Features.Camera.Infrastructure;
 using _Project.Features.Core.Application;
 using _Project.Features.Core.Domain;
 using _Project.Features.Core.Infrastructure;
+using _Project.Features.Core.Persistence.Regions;
 using _Project.Features.Cursor.Presentation;
 using _Project.Features.GameTime.Application;
 using _Project.Features.GameTime.Domain;
@@ -17,11 +18,14 @@ using _Project.Features.Player.Infrastructure;
 using _Project.Features.Player.Presentation;
 using _Project.Features.ProceduralWorld.Application.Chunks;
 using _Project.Features.ProceduralWorld.Application.Chunks.Generation;
+using _Project.Features.ProceduralWorld.Application.Persistence;
 using _Project.Features.ProceduralWorld.Application.World;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using _Project.Features.ProceduralWorld.Domain.Hydrology;
+using _Project.Features.ProceduralWorld.Domain.Persistence;
 using _Project.Features.ProceduralWorld.Domain.World;
 using _Project.Features.ProceduralWorld.Infrastructure;
+using _Project.Features.ProceduralWorld.Infrastructure.Chunks;
 using _Project.Features.ProceduralWorld.Infrastructure.Hydrology;
 using _Project.Features.ProceduralWorld.Infrastructure.Interfaces;
 using _Project.Features.ProceduralWorld.Infrastructure.Landscape;
@@ -78,6 +82,7 @@ namespace _Project.Features.Core.Bootstrap.Game
             RegisterCamera(builder);
             RegisterTickSystem(builder);
             RegisterGameTimeSystem(builder);
+            RegisterPersistence(builder);
             RegisterProceduralWorld(builder);
             RegisterCore(builder);
             RegisterUI(builder);
@@ -177,6 +182,35 @@ namespace _Project.Features.Core.Bootstrap.Game
                 .As<IInitializable>();
 
             builder.RegisterComponentInHierarchy<GameTimePresenter>();
+        }
+        
+        private void RegisterPersistence(IContainerBuilder builder)
+        {
+            builder.Register<PalRegionFileStore>(Lifetime.Singleton)
+                .As<IPalRegionReader>()
+                .As<IPalRegionWriter>();
+
+            builder.Register<ChunkDeltaSerializer>(Lifetime.Singleton);
+
+            builder.Register<ChunkDeltaStore>(Lifetime.Singleton);
+            
+            builder.RegisterInstance(new GeneratorVersionStamp(vegetationVersion: 1));
+
+            builder.Register<DirtyChunkRegistry>(Lifetime.Singleton)
+                .As<IDirtyChunkRegistry>();
+
+            builder.Register<ChunkMutationTracker>(Lifetime.Singleton)
+                .As<IChunkMutationTracker>();
+
+            builder.Register<WorldSaveService>(Lifetime.Singleton)
+                .As<IWorldSaveService>();
+
+            builder.Register<WorldAutoSaveSystem>(Lifetime.Singleton)
+                .As<ITickable>()
+                .AsSelf();
+            
+            builder.Register<DeltaApplicationStage>(Lifetime.Singleton)
+                .As<IDeltaStage>();
         }
 
         private void RegisterProceduralWorld(IContainerBuilder builder)
@@ -318,7 +352,8 @@ namespace _Project.Features.Core.Bootstrap.Game
             builder.Register<CoreGameLoop>(Lifetime.Singleton)
                 .As<IInitializable>();
             
-            builder.RegisterComponentInHierarchy<SceneSettingsPresenter>(); }
+            builder.RegisterComponentInHierarchy<SceneSettingsPresenter>(); 
+        }
 
         private void RegisterUI(IContainerBuilder builder)
         {
