@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using _Project.Features.ProceduralWorld.Application.Chunks.Generation;
+using _Project.Features.ProceduralWorld.Application.Persistence;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using _Project.Features.ProceduralWorld.Infrastructure.Chunks;
 using _Project.Features.ProceduralWorld.Infrastructure.Interfaces;
@@ -30,9 +31,11 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
 
         private readonly ILandscapeFactory _factory;
         private readonly ChunkNeighborConnector _neighborConnector;
-        
+        private readonly IDeltaStage _deltaStage;
+        private readonly IWorldSaveService _saveService;
+
         private readonly HashSet<ChunkCoordinate> _loading = new();
-        
+
         private readonly Action<ChunkGenerationResult> _applyAction;
         private readonly Action<ChunkCoordinate> _completedAction;
 
@@ -44,15 +47,21 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
             ChunkRepository repository,
             ILandscapeApplier applier,
             ILandscapeFactory factory,
-            ChunkNeighborConnector neighborConnector)
+            ChunkNeighborConnector neighborConnector,
+            IDeltaStage deltaStage,
+            IWorldSaveService saveService)
         {
             _scheduler = scheduler;
             _repository = repository;
             _factory = factory;
             _neighborConnector = neighborConnector;
+            _deltaStage = deltaStage;
+            _saveService = saveService;
             
             _applyAction = result =>
             {
+                _deltaStage.Apply(result.State.Context.Coordinate, result.State.Vegetation);
+
                 applier.Apply(result);
 
                 result.Dispose();
@@ -123,14 +132,15 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
         {
             if (!_repository.TryGet(coordinate, out ChunkInstance chunk))
                 return;
- 
+
+            _saveService.SaveChunk(coordinate); // flush pending mutations перед выгрузкой
+
             _neighborConnector.Disconnect(_repository, coordinate);
- 
             _repository.Remove(coordinate);
- 
+
             chunk.Landscape.Dispose();
             chunk.Hydrology.Dispose();
- 
+
             _factory.Release(chunk.Terrain);
         }
 
