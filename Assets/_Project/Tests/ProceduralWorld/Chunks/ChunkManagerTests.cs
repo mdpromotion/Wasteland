@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using _Project.Features.Core.Infrastructure;
 using _Project.Features.ProceduralWorld.Application.Chunks;
 using _Project.Features.ProceduralWorld.Application.Chunks.Generation;
+using _Project.Features.ProceduralWorld.Application.Persistence;
 using _Project.Features.ProceduralWorld.Domain;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
+using _Project.Features.ProceduralWorld.Domain.Vegetation;
 using _Project.Features.ProceduralWorld.Infrastructure.Chunks;
 using _Project.Features.ProceduralWorld.Infrastructure.Interfaces;
 using _Project.Features.ProceduralWorld.Presentation.Landscape;
@@ -35,7 +38,9 @@ namespace _Project.Tests.ProceduralWorld.Chunks
                     applier,
                     new FakeLandscapeFactory(),
                     new ChunkNeighborConnector(
-                        new FakeLandscapeFactory()));
+                        new FakeLandscapeFactory()),
+                    new FakeDeltaStage(),
+                    new FakeWorldSaveService());
 
             ChunkCoordinate coordinate =
                 new ChunkCoordinate(5, 10);
@@ -80,12 +85,53 @@ namespace _Project.Tests.ProceduralWorld.Chunks
                     new RecordingApplier(),
                     new FakeLandscapeFactory(),
                     new ChunkNeighborConnector(
-                        new FakeLandscapeFactory()));
+                        new FakeLandscapeFactory()),
+                    new FakeDeltaStage(),
+                    new FakeWorldSaveService());
 
             manager.QueueLoad(coordinate);
             manager.Tick();
 
             Assert.That(generator.Requests, Is.Empty);
+        }
+        
+        private sealed class SpyDeltaStage : IDeltaStage
+        {
+            public readonly List<ChunkCoordinate> AppliedFor = new();
+
+            public void Apply(ChunkCoordinate coordinate, VegetationData vegetation) =>
+                AppliedFor.Add(coordinate);
+        }
+
+        private sealed class SpyWorldSaveService : IWorldSaveService
+        {
+            public readonly List<ChunkCoordinate> SavedChunks = new();
+
+            public event Action<ChunkCoordinate> ChunkSaved;
+            public event Action WorldSaved;
+
+            public void SaveChunk(ChunkCoordinate coord) => SavedChunks.Add(coord);
+            public void SaveAllDirty() { }
+        }
+
+        [Test]
+        public void Unload_ChunkNotInRepository_DoesNotCallSaveChunk()
+        {
+            var repository = new ChunkRepository();
+            var saveService = new SpyWorldSaveService();
+
+            var manager = new ChunkManager(
+                new ChunkGenerationScheduler(new RecordingGenerator(), new UnlimitedFrameBudget()),
+                repository,
+                new RecordingApplier(),
+                new FakeLandscapeFactory(),
+                new ChunkNeighborConnector(new FakeLandscapeFactory()),
+                new FakeDeltaStage(),
+                saveService);
+
+            manager.Unload(new ChunkCoordinate(50, 50));
+
+            Assert.IsEmpty(saveService.SavedChunks);
         }
 
         private sealed class RecordingGenerator : IChunkGenerator
@@ -139,12 +185,35 @@ namespace _Project.Tests.ProceduralWorld.Chunks
             }
         }
 
+        private sealed class FakeDeltaStage : IDeltaStage
+        {
+            public void Apply(
+                ChunkCoordinate coordinate,
+                _Project.Features.ProceduralWorld.Domain.Vegetation.VegetationData vegetation)
+            {
+            }
+        }
+
+        private sealed class FakeWorldSaveService : IWorldSaveService
+        {
+            public event Action<ChunkCoordinate> ChunkSaved;
+            public event Action WorldSaved;
+
+            public void SaveChunk(ChunkCoordinate coord)
+            {
+            }
+
+            public void SaveAllDirty()
+            {
+            }
+        }
+
         private sealed class FakeLandscapeFactory :
             ILandscapeFactory
         {
             public Terrain Create(ChunkCoordinate coordinate, Transform parent)
             {
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
 
             public void Connect(
@@ -158,12 +227,10 @@ namespace _Project.Tests.ProceduralWorld.Chunks
 
             public void Show(Terrain terrain)
             {
-                
             }
 
             public void Release(Terrain terrain)
             {
-                
             }
         }
     }
