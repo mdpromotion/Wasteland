@@ -222,6 +222,7 @@ namespace _Project.Tests.ProceduralWorld.Vegetation
 
                 VegetationCandidateJob candidateJob = new VegetationCandidateJob(
                     resolution,
+                    12,
                     chunkCoordinate,
                     parameters,
                     heights,
