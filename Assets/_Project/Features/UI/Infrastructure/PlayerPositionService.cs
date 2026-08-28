@@ -10,11 +10,13 @@ namespace _Project.Features.UI.Infrastructure
     {
         WorldPosition GetPlayerPosition();
         ChunkCoordinate GetCurrentChunkCoordinate();
+        
+        WorldPosition ToWorldPosition(Vector3 localUnityPosition);
     }
-    
+
     public class PlayerPositionService : IPlayerPositionService
     {
-        private readonly ChunkGrid  _chunkGrid;
+        private readonly ChunkGrid _chunkGrid;
         private readonly IPlayerReadOnly _player;
 
         public PlayerPositionService(ChunkGrid chunkGrid, IPlayerReadOnly player)
@@ -24,17 +26,22 @@ namespace _Project.Features.UI.Infrastructure
         }
 
         public WorldPosition GetPlayerPosition()
-        {
-            ChunkCoordinate currentChunk = _chunkGrid.OriginCoordinate;;
-            Vector3 playerPosition = _player.Position;
-            
-            var worldPosition = GenerationSpace.AbsoluteChunkOrigin(
-                currentChunk, _chunkGrid.ChunkSizeX, _chunkGrid.ChunkSizeZ);;
-            
-            return new WorldPosition(worldPosition.x + _player.Position.x, playerPosition.y, worldPosition.y + _player.Position.z);
-        }
+            => ToWorldPosition(_player.Position);
 
         public ChunkCoordinate GetCurrentChunkCoordinate()
             => _chunkGrid.ToChunkCoordinate(_player.Position);
+
+        public WorldPosition ToWorldPosition(Vector3 localUnityPosition)
+        {
+            ChunkCoordinate currentOrigin = _chunkGrid.OriginCoordinate;
+
+            var originAbs = GenerationSpace.AbsoluteChunkOrigin(
+                currentOrigin, _chunkGrid.ChunkSizeX, _chunkGrid.ChunkSizeZ);
+
+            return new WorldPosition(
+                originAbs.x + localUnityPosition.x,
+                localUnityPosition.y,
+                originAbs.y + localUnityPosition.z);
+        }
     }
 }

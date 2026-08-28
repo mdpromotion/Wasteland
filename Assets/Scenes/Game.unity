@@ -2197,6 +2197,7 @@ GameObject:
   - component: {fileID: 1508698442}
   - component: {fileID: 1508698441}
   - component: {fileID: 1508698445}
+  - component: {fileID: 1508698454}
   - component: {fileID: 1508698446}
   - component: {fileID: 1508698448}
   - component: {fileID: 1508698450}
@@ -2424,6 +2425,24 @@ MonoBehaviour:
   _sprintStepDistance: 6.5
   _crouchStepDistance: 1.4
   _minSpeedForStep: 0
+--- !u!114 &1508698454
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1508698440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cbe633a6c2b4e108290f4f1b8828f5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Project.Features.Player.Infrastructure.PlayerBreakableInteractor
+  _interval: 1
+  _rayDistance: 5
+  _searchRadius: 5
+  _raycastMask:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!1 &1652573605
 GameObject:
   m_ObjectHideFlags: 0

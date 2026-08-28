@@ -12,6 +12,7 @@ using _Project.Features.ProceduralWorld.Infrastructure.Landscape;
 using _Project.Features.ProceduralWorld.Infrastructure.Vegetation;
 using _Project.Features.ProceduralWorld.Infrastructure.Vegetation.Configs;
 using System.Collections.Generic;
+using _Project.Features.ProceduralWorld.Infrastructure.Chunks;
 using _Project.Features.ProceduralWorld.Presentation.Hydrology;
 using _Project.Features.ProceduralWorld.Presentation.Landscape;
 using _Project.Features.ProceduralWorld.Presentation.Vegetation;
@@ -114,6 +115,12 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
             builder.Register<ChunkGenerationPipeline>(Lifetime.Singleton)
                 .AsSelf()
                 .As<IChunkGenerator>();
+            
+            builder.Register<WorldSpaceConverter>(Lifetime.Singleton)
+                .As<IWorldSpaceConverter>();
+            
+            builder.Register<BreakableQueryService>(Lifetime.Singleton)
+                .As<IBreakableQuery>();
 
             builder.RegisterBuildCallback(container =>
             {

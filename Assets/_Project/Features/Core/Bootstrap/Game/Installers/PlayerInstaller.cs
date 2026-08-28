@@ -5,6 +5,7 @@ using _Project.Features.Player.Infrastructure;
 using _Project.Features.Player.Presentation;
 using _Project.Features.ProceduralWorld.Application.Chunks;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
+using _Project.Features.ProceduralWorld.Domain.Vegetation;
 using _Project.Features.ProceduralWorld.Infrastructure.Hydrology;
 using UnityEngine;
 using VContainer;
@@ -62,6 +63,7 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
 
             builder.RegisterInstance(playerSoundSet);
 
+            builder.RegisterComponentInHierarchy<PlayerBreakableInteractor>();
             builder.RegisterComponentInHierarchy<FootstepController>();
         }
     }
