@@ -288,6 +288,7 @@ namespace _Project.Tests.ProceduralWorld.World
                 new ChunkCoordinate(x, y),
                 null,
                 null,
+                null,
                 null);
         }
 

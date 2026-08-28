@@ -90,6 +90,7 @@ namespace _Project.Tests.ProceduralWorld.Chunks
                 coordinate,
                 null,
                 null,
+                null,
                 null);
         }
     }
