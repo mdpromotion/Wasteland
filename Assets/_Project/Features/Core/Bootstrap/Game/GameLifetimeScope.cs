@@ -1,51 +1,12 @@
-using System.Collections.Generic;
-using _Project.Features.Camera.Application;
-using _Project.Features.Camera.Infrastructure;
-using _Project.Features.Core.Application;
-using _Project.Features.Core.Domain;
-using _Project.Features.Core.Infrastructure;
-using _Project.Features.Core.Persistence.Regions;
-using _Project.Features.Cursor.Presentation;
-using _Project.Features.GameTime.Application;
-using _Project.Features.GameTime.Domain;
-using _Project.Features.GameTime.Presentation;
-using _Project.Features.Graphics.Domain;
-using _Project.Features.Graphics.Presentation;
-using _Project.Features.Player.Application;
-using _Project.Features.Player.Application.UseCases;
-using _Project.Features.Player.Domain;
+using _Project.Features.Core.Bootstrap.Game.Installers;
 using _Project.Features.Player.Infrastructure;
-using _Project.Features.Player.Presentation;
-using _Project.Features.ProceduralWorld.Application.Chunks;
-using _Project.Features.ProceduralWorld.Application.Chunks.Generation;
-using _Project.Features.ProceduralWorld.Application.Persistence;
-using _Project.Features.ProceduralWorld.Application.World;
-using _Project.Features.ProceduralWorld.Domain.Chunks;
-using _Project.Features.ProceduralWorld.Domain.Hydrology;
-using _Project.Features.ProceduralWorld.Domain.Persistence;
-using _Project.Features.ProceduralWorld.Domain.World;
-using _Project.Features.ProceduralWorld.Infrastructure;
-using _Project.Features.ProceduralWorld.Infrastructure.Chunks;
-using _Project.Features.ProceduralWorld.Infrastructure.Hydrology;
-using _Project.Features.ProceduralWorld.Infrastructure.Interfaces;
-using _Project.Features.ProceduralWorld.Infrastructure.Landscape;
-using _Project.Features.ProceduralWorld.Infrastructure.Vegetation;
 using _Project.Features.ProceduralWorld.Infrastructure.Vegetation.Configs;
-using _Project.Features.ProceduralWorld.Presentation.Hydrology;
-using _Project.Features.ProceduralWorld.Presentation.Landscape;
-using _Project.Features.ProceduralWorld.Presentation.Vegetation;
-using _Project.Features.ProceduralWorld.Presentation.World;
-using _Project.Features.Shared.Application;
-using _Project.Features.Sound.Application;
+using _Project.Features.ProceduralWorld.Domain.Hydrology;
+using _Project.Features.ProceduralWorld.Domain.World;
 using _Project.Features.Sound.Infrastructure;
-using _Project.Features.Sound.Presentation;
-using _Project.Features.Tick;
-using _Project.Features.Tick.Application;
-using _Project.Features.Tick.Domain;
-using _Project.Features.UI.Infrastructure;
-using _Project.Features.UI.Menus.DebugMenu;
-using _Project.Features.UI.Menus.InGameMenu;
-using _Project.Features.UI.Menus.SettingsMenu;
+using _Project.Features.Camera.Infrastructure;
+using _Project.Features.Core.Infrastructure;
+using _Project.Features.ProceduralWorld.Infrastructure.Hydrology;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -71,302 +32,48 @@ namespace _Project.Features.Core.Bootstrap.Game
         [Header("Player")]
         [SerializeField] private PlayerMovementConfig playerMovementConfig;
         [SerializeField] private PlayerCameraConfig playerCameraConfig;
-        
+
         [Header("Performance")]
         [SerializeField] private FrameBudgetConfig frameBudgetConfig;
 
         protected override void Configure(IContainerBuilder builder)
-        { 
-            RegisterSound(builder);
-            RegisterPlayer(builder);
-            RegisterCamera(builder);
-            RegisterTickSystem(builder);
-            RegisterGameTimeSystem(builder);
-            RegisterPersistence(builder);
-            RegisterProceduralWorld(builder);
-            RegisterCore(builder);
-            RegisterUI(builder);
-        }
-
-        private void RegisterSound(IContainerBuilder builder)
         {
-            builder.RegisterInstance(database);
+            SoundInstaller.Install(
+                builder,
+                database,
+                globalMaxVoices);
 
-            builder.Register(_ => new SoundPlaybackGuard(globalMaxVoices), Lifetime.Singleton);
+            PlayerInstaller.Install(
+                builder,
+                playerMovementConfig,
+                playerSoundSet,
+                chunkPrefab);
 
-            builder.RegisterComponentOnNewGameObject<SoundVoicePool>(Lifetime.Singleton, "SoundVoicePool");
+            CameraInstaller.Install(
+                builder,
+                playerCameraConfig);
 
-            builder.Register<SoundService>(Lifetime.Singleton)
-                .As<ISoundService>();
-        }
+            TickInstaller.Install(builder);
 
-        private void RegisterPlayer(IContainerBuilder builder)
-        {
-            builder.RegisterInstance(playerMovementConfig)
-                .AsSelf();
+            GameTimeInstaller.Install(builder);
 
-            builder.Register<GroundMovementUseCase>(Lifetime.Singleton);
+            PersistenceInstaller.Install(builder);
 
-            builder.Register<SwimmingMovementUseCase>(Lifetime.Singleton);
+            ProceduralWorldInstaller.Install(
+                builder,
+                chunkPrefab,
+                macroGridSettings,
+                riverCarvingSettings,
+                vegetationCatalog,
+                waterMaterial,
+                chunksParent,
+                worldRebaseSettings);
 
-            builder.RegisterComponentInHierarchy<PlayerStanceController>()
-                .As<IPlayerStanceState>();
+            CoreInstaller.Install(
+                builder,
+                frameBudgetConfig);
 
-            builder.RegisterComponentInHierarchy<FpsPlayerMotor>()
-                .As<IFpsPlayerMotor>();
-            
-            builder.Register<PlayerEnvironmentState>(Lifetime.Singleton)
-                .As<IPlayerEnvironmentState>()
-                .AsSelf();
-            
-            builder.Register<PlayerController>(Lifetime.Singleton)
-                .As<IFixedTickable>()
-                .As<IPlayerController>();
-            
-            builder.Register<PlayerWorldRebaseSync>(Lifetime.Singleton).AsImplementedInterfaces();
-
-            builder.RegisterComponentInHierarchy<RigidbodyPlayerState>()
-                .As<IPlayerReadOnly>();
-
-            builder.RegisterComponentInHierarchy<WaterVolumeTracker>()
-                .As<IWaterState>();
-
-            builder.RegisterComponentInHierarchy<PlayerWaterSoundController>();
-
-            builder.Register(
-                    container => new WaterQueryService(
-                        container.Resolve<ChunkGrid>(),
-                        container.Resolve<IChunkLookup>(),
-                        chunkPrefab.terrainData.size.y),
-                    Lifetime.Singleton)
-                .As<IWaterQuery>();
-
-            builder.RegisterInstance(playerSoundSet);
-            
-            builder.RegisterComponentInHierarchy<FootstepController>();
-        }
-
-        private void RegisterCamera(IContainerBuilder builder)
-        {
-            builder.RegisterInstance(playerCameraConfig);
-            
-            builder.RegisterComponentInHierarchy<CameraMotor>()
-                .As<ICameraMotor>();
-
-            builder.Register<CameraController>(Lifetime.Singleton)
-                .As<ILateTickable>();
-            
-            builder.Register<CameraWorldRebaseSync>(Lifetime.Singleton).AsImplementedInterfaces();
-        }
-        
-        private void RegisterTickSystem(IContainerBuilder builder)
-        {
-            builder.Register<TickData>(Lifetime.Singleton);
-            
-            builder.Register<TickController>(Lifetime.Singleton)
-                .As<IFixedTickable>()
-                .As<ITick>();
-
-            builder.Register<TickDebug>(Lifetime.Singleton)
-                .As<IInitializable>()
-                .AsSelf();
-        }
-
-        private void RegisterGameTimeSystem(IContainerBuilder builder)
-        {
-            builder.Register<GameTime.Domain.GameTime>(Lifetime.Singleton)
-                .As<IGameTime>()
-                .AsSelf();
-
-            builder.Register<GameTimeController>(Lifetime.Singleton)
-                .As<IInitializable>();
-
-            builder.RegisterComponentInHierarchy<GameTimePresenter>();
-        }
-        
-        private void RegisterPersistence(IContainerBuilder builder)
-        {
-            builder.Register<PalRegionFileStore>(Lifetime.Singleton)
-                .As<IPalRegionReader>()
-                .As<IPalRegionWriter>();
-
-            builder.Register<ChunkDeltaSerializer>(Lifetime.Singleton);
-
-            builder.Register<ChunkDeltaStore>(Lifetime.Singleton);
-            
-            builder.RegisterInstance(new GeneratorVersionStamp(vegetationVersion: 1));
-
-            builder.Register<DirtyChunkRegistry>(Lifetime.Singleton)
-                .As<IDirtyChunkRegistry>();
-
-            builder.Register<ChunkMutationTracker>(Lifetime.Singleton)
-                .As<IChunkMutationTracker>();
-
-            builder.Register<WorldSaveService>(Lifetime.Singleton)
-                .As<IWorldSaveService>();
-
-            builder.Register<WorldAutoSaveSystem>(Lifetime.Singleton)
-                .As<ITickable>()
-                .AsSelf();
-            
-            builder.Register<DeltaApplicationStage>(Lifetime.Singleton)
-                .As<IDeltaStage>();
-        }
-
-        private void RegisterProceduralWorld(IContainerBuilder builder)
-        {
-            builder.RegisterInstance(macroGridSettings);
-            builder.RegisterInstance(riverCarvingSettings);
-            builder.RegisterInstance(worldRebaseSettings);
-            builder.RegisterInstance(vegetationCatalog);
-
-            // Grid / caches
-            builder.Register(
-                    container => new ChunkGrid(
-                        chunkPrefab.terrainData.size.x,
-                        chunkPrefab.terrainData.size.z),
-                    Lifetime.Singleton);
-
-            builder.Register<MacroRegionCache>(Lifetime.Singleton);
-
-            builder.Register<ChunkRepository>(Lifetime.Singleton)
-                .As<IChunkLookup>()
-                .AsSelf();
-
-            // Appliers
-            builder.Register(
-                    container => new WaterSurfaceApplier(
-                        container.Resolve<ChunkGrid>(),
-                        chunkPrefab.terrainData.size.y,
-                        waterMaterial),
-                    Lifetime.Singleton)
-                .As<IWaterSurfaceApplier>();
-
-            builder.Register<VegetationApplier>(Lifetime.Singleton);
-
-            builder.Register<TerrainNoiseSettingsProvider>(Lifetime.Singleton);
-            
-            builder.Register<VegetationSettingsProvider>(Lifetime.Singleton);
-
-            builder.Register<UnityTerrainWriter>(Lifetime.Singleton)
-                .As<ITerrainWriter>();
-
-            builder.Register<ChunkNeighborConnector>(Lifetime.Singleton);
-
-            builder.Register(
-                    container => new LandscapeChunkFactory(
-                        chunkPrefab,
-                        container.Resolve<ChunkGrid>(),
-                        container.Resolve<GraphicsState>()),
-                    Lifetime.Singleton)
-                .As<ILandscapeFactory>();
-
-            builder.Register(
-                    container => new LandscapeApplier(
-                        container.Resolve<ILandscapeFactory>(),
-                        container.Resolve<ITerrainWriter>(),
-                        container.Resolve<ChunkNeighborConnector>(),
-                        container.Resolve<ChunkRepository>(),
-                        container.Resolve<IWaterSurfaceApplier>(),
-                        container.Resolve<VegetationApplier>(),
-                        chunksParent),
-                    Lifetime.Singleton)
-                .As<ILandscapeApplier>();
-
-            builder.Register<WorldRebaseApplier>(Lifetime.Singleton)
-                .As<IWorldRebaseApplier>();
-
-            // Generation pipeline
-            builder.Register<LandscapeGenerator>(Lifetime.Singleton)
-                .As<IGenerationStage>();
-
-            builder.Register(
-                    container => new HydrologyGenerator(
-                        container.Resolve<ChunkGrid>(),
-                        container.Resolve<MacroRegionCache>(),
-                        container.Resolve<MacroGridSettings>()),
-                    Lifetime.Singleton)
-                .As<IGenerationStage>();
-
-            builder.Register<WaterSurfaceStage>(Lifetime.Singleton)
-                .As<IGenerationStage>();
-            
-            builder.Register<VegetationGenerator>(Lifetime.Singleton)
-                .As<IGenerationStage>();
-
-            builder.Register<ChunkGenerationPipeline>(Lifetime.Singleton)
-                .AsSelf()
-                .As<IChunkGenerator>();
-
-            builder.RegisterBuildCallback(container =>
-            {
-                ChunkGenerationPipeline pipeline = container.Resolve<ChunkGenerationPipeline>();
-
-                foreach (IGenerationStage stage in container.Resolve<IEnumerable<IGenerationStage>>())
-                {
-                    pipeline.Add(stage);
-                }
-            });
-
-            // Streaming / management
-            builder.Register<ChunkGenerationScheduler>(Lifetime.Singleton);
-
-            builder.Register<ChunkManager>(Lifetime.Singleton)
-                .As<IChunkManager>()
-                .As<ITickable>()
-                .AsSelf();
-            
-            builder.Register<WorldRebaseService>(Lifetime.Singleton);
-
-            builder.Register(
-                container => new WorldStreamer(
-                    container.Resolve<ChunkManager>(),
-                    container.Resolve<ChunkGrid>(),
-                    container.Resolve<IPlayerReadOnly>(),
-                    container.Resolve<GraphicsState>(),
-                    container.Resolve<WorldRebaseService>()),
-                Lifetime.Singleton)
-                .As<IInitializable>()
-                .As<ITickable>();
-        }
-        
-        private void RegisterCore(IContainerBuilder builder)
-        {
-            builder.Register<GameState>(Lifetime.Singleton)
-                .As<IGameStateController>()
-                .As<IGameState>();
-            
-            builder.RegisterInstance(frameBudgetConfig);
-
-            builder.Register<FrameBudget>(
-                    Lifetime.Singleton)
-                .As<IFrameBudget>()
-                .As<ITickable>();
-
-            builder.Register<CursorLockService>(Lifetime.Singleton)
-                .As<ICursorService>();
-            
-            builder.Register<CoreTimeService>(Lifetime.Singleton)
-                .As<IInitializable>();
-            
-            builder.Register<CoreGameLoop>(Lifetime.Singleton)
-                .As<IInitializable>();
-            
-            builder.RegisterComponentInHierarchy<SceneSettingsPresenter>(); 
-        }
-
-        private void RegisterUI(IContainerBuilder builder)
-        {
-            builder.Register<FPSCounter>(Lifetime.Singleton)
-                .As<ITickable>()
-                .As<IFPSCounter>();
-
-            builder.Register<PlayerPositionService>(Lifetime.Singleton)
-                .As<IPlayerPositionService>();
-            
-            builder.RegisterComponentInHierarchy<DebugMenuPresenter>();
-            builder.RegisterComponentInHierarchy<InGameMenuPresenter>();
-            builder.RegisterComponentInHierarchy<SettingsMenuPresenter>();
+            UIInstaller.Install(builder);
         }
     }
 }
