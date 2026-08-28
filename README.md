@@ -12,6 +12,12 @@
 
 The player wakes up in a ruined world and has to survive against everything it throws at them — hostile creatures ranging from desperate survivors to mutated horrors, each with distinct combat behavior. There is no fixed map: the world is endless and generated on the fly, dotted with structures worth raiding for loot and **Knowledge** — a core progression mechanic that permanently improves the character (strength, crafting speed, and more). Combat is built around a risk/noise trade-off: quiet, low-durability melee weapons like bats and crowbars versus loud, ammo-hungry firearms that can pull every nearby threat straight to you. The game leans heavily into RPG systems and survival tension.
 
+## 🎥 Gameplay Demos
+
+A collection of technical and gameplay demos showcasing the current state of **Wasteland** — procedural world generation, exploration, water, vegetation, lighting, and other systems.
+
+**[▶ Watch the Wasteland Demo Playlist](https://youtube.com/playlist?list=PLQoi69tn3_QY&si=0sbZkD2x2PrQOACd)**
+
 ## 🚀 Core Technologies & Approach
 
 - **Clean Architecture + MVP** — modular separation between gameplay logic, infrastructure, and presentation.
@@ -59,6 +65,12 @@ The player wakes up in a ruined world and has to survive against everything it t
 ## Концепт
 
 Игрок оказывается в разрушенном мире и вынужден выживать в ужасающих условиях. Повсюду его поджидают враждебные существа — от отчаявшихся выживших до мутантов с уникальным боевым поведением. Фиксированной карты нет: мир бесконечен и генерируется на лету, а по пути встречаются структуры, которые стоит обыскать ради лута и **Знаний** — ключевой механики прогрессии, которая постоянно улучшает персонажа (сила, скорость крафта и многое другое). Бой строится на балансе тишины и шума: тихое, но хрупкое ближнее оружие вроде бит и ломов против громкого огнестрела, требующего патроны и способного привлечь всех тварей поблизости. Игра имеет сильный уклон в RPG и выживание.
+
+## 🎥 Демо игрового процесса
+
+Плейлист с техническими и игровыми демо, демонстрирующими текущее состояние **Wasteland** — процедурную генерацию мира, исследование, воду, растительность, освещение и другие системы.
+
+**[▶ Смотреть демо Wasteland](https://youtube.com/playlist?list=PLQoi69tn3_QY&si=0sbZkD2x2PrQOACd)**
 
 ## 🚀 Основные технологии и подход
 
