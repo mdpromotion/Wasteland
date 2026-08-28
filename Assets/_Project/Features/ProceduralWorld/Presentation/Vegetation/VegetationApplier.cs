@@ -9,6 +9,7 @@ namespace _Project.Features.ProceduralWorld.Presentation.Vegetation
     public class VegetationApplier
     {
         private readonly VegetationSettingsProvider _provider;
+        private readonly ChunkGrid _chunkGrid;
 
         private readonly Dictionary<VegetationSpeciesType, IReadOnlyList<GameObject>> _prefabCache;
         
@@ -16,9 +17,10 @@ namespace _Project.Features.ProceduralWorld.Presentation.Vegetation
         private const int MaxDetailCoverage = 255;
         private const float CoverageContributionPerInstance = 48f;
 
-        public VegetationApplier(VegetationSettingsProvider provider)
+        public VegetationApplier(VegetationSettingsProvider provider, ChunkGrid chunkGrid)
         {
             _provider = provider;
+            _chunkGrid = chunkGrid;
             _prefabCache = new Dictionary<VegetationSpeciesType, IReadOnlyList<GameObject>>();
         }
 
@@ -32,7 +34,7 @@ namespace _Project.Features.ProceduralWorld.Presentation.Vegetation
             terrainData.treeInstances = System.Array.Empty<TreeInstance>();
             TerrainCollider terrainCollider = EnsureTreeCollider(terrain);
 
-            int resolution = state.Landscape.Resolution;
+            int resolution = (int)_chunkGrid.ChunkSizeX;
             float terrainHeight = terrainData.size.y;
 
             ApplyTrees(state, terrainData, resolution, terrainHeight);
