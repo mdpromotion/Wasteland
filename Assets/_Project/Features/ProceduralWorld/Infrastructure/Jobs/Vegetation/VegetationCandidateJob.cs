@@ -108,7 +108,8 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Jobs.Vegetation
                 Id = VegetationInstanceIdUtility.FromGlobalCell(globalCell),
                 Position = new float3(localX, height, localZ),
                 Rotation = rotation,
-                Scale = scale
+                Scale = scale,
+                IsBreakable = _species.IsBreakable
             };
 
             _candidateMask[index] = 1;
