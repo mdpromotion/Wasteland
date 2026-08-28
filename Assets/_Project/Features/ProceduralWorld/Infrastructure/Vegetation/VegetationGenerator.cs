@@ -15,14 +15,16 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Vegetation
     {
         private readonly VegetationSettingsProvider _settingsProvider;
         private readonly IWorldSettings _worldSettings;
+        private readonly ChunkGrid _chunkGrid;
 
         private List<(VegetationSpeciesType Species, VegetationGenerationParams Params)> _speciesInPriorityOrder;
         private bool _isPrioritized = false;
 
-        public VegetationGenerator(VegetationSettingsProvider settingsProvider, IWorldSettings worldSettings)
+        public VegetationGenerator(VegetationSettingsProvider settingsProvider, IWorldSettings worldSettings, ChunkGrid chunkGrid)
         {
             _worldSettings = worldSettings;
             _settingsProvider = settingsProvider;
+            _chunkGrid =  chunkGrid;
             _speciesInPriorityOrder = new List<(VegetationSpeciesType, VegetationGenerationParams)>();
         }
 
@@ -32,6 +34,9 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Vegetation
             int2 chunkCoordinate = new int2(context.Coordinate.X, context.Coordinate.Y);
 
             int resolution = state.Landscape.Resolution;
+            float chunkWorldSize = _chunkGrid.ChunkSizeX;
+            
+            float cellSize = chunkWorldSize / (resolution - 1);
             int cellCount = resolution * resolution;
 
             NativeArray<byte> occupancy = new NativeArray<byte>(
@@ -59,6 +64,7 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Vegetation
 
                 VegetationCandidateJob candidateJob = new VegetationCandidateJob(
                     resolution,
+                    cellSize,
                     chunkCoordinate,
                     generationParams,
                     state.Landscape.Heights,

@@ -24,9 +24,12 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Jobs.Vegetation
 
         [WriteOnly] private NativeArray<VegetationInstanceData> _candidates;
         [WriteOnly] private NativeArray<byte> _candidateMask;
+        
+        [ReadOnly] private readonly float _cellSize;
 
         public VegetationCandidateJob(
             int resolution,
+            float cellSize, 
             int2 chunkCoordinate,
             VegetationGenerationParams species,
             NativeArray<float> heights,
@@ -38,6 +41,7 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Jobs.Vegetation
             NativeArray<byte> candidateMask)
         {
             _resolution = resolution;
+            _cellSize = cellSize;
             _chunkCoordinate = chunkCoordinate;
             _species = species;
             _heights = heights;
@@ -106,10 +110,10 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Jobs.Vegetation
             _candidates[index] = new VegetationInstanceData
             {
                 Id = VegetationInstanceIdUtility.FromGlobalCell(globalCell),
-                Position = new float3(localX, height, localZ),
+                Position = new float3(localX * _cellSize, height, localZ * _cellSize),
                 Rotation = rotation,
                 Scale = scale,
-                IsBreakable = _species.IsBreakable
+                //IsBreakable = _species.IsBreakable // temporary
             };
 
             _candidateMask[index] = 1;
