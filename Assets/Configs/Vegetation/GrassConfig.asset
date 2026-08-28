@@ -17,8 +17,8 @@ MonoBehaviour:
   - {fileID: 3996119203810107092, guid: 8346c551980ac4849839561d1cb2af15, type: 3}
   - {fileID: 3996119203810107092, guid: 40a45ec83daf93a459fcfcb2f0d0bf73, type: 3}
   speciesType: 1
-  coverage: 0.65
-  density: 1
+  coverage: 0.75
+  density: 1.5
   edgeSmooting: 1
   minScale: 25
   maxScale: 100
