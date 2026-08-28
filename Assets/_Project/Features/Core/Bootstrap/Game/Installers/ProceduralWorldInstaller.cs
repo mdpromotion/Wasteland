@@ -1,15 +1,11 @@
 using _Project.Features.Graphics.Domain;
-using _Project.Features.Player.Domain;
 using _Project.Features.ProceduralWorld.Application.Chunks;
 using _Project.Features.ProceduralWorld.Application.Chunks.Generation;
-using _Project.Features.ProceduralWorld.Application.Persistence;
 using _Project.Features.ProceduralWorld.Application.World;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using _Project.Features.ProceduralWorld.Domain.Hydrology;
-using _Project.Features.ProceduralWorld.Domain.Persistence;
 using _Project.Features.ProceduralWorld.Domain.World;
 using _Project.Features.ProceduralWorld.Infrastructure;
-using _Project.Features.ProceduralWorld.Infrastructure.Chunks;
 using _Project.Features.ProceduralWorld.Infrastructure.Hydrology;
 using _Project.Features.ProceduralWorld.Infrastructure.Interfaces;
 using _Project.Features.ProceduralWorld.Infrastructure.Landscape;
@@ -105,13 +101,8 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
 
             builder.Register<LandscapeGenerator>(Lifetime.Singleton)
                 .As<IGenerationStage>();
-
-            builder.Register(
-                    container => new HydrologyGenerator(
-                        container.Resolve<ChunkGrid>(),
-                        container.Resolve<MacroRegionCache>(),
-                        container.Resolve<MacroGridSettings>()),
-                    Lifetime.Singleton)
+            
+            builder.Register<HydrologyGenerator>(Lifetime.Singleton)
                 .As<IGenerationStage>();
 
             builder.Register<WaterSurfaceStage>(Lifetime.Singleton)
@@ -147,14 +138,7 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
 
             builder.Register<WorldRebaseService>(Lifetime.Singleton);
 
-            builder.Register(
-                    container => new WorldStreamer(
-                        container.Resolve<ChunkManager>(),
-                        container.Resolve<ChunkGrid>(),
-                        container.Resolve<IPlayerReadOnly>(),
-                        container.Resolve<GraphicsState>(),
-                        container.Resolve<WorldRebaseService>()),
-                    Lifetime.Singleton)
+            builder.Register<WorldStreamer>(Lifetime.Singleton)
                 .As<IInitializable>()
                 .As<ITickable>();
         }
