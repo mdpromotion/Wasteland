@@ -6,5 +6,6 @@ namespace _Project.Features.Player.Domain
     {
         Vector3 Position { get; }
         Vector3 Velocity { get; }
+        Vector3 Forward { get; }
     }
 }

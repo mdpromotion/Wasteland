@@ -28,5 +28,5 @@ MonoBehaviour:
   patchNoiseOctaves: 1
   priority: 20
   occupancyRadius: 0
-  isBreakable: 1
+  isBreakable: 0
   isDetail: 1

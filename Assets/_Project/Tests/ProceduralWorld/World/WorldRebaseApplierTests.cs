@@ -21,6 +21,7 @@ namespace _Project.Tests.ProceduralWorld.World
                 new ChunkCoordinate(0, 0),
                 null,
                 null,
+                null,
                 terrain);
 
             var applier = new WorldRebaseApplier();
@@ -43,6 +44,7 @@ namespace _Project.Tests.ProceduralWorld.World
         {
             var chunk = new ChunkInstance(
                 new ChunkCoordinate(0, 0),
+                null,
                 null,
                 null,
                 null);

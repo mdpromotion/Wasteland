@@ -40,6 +40,7 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Vegetation
                     PatchNoiseFrequency = config.PatchNoiseFrequency,
                     PatchNoiseOctaves = config.PatchNoiseOctaves,
                     Priority = config.Priority,
+                    IsBreakable = config.IsBreakable,
                     OccupancyRadius = config.OccupancyRadius
                 };
                 

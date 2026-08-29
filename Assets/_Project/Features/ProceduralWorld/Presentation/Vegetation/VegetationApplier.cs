@@ -29,6 +29,14 @@ namespace _Project.Features.ProceduralWorld.Presentation.Vegetation
             if (state.Vegetation == null)
                 return;
 
+            Apply(state.Vegetation, terrain);
+        }
+
+        public void Apply(VegetationData vegetation, Terrain terrain)
+        {
+            if (vegetation == null)
+                return;
+
             TerrainData terrainData = terrain.terrainData;
 
             terrainData.treeInstances = System.Array.Empty<TreeInstance>();
@@ -37,14 +45,14 @@ namespace _Project.Features.ProceduralWorld.Presentation.Vegetation
             int resolution = (int)_chunkGrid.ChunkSizeX;
             float terrainHeight = terrainData.size.y;
 
-            ApplyTrees(state, terrainData, resolution, terrainHeight);
-            ApplyDetails(state, terrainData, resolution);
+            ApplyTrees(vegetation, terrainData, resolution, terrainHeight);
+            ApplyDetails(vegetation, terrainData, resolution);
 
             RefreshTreeColliders(terrainCollider);
         }
 
         private void ApplyTrees(
-            ChunkGenerationState state,
+            VegetationData vegetationData,
             TerrainData terrainData,
             int resolution,
             float terrainHeight)
@@ -52,7 +60,7 @@ namespace _Project.Features.ProceduralWorld.Presentation.Vegetation
             List<TreePrototype> prototypes = new();
             Dictionary<VegetationSpeciesType, int[]> speciesPrototypeIndices = new();
 
-            foreach (var layer in state.Vegetation.Layers)
+            foreach (var layer in vegetationData.Layers)
             {
                 if (layer == null || layer.Instances.Length == 0)
                     continue;
@@ -88,7 +96,7 @@ namespace _Project.Features.ProceduralWorld.Presentation.Vegetation
 
             List<TreeInstance> treeInstances = new();
 
-            foreach (var layer in state.Vegetation.Layers)
+            foreach (var layer in vegetationData.Layers)
             {
                 if (layer == null || layer.Instances.Length == 0)
                     continue;
@@ -125,7 +133,7 @@ namespace _Project.Features.ProceduralWorld.Presentation.Vegetation
         }
 
         private void ApplyDetails(
-            ChunkGenerationState state,
+            VegetationData vegetationData,
             TerrainData terrainData,
             int resolution)
         {
@@ -141,7 +149,7 @@ namespace _Project.Features.ProceduralWorld.Presentation.Vegetation
 
             bool hasAnyDetailLayer = false;
 
-            foreach (var layer in state.Vegetation.Layers)
+            foreach (var layer in vegetationData.Layers)
             {
                 if (layer == null || layer.Instances.Length == 0) continue;
                 if (_provider.GetRenderKind(layer.Species) != VegetationRenderKind.Detail) continue;
@@ -223,7 +231,7 @@ namespace _Project.Features.ProceduralWorld.Presentation.Vegetation
             foreach (var (species, variantIndex, map) in pendingMaps)
                 mapLookup[(species, variantIndex)] = map;
 
-            foreach (var layer in state.Vegetation.Layers)
+            foreach (var layer in vegetationData.Layers)
             {
                 if (layer == null || layer.Instances.Length == 0) continue;
                 if (!speciesLayerIndices.TryGetValue(layer.Species, out int[] layerIndices)) continue;

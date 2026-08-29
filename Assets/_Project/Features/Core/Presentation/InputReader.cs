@@ -7,6 +7,8 @@ namespace _Project.Features.Core.Presentation
 {
     public interface IPlayerInputReader
     {
+        bool LeftMouseButtonPressed { get; }
+        bool RightMouseButtonPressed { get; }
         Vector2 Move { get; }
         Vector2 Look { get; }
         bool JumpPressed { get; }
@@ -32,6 +34,8 @@ namespace _Project.Features.Core.Presentation
             _inputActions = inputActions;
         }
 
+        public bool LeftMouseButtonPressed => _inputActions.Player.LeftMouse.IsPressed();
+        public bool RightMouseButtonPressed => _inputActions.Player.RightMouse.IsPressed();
         public Vector2 Move => _inputActions.Player.Move.ReadValue<Vector2>();
         public Vector2 Look => _inputActions.Player.Look.ReadValue<Vector2>();
         public bool JumpPressed => _inputActions.Player.Jump.IsPressed();

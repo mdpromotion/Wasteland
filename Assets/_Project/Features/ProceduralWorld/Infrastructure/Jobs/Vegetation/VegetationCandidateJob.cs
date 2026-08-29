@@ -106,6 +106,12 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Jobs.Vegetation
 
             float scale = random.NextFloat(_species.MinScale, _species.MaxScale);
             float rotation = random.NextFloat(0f, math.PI * 2f);
+            
+            float offsetX = random.NextFloat(0f, 1f);
+            float offsetZ = random.NextFloat(0f, 1f);
+            
+            float posX = localX + offsetX;
+            float posZ = localZ + offsetZ;
 
             _candidates[index] = new VegetationInstanceData
             {
@@ -113,7 +119,7 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Jobs.Vegetation
                 Position = new float3(localX * _cellSize, height, localZ * _cellSize),
                 Rotation = rotation,
                 Scale = scale,
-                //IsBreakable = _species.IsBreakable // temporary
+                IsBreakable = _species.IsBreakable
             };
 
             _candidateMask[index] = 1;

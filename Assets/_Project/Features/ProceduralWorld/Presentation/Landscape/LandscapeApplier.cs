@@ -57,7 +57,7 @@ namespace _Project.Features.ProceduralWorld.Presentation.Landscape
             _waterSurfaceApplier.Apply(state, terrain);
             _vegetationApplier.Apply(state, terrain);
 
-            ChunkInstance chunk = new ChunkInstance(data.Coordinate, data, state.Hydrology, terrain);
+            ChunkInstance chunk = new ChunkInstance(data.Coordinate, data, state.Hydrology, state.Vegetation, terrain);
 
             _repository.Add(chunk);
             _neighborConnector.Connect(_repository, data.Coordinate);

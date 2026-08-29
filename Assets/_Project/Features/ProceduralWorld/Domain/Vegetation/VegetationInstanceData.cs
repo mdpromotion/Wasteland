@@ -23,6 +23,11 @@ namespace _Project.Features.ProceduralWorld.Domain.Vegetation
         public float Scale;
 
         /// <summary>
+        /// Can be broken by the player.
+        /// </summary>
+        public bool IsBreakable;
+
+        /// <summary>
         /// Stable deterministic identifier derived from the global cell.
         /// Species is part of the full identity because instances are grouped by species layer.
         /// </summary>
