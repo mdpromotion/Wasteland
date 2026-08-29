@@ -1,3 +1,4 @@
+using _Project.Features.Interaction.Infrastructure;
 using _Project.Features.Player.Application;
 using _Project.Features.Player.Application.UseCases;
 using _Project.Features.Player.Domain;
@@ -62,8 +63,14 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
                 .As<IWaterQuery>();
 
             builder.RegisterInstance(playerSoundSet);
+            
+            builder.Register<BreakableHitHandler>(Lifetime.Singleton).
+                As<IHitHandler>()
+                .AsSelf();
 
-            builder.RegisterComponentInHierarchy<PlayerBreakableInteractor>();
+            builder.RegisterComponentInHierarchy<PlayerInteractionController>()
+                .As<IPlayerInteractionController>();
+            
             builder.RegisterComponentInHierarchy<FootstepController>();
         }
     }

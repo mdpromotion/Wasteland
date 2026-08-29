@@ -119,7 +119,7 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Jobs.Vegetation
                 Position = new float3(localX * _cellSize, height, localZ * _cellSize),
                 Rotation = rotation,
                 Scale = scale,
-                //IsBreakable = _species.IsBreakable // temporary
+                IsBreakable = _species.IsBreakable
             };
 
             _candidateMask[index] = 1;

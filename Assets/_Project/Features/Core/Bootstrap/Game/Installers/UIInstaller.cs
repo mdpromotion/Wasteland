@@ -1,5 +1,6 @@
 using _Project.Features.Core.Infrastructure;
 using _Project.Features.Player.Application;
+using _Project.Features.UI.Hud.CooldownBar;
 using _Project.Features.UI.Infrastructure;
 using _Project.Features.UI.Menus.DebugMenu;
 using _Project.Features.UI.Menus.InGameMenu;
@@ -19,6 +20,8 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
 
             builder.Register<PlayerPositionService>(Lifetime.Singleton)
                 .As<IPlayerPositionService>();
+
+            builder.RegisterComponentInHierarchy<CooldownBarPresenter>();
 
             builder.RegisterComponentInHierarchy<DebugMenuPresenter>();
 

@@ -1,6 +1,6 @@
 using System;
-using _Project.Features.Interaction.Infrastructure;
 using _Project.Features.ProceduralWorld.Application.Chunks;
+using _Project.Features.ProceduralWorld.Application.Persistence;
 using _Project.Features.ProceduralWorld.Domain.Vegetation;
 using _Project.Features.ProceduralWorld.Domain.World;
 using _Project.Features.ProceduralWorld.Infrastructure.Chunks;
@@ -9,64 +9,72 @@ using _Project.Features.ProceduralWorld.Presentation.Vegetation;
 using _Project.Features.UI.Infrastructure;
 using UnityEngine;
 
-public sealed class BreakableHitHandler : IHitHandler
+namespace _Project.Features.Interaction.Infrastructure
 {
-    private readonly IPlayerPositionService _playerPositionService;
-    private readonly IBreakableQuery _breakableQuery;
-    private readonly IBreakableTreeHealthService _healthService;
-    private readonly IChunkLookup _chunkLookup;
-    private readonly VegetationApplier _vegetationApplier;
-
-    private readonly int _breakableLayer;
-    private readonly float _searchRadius;
-
-    public event Action<BreakableHit> OnBreakableFound;
-    public event Action OnNothingFound;
-    public event Action<BreakableHit> OnBreakableDestroyed;
-
-    public BreakableHitHandler(
-        IPlayerPositionService playerPositionService,
-        IBreakableQuery breakableQuery,
-        IBreakableTreeHealthService healthService,
-        IChunkLookup chunkLookup,
-        VegetationApplier vegetationApplier)
+    public sealed class BreakableHitHandler : IHitHandler
     {
-        _playerPositionService = playerPositionService;
-        _breakableQuery = breakableQuery;
-        _healthService = healthService;
-        _chunkLookup = chunkLookup;
-        _vegetationApplier = vegetationApplier;
-        _searchRadius = 5f;
+        private readonly IPlayerPositionService _playerPositionService;
+        private readonly IBreakableQuery _breakableQuery;
+        private readonly IBreakableTreeHealthService _healthService;
+        private readonly IChunkLookup _chunkLookup;
+        private readonly VegetationApplier _vegetationApplier;
+        private readonly IChunkMutationTracker _mutationTracker;
 
-        _breakableLayer = LayerMask.NameToLayer("Ground");
-    }
+        private readonly int _breakableLayer;
+        private readonly float _searchRadius;
 
-    public bool CanHandle(RaycastHit hit) => hit.collider.gameObject.layer == _breakableLayer;
+        public event Action<BreakableHit> OnBreakableFound;
+        public event Action OnNothingFound;
+        public event Action<BreakableHit> OnBreakableDestroyed;
 
-    public void Handle(RaycastHit hit, float damage)
-    {
-        WorldPosition absoluteHitPosition = _playerPositionService.ToWorldPosition(hit.point);
-
-        if (!_breakableQuery.TryFindBreakable(absoluteHitPosition, _searchRadius, out BreakableHit breakableHit))
+        public BreakableHitHandler(
+            IPlayerPositionService playerPositionService,
+            IBreakableQuery breakableQuery,
+            IBreakableTreeHealthService healthService,
+            IChunkLookup chunkLookup,
+            VegetationApplier vegetationApplier,
+            IChunkMutationTracker mutationTracker) 
         {
-            OnNothingFound?.Invoke();
-            return;
+            _playerPositionService = playerPositionService;
+            _breakableQuery = breakableQuery;
+            _healthService = healthService;
+            _chunkLookup = chunkLookup;
+            _vegetationApplier = vegetationApplier;
+            _mutationTracker = mutationTracker;
+            _searchRadius = 5f;
+
+            _breakableLayer = LayerMask.NameToLayer("Ground");
         }
 
-        OnBreakableFound?.Invoke(breakableHit);
+        public bool CanHandle(RaycastHit hit) => hit.collider.gameObject.layer == _breakableLayer;
 
-        bool destroyed = _healthService.ApplyDamage(breakableHit, damage);
-        if (!destroyed)
-            return;
+        public void Handle(RaycastHit hit, float damage)
+        {
+            WorldPosition absoluteHitPosition = _playerPositionService.ToWorldPosition(hit.point);
 
-        if (!_chunkLookup.TryGet(breakableHit.Coordinate, out ChunkInstance chunk) || chunk.Vegetation == null)
-            return;
+            if (!_breakableQuery.TryFindBreakable(absoluteHitPosition, _searchRadius, out BreakableHit breakableHit))
+            {
+                OnNothingFound?.Invoke();
+                return;
+            }
 
-        if (!chunk.Vegetation.TryRemoveInstance(breakableHit.Species, breakableHit.Id))
-            return; // уже удалено — например, повторный удар пришёлся на кадр после срубки
+            OnBreakableFound?.Invoke(breakableHit);
 
-        _vegetationApplier.Apply(chunk.Vegetation, chunk.Terrain);
+            bool destroyed = _healthService.ApplyDamage(breakableHit, damage);
+            if (!destroyed)
+                return;
 
-        OnBreakableDestroyed?.Invoke(breakableHit);
+            if (!_chunkLookup.TryGet(breakableHit.Coordinate, out ChunkInstance chunk) || chunk.Vegetation == null)
+                return;
+
+            if (!chunk.Vegetation.TryRemoveInstance(breakableHit.Species, breakableHit.Id))
+                return;
+        
+            _mutationTracker.RecordVegetationRemoved(breakableHit.Coordinate, breakableHit.Id);
+
+            _vegetationApplier.Apply(chunk.Vegetation, chunk.Terrain);
+
+            OnBreakableDestroyed?.Invoke(breakableHit);
+        }
     }
 }

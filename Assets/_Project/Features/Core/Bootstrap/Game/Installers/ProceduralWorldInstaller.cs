@@ -12,6 +12,7 @@ using _Project.Features.ProceduralWorld.Infrastructure.Landscape;
 using _Project.Features.ProceduralWorld.Infrastructure.Vegetation;
 using _Project.Features.ProceduralWorld.Infrastructure.Vegetation.Configs;
 using System.Collections.Generic;
+using _Project.Features.ProceduralWorld.Domain.Vegetation;
 using _Project.Features.ProceduralWorld.Infrastructure.Chunks;
 using _Project.Features.ProceduralWorld.Presentation.Hydrology;
 using _Project.Features.ProceduralWorld.Presentation.Landscape;
@@ -74,6 +75,9 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
                 .As<ITerrainWriter>();
 
             builder.Register<ChunkNeighborConnector>(Lifetime.Singleton);
+            
+            builder.Register<BreakableTreeHealthService>(Lifetime.Singleton)
+                .As<IBreakableTreeHealthService>();
 
             builder.Register(
                     container => new LandscapeChunkFactory(
