@@ -34,6 +34,10 @@ namespace _Project.Features.Persistence.Infrastructure
             var path = GetPath(category);
             var tmpPath = path + ".tmp";
 
+            var directory = Path.GetDirectoryName(path);
+            if (!string.IsNullOrEmpty(directory))
+                Directory.CreateDirectory(directory);
+
             var json = JsonConvert.SerializeObject(
                 data,
                 SerializerSettings);
