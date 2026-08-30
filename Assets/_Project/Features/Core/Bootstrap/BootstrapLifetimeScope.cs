@@ -1,11 +1,7 @@
-﻿using _Project.Features.Core.Infrastructure;
-using _Project.Features.Core.Persistence;
-using _Project.Features.Core.Presentation;
-using _Project.Features.Graphics.Domain;
+﻿using _Project.Features.Core.Bootstrap.Installers;
+using _Project.Features.Core.Infrastructure;
 using _Project.Features.Graphics.Infrastucture;
-using _Project.Features.Persistence.Infrastructure;
 using _Project.Features.ProceduralWorld.Domain.World;
-using _Project.Features.UI.Application;
 using _Project.Features.UI.Infrastructure;
 using _Project.Features.UI.Menus.LoadingScreen.View;
 using UnityEngine;
@@ -24,7 +20,7 @@ namespace _Project.Features.Core.Bootstrap
         [SerializeField] private WorldSettingsConfig worldSettingsConfig;
         [SerializeField] private GraphicsConfigResolver graphicsConfigResolver;
         [SerializeField] private FogConfig fogConfig;
-        
+
         protected override void Awake()
         {
             Instance = this;
@@ -34,63 +30,19 @@ namespace _Project.Features.Core.Bootstrap
 
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.Register<FogState>(Lifetime.Singleton);
-            
-            builder.Register<GraphicsState>(Lifetime.Singleton);
+            CoreInstaller.Install(builder, sceneDatabase, loadingScreenView);
 
-            builder.Register<FogSettings>(Lifetime.Singleton)
-                .As<IFogSettings>()
-                .As<IInitializable>();
-            
-            builder.RegisterInstance(loadingScreenView);
-            builder.RegisterInstance(sceneDatabase);
-            builder.RegisterInstance(qualityConfig);
-            builder.RegisterInstance(worldSettingsConfig);
-            builder.RegisterInstance(fogConfig);
-            
-            builder.Register<WorldSettings>(Lifetime.Singleton)
-                .As<IWorldSettings>()
-                .As<IWorldSettingsController>();
-            
-            builder.Register<InputSystem_Actions>(Lifetime.Singleton);
+            InputInstaller.Install(builder);
 
-            builder.Register<InputReader>(Lifetime.Singleton)
-                .As<IPlayerInputReader>()
-                .As<IPlayerUIInputReader>()
-                .As<IInitializable>();
+            JsonPersistenceInstaller.Install(builder);
 
-            builder.Register<ILoadSceneService, LoadSceneService>(Lifetime.Singleton);
+            WorldSettingsInstaller.Install(builder, worldSettingsConfig);
 
-            builder.Register<BootstrapEntryPoint>(Lifetime.Singleton)
-                .As<IInitializable>();
-            
-            builder.Register<SceneTransitionService>(Lifetime.Singleton);
-            builder.Register<LoadSceneController>(Lifetime.Singleton);
-            
-            builder.Register<JsonFileStore>(Lifetime.Singleton)
-                .As<IJsonReader>()
-                .As<IJsonWriter>();
-            
-            builder.RegisterInstance(graphicsConfigResolver)
-                .As<IGraphicsConfigResolver>()
-                .AsSelf();
-            
-            builder.RegisterBuildCallback(container =>
-            {
-                container.Inject(graphicsConfigResolver);
-            });
-
-            builder.Register<GraphicsSettingsRepository>(Lifetime.Singleton)
-                .As<IGraphicsSettingsRepository>();
-            
-            builder.Register<UnitySettingsApplier>(Lifetime.Singleton)
-                .As<IInitializable>();
-            
-            builder.Register<FogApplier>(Lifetime.Singleton)
-                .As<IFogApplier>();
-            
-            builder.Register<FogAnimator>(Lifetime.Singleton)
-                .As<IFogAnimator>();
+            GraphicsInstaller.Install(
+                builder,
+                qualityConfig,
+                fogConfig,
+                graphicsConfigResolver);
         }
     }
 }
