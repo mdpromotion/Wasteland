@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using _Project.Features.Core.Persistence.Regions;
+using _Project.Features.Persistence.Application;
+using _Project.Features.Persistence.Domain;
 using NUnit.Framework;
 
 namespace _Project.Tests.Core.Persistence

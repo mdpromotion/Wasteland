@@ -1,4 +1,4 @@
-namespace _Project.Features.Core.Persistence.Regions
+namespace _Project.Features.Persistence.Application
 {
     public enum PalSlotState
     {

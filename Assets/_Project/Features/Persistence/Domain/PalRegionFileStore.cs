@@ -1,7 +1,9 @@
 using System;
 using System.IO;
+using _Project.Features.Persistence.Application;
+using _Project.Features.Persistence.Infrastructure;
 
-namespace _Project.Features.Core.Persistence.Regions
+namespace _Project.Features.Persistence.Domain
 {
     public class PalRegionFileStore : IPalRegionWriter, IPalRegionReader
     {

@@ -1,4 +1,4 @@
-namespace _Project.Features.Core.Persistence.Regions
+namespace _Project.Features.Persistence.Infrastructure
 {
     internal static class Crc32
     {

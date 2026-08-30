@@ -2,9 +2,8 @@ using System;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using UnityEngine;
 
-namespace _Project.Features.Core.Persistence
+namespace _Project.Features.Persistence.Infrastructure
 {
     public interface IJsonWriter
     {

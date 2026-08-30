@@ -1,8 +1,9 @@
 using System;
+using _Project.Features.Persistence.Infrastructure;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using _Project.Features.ProceduralWorld.Domain.Persistence;
 
-namespace _Project.Features.Core.Persistence.Regions
+namespace _Project.Features.Persistence.Application
 {
     public sealed class ChunkDeltaStore
     {
