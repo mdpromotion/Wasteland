@@ -15,7 +15,6 @@ namespace _Project.Features.UI.Menus.MainMenu
     public enum MenuType
     {
         WorldMenu,
-        StartGame,
         Settings
     }
 
@@ -32,28 +31,20 @@ namespace _Project.Features.UI.Menus.MainMenu
         [SerializeField] private MenuButton[] buttons;
         [SerializeField] private List<MenuEntry> menus;
         [SerializeField] private SettingsMenuView settingsMenuView;
-        [SerializeField] private SeedFieldView seedField;
         
-        private LoadSceneController _loadSceneController;
         private SceneTransitionService _sceneTransitionService;
-        private IWorldSettingsController _worldSettings;
 
-        private bool _isLoading;
         private bool _isWorldMenuVisible;
         private bool _isSettingsMenuVisible;
 
         [Inject]
-        public void Construct(LoadSceneController loadSceneController, SceneTransitionService sceneTransitionService, IWorldSettingsController worldSettings)
+        public void Construct(SceneTransitionService sceneTransitionService)
         {
-            _loadSceneController = loadSceneController;
             _sceneTransitionService = sceneTransitionService;
-            _worldSettings = worldSettings;
         }
 
         public void Start()
         {
-            _isLoading = false;
-            
             HandleWorldMenu();
             
             foreach (var button in buttons)
@@ -73,9 +64,6 @@ namespace _Project.Features.UI.Menus.MainMenu
                 case MenuType.WorldMenu:
                     HandleWorldMenu();
                     break;
-                case MenuType.StartGame:
-                    HandleStartGame();
-                    break;
                 case MenuType.Settings:
                     HandleSettings();
                     break;
@@ -87,20 +75,6 @@ namespace _Project.Features.UI.Menus.MainMenu
         {
             _isWorldMenuVisible= !_isWorldMenuVisible;
             SetMenuState(MenuType.WorldMenu, _isWorldMenuVisible);
-        }
-
-        private void HandleStartGame()
-        {
-            if (_isLoading)
-                return;
-
-            if (!seedField.TryGetSeed(out var seed))
-                seed = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
-            
-            _worldSettings.SetSeed(seed);
-            
-            _loadSceneController.LoadGameScene().Forget();
-            _isLoading = true;
         }
 
         private void HandleSettings()

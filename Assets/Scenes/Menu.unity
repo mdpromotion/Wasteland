@@ -499,7 +499,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 67153030}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a28b3441bfaee0a4b991488d080b3a07, type: 3}
   m_Name: 
@@ -4284,6 +4284,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1434069498}
   - component: {fileID: 1434069499}
+  - component: {fileID: 1434069500}
   - component: {fileID: 1434069497}
   - component: {fileID: 1434069496}
   - component: {fileID: 1434069495}
@@ -4394,7 +4395,6 @@ MonoBehaviour:
   buttons:
   - {fileID: 625430748}
   - {fileID: 582962579}
-  - {fileID: 2043364406}
   - {fileID: 1910950059}
   menus:
   - menuType: 0
@@ -4404,7 +4404,20 @@ MonoBehaviour:
     mainMenuView: {fileID: 480000151}
     isVisibleWhenActive: 1
   settingsMenuView: {fileID: 1772791278}
+--- !u!114 &1434069500
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1434069494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21883f21c5afa424380d217428fd1ad3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Project.Features.UI.Menus.MainMenu.World.WorldMenuPresenter
   seedField: {fileID: 739245686}
+  createWorldButton: {fileID: 2043364406}
 --- !u!1 &1461242542
 GameObject:
   m_ObjectHideFlags: 0
@@ -6435,10 +6448,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 2043364399}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbdba46f41a1e2343a477d7f3a8f6187, type: 3}
+  m_Script: {fileID: 11500000, guid: bd0a0b1e40d3b454d8f49c6097fbdf5a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Project.Features.UI.MainMenu.MenuButton
-  buttonType: 1
+  m_EditorClassIdentifier: Assembly-CSharp::_Project.Features.UI.Menus.MainMenu.World.CreateWorldButton
 --- !u!1 &2047127711
 GameObject:
   m_ObjectHideFlags: 0

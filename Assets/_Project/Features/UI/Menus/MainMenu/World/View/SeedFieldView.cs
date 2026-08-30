@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace _Project.Features.UI.Menus.MainMenu.View
+namespace _Project.Features.UI.Menus.MainMenu.World.View
 {
-    [RequireComponent(typeof(SeedFieldView))]
+    [RequireComponent(typeof(InputField))]
     public class SeedFieldView : MonoBehaviour
     {
         private InputField _seedField;
