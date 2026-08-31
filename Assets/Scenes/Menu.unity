@@ -6130,7 +6130,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbdba46f41a1e2343a477d7f3a8f6187, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Project.Features.UI.MainMenu.WorldMenuButton
-  buttonType: 2
+  buttonType: 1
 --- !u!114 &1910950060
 MonoBehaviour:
   m_ObjectHideFlags: 0

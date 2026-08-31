@@ -57,8 +57,10 @@ namespace _Project.Features.UI.Menus.MainMenu.World
             if (!seedField.TryGetSeed(out var seed))
                 seed = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
             
-            _worldCatalog.CreateWorld(worldName, seed);
-            _worldSettings.SetSeed(seed);
+            var descriptor = _worldCatalog.CreateWorld(worldName, seed);
+            
+            _worldSettings.SetName(descriptor.Name);
+            _worldSettings.SetSeed(descriptor.Seed);
             
             _loadSceneController.LoadGameScene().Forget();
             _isLoading = true;

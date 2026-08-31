@@ -7,6 +7,7 @@ namespace _Project.Features.ProceduralWorld.Domain.World
     /// </summary>
     public interface IWorldSettings
     {
+        string Name { get; }
         int Seed { get; }
         int Octaves { get; }
         float Scale { get; }
@@ -20,6 +21,7 @@ namespace _Project.Features.ProceduralWorld.Domain.World
     /// </summary>
     public interface IWorldSettingsController
     {
+        void SetName(string value);
         void SetSeed(int seed);
     }
     
@@ -33,6 +35,7 @@ namespace _Project.Features.ProceduralWorld.Domain.World
     /// </remarks>
     public sealed class WorldSettings : IWorldSettings, IWorldSettingsController
     {
+        public string Name { get; private set; }
         public int Seed { get; private set; }
 
         public int Octaves { get; }
@@ -50,6 +53,10 @@ namespace _Project.Features.ProceduralWorld.Domain.World
             RedistributionPower = config.RedistributionPower;
         }
 
+        public void SetName(string value)
+        {
+            Name = value;
+        }
         public void SetSeed(int seed)
         {
             Seed = seed;

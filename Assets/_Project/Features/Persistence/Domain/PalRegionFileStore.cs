@@ -2,12 +2,19 @@ using System;
 using System.IO;
 using _Project.Features.Persistence.Application;
 using _Project.Features.Persistence.Infrastructure;
+using _Project.Features.ProceduralWorld.Domain.World;
 
 namespace _Project.Features.Persistence.Domain
 {
     public class PalRegionFileStore : IPalRegionWriter, IPalRegionReader
     {
-        private readonly string _rootPath = UnityEngine.Application.persistentDataPath;
+        private readonly IWorldSettings _worldSettings;
+
+        public PalRegionFileStore(IWorldSettings worldSettings)
+        {
+            _worldSettings = worldSettings;
+        }
+
 
         public void WriteSlot(int regionX, int regionZ, int slotIndex, byte[] payload)
         {
@@ -182,6 +189,11 @@ namespace _Project.Features.Persistence.Domain
         }
 
         private string GetRegionPath(int regionX, int regionZ) =>
-            Path.Combine(_rootPath, "Regions", $"r.{regionX}.{regionZ}.pal");
+            Path.Combine(
+                UnityEngine.Application.persistentDataPath,
+                "Worlds",
+                _worldSettings.Name,
+                "Regions",
+                $"r.{regionX}.{regionZ}.pal");
     }
 }

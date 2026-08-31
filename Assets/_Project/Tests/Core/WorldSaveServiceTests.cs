@@ -7,6 +7,7 @@ using _Project.Features.Persistence.Infrastructure;
 using _Project.Features.ProceduralWorld.Application.Persistence;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using _Project.Features.ProceduralWorld.Domain.Persistence;
+using _Project.Features.ProceduralWorld.Domain.World;
 using NUnit.Framework;
 
 namespace _Project.Tests.ProceduralWorld.Persistence
@@ -28,6 +29,7 @@ namespace _Project.Tests.ProceduralWorld.Persistence
         }
 
         private PalRegionFileStore _fileStore;
+        private FakeWorldSettings _worldSettings;
         private ChunkDeltaStore _deltaStore;
         private FakeMutationTracker _tracker;
         private DirtyChunkRegistry _dirtyRegistry;
@@ -37,9 +39,14 @@ namespace _Project.Tests.ProceduralWorld.Persistence
         [SetUp]
         public void SetUp()
         {
-            _fileStore = new PalRegionFileStore();
+            _worldSettings = new FakeWorldSettings { Name = "Test-World" };
+            _fileStore = new PalRegionFileStore(_worldSettings);
             _deltaStore = new ChunkDeltaStore(_fileStore, _fileStore, new ChunkDeltaSerializer());
-            _regionsDir = Path.Combine(UnityEngine.Application.persistentDataPath, "Regions");
+            _regionsDir = Path.Combine(
+                UnityEngine.Application.persistentDataPath,
+                "Worlds",
+                _worldSettings.Name,
+                "Regions");
 
             if (Directory.Exists(_regionsDir))
                 Directory.Delete(_regionsDir, recursive: true);
@@ -142,6 +149,16 @@ namespace _Project.Tests.ProceduralWorld.Persistence
             _saveService.SaveAllDirty();
 
             Assert.IsFalse(_dirtyRegistry.HasDirtyChunks);
+        }
+        internal sealed class FakeWorldSettings : IWorldSettings
+        {
+            public string Name { get; set; } = "Test-World";
+            public int Seed { get; set; }
+            public int Octaves { get; set; }
+            public float Scale { get; set; }
+            public float Persistence { get; set; }
+            public float Lacunarity { get; set; }
+            public float RedistributionPower { get; set; }
         }
     }
 }
