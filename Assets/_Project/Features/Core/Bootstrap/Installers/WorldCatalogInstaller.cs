@@ -2,7 +2,7 @@ using _Project.Features.Persistence.Application;
 using _Project.Features.Persistence.Infrastructure;
 using VContainer;
 
-namespace _Project.Features.Core.Bootstrap.Bootstrap.Installers
+namespace _Project.Features.Core.Bootstrap.Installers
 {
     public static class WorldCatalogInstaller
     {

@@ -36,6 +36,8 @@ namespace _Project.Features.Core.Bootstrap
 
             JsonPersistenceInstaller.Install(builder);
 
+            WorldCatalogInstaller.Install(builder);
+
             WorldSettingsInstaller.Install(builder, worldSettingsConfig);
 
             GraphicsInstaller.Install(
