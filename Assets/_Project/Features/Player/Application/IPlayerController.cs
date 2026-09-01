@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace _Project.Features.Player.Application
 {
@@ -7,7 +8,9 @@ namespace _Project.Features.Player.Application
         void SetLookYaw(float yawDelta);
         void Freeze(bool state);
         
+        Vector3 LastKnownPosition { get; }
         float LookYaw { get; }
+        void SyncYaw(float yaw);
 
         bool Prepare();
         void Ready();

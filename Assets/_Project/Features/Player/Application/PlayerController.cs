@@ -28,7 +28,9 @@ namespace _Project.Features.Player.Application
         private readonly IGameState _gameState;
 
         private Vector3 _safePosition;
-
+        private Vector3 _lastKnownPosition;
+        public Vector3 LastKnownPosition => _lastKnownPosition;
+        
         private const float LandingFallSpeedThreshold = -3f;
 
         public event Action OnJumped;
@@ -59,11 +61,19 @@ namespace _Project.Features.Player.Application
         {
             _playerMotor.TeleportToPosition(_safePosition);
         }
+        
+        public void SyncYaw(float yaw)
+        {
+            _yaw = yaw;
+        }
 
         public void FixedTick()
         {
             if (_gameState.Paused)
                 return;
+            
+            if (_playerMotor.IsAlive)
+                _lastKnownPosition = _playerMotor.CurrentPosition;
 
             _environmentState.Update();
 

@@ -1,4 +1,6 @@
-using _Project.Features.Core.Persistence.Regions;
+using _Project.Features.Persistence.Application;
+using _Project.Features.Persistence.Domain;
+using _Project.Features.Persistence.Infrastructure;
 using _Project.Features.ProceduralWorld.Application.Persistence;
 using _Project.Features.ProceduralWorld.Domain.Persistence;
 using _Project.Features.ProceduralWorld.Infrastructure;
@@ -32,10 +34,13 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
 
             builder.Register<WorldSaveService>(Lifetime.Singleton)
                 .As<IWorldSaveService>();
+            
+            builder.Register<PlayerFileStore>(Lifetime.Singleton)
+                .As<IPlayerSaveReader>()
+                .As<IPlayerSaveWriter>();
 
-            builder.Register<WorldAutoSaveSystem>(Lifetime.Singleton)
-                .As<ITickable>()
-                .AsSelf();
+            builder.Register<PlayerPersistenceService>(Lifetime.Singleton)
+                .As<IPlayerPersistence>();
 
             builder.Register<DeltaApplicationStage>(Lifetime.Singleton)
                 .As<IDeltaStage>();

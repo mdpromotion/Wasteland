@@ -5,6 +5,8 @@ namespace _Project.Features.Player.Presentation
     public interface IFpsPlayerMotor
     {
         Vector3 CurrentVelocity { get; }
+        Vector3 CurrentPosition { get; }
+        bool IsAlive { get; }
 
         void SetVelocity(Vector3 velocity);
         void SetRotation(Quaternion rotation);

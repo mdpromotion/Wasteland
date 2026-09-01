@@ -23,7 +23,17 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
             builder.Register<FrameBudget>(Lifetime.Singleton)
                 .As<IFrameBudget>()
                 .As<ITickable>();
+            
+            builder.Register<GameSaveService>(Lifetime.Singleton)
+                .As<IGameSaveService>();
+            
+            builder.Register<WorldAutoSaveSystem>(Lifetime.Singleton)
+                .As<ITickable>()
+                .AsSelf();
 
+            builder.Register<GameSessionSaveController>(Lifetime.Singleton)
+                .As<IGameSessionSaveController>();
+            
             builder.Register<CursorLockService>(Lifetime.Singleton)
                 .As<ICursorService>();
 

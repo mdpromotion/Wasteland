@@ -1,6 +1,8 @@
 using System;
 using System.IO;
-using _Project.Features.Core.Persistence.Regions;
+using _Project.Features.Persistence.Application;
+using _Project.Features.Persistence.Domain;
+using _Project.Features.ProceduralWorld.Domain.World;
 using NUnit.Framework;
 
 namespace _Project.Tests.Core.Persistence
@@ -8,13 +10,19 @@ namespace _Project.Tests.Core.Persistence
     public class PalRegionFileStoreTests
     {
         private PalRegionFileStore _store;
+        private FakeWorldSettings _worldSettings;
         private string _regionsDir;
 
         [SetUp]
         public void SetUp()
         {
-            _store = new PalRegionFileStore();
-            _regionsDir = Path.Combine(UnityEngine.Application.persistentDataPath, "Regions");
+            _worldSettings = new FakeWorldSettings { Name = "Test-World" };
+            _store = new PalRegionFileStore(_worldSettings);
+            _regionsDir = Path.Combine(
+                UnityEngine.Application.persistentDataPath,
+                "Worlds",
+                _worldSettings.Name,
+                "Regions");
             
             if (Directory.Exists(_regionsDir))
                 Directory.Delete(_regionsDir, recursive: true);
@@ -176,6 +184,16 @@ namespace _Project.Tests.Core.Persistence
             File.WriteAllBytes(Path.Combine(_regionsDir, "r.0.0.pal"), new byte[64]);
 
             Assert.Throws<InvalidDataException>(() => _store.ReadSlot(0, 0, 0));
+        }
+        sealed class FakeWorldSettings : IWorldSettings
+        {
+            public string Name { get; set; } = "Test-World";
+            public int Seed { get; set; }
+            public int Octaves { get; set; }
+            public float Scale { get; set; }
+            public float Persistence { get; set; }
+            public float Lacunarity { get; set; }
+            public float RedistributionPower { get; set; }
         }
     }
 }

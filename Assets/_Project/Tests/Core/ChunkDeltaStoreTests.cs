@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using _Project.Features.Core.Persistence.Regions;
+using _Project.Features.Persistence.Application;
+using _Project.Features.Persistence.Domain;
+using _Project.Features.Persistence.Infrastructure;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using _Project.Features.ProceduralWorld.Domain.Persistence;
+using _Project.Features.ProceduralWorld.Domain.World;
 using NUnit.Framework;
 
 namespace _Project.Tests.Core.Persistence
@@ -12,14 +15,21 @@ namespace _Project.Tests.Core.Persistence
     {
         private PalRegionFileStore _fileStore;
         private ChunkDeltaStore _deltaStore;
+        private FakeWorldSettings _worldSettings;
         private string _regionsDir;
 
         [SetUp]
         public void SetUp()
         {
-            _fileStore = new PalRegionFileStore();
+            _worldSettings = new FakeWorldSettings { Name = "Test-World" };
+            _fileStore = new PalRegionFileStore(_worldSettings);
+            
             _deltaStore = new ChunkDeltaStore(_fileStore, _fileStore, new ChunkDeltaSerializer());
-            _regionsDir = Path.Combine(UnityEngine.Application.persistentDataPath, "Regions");
+            _regionsDir = Path.Combine(
+                UnityEngine.Application.persistentDataPath,
+                "Worlds",
+                _worldSettings.Name,
+                "Regions");
 
             if (Directory.Exists(_regionsDir))
                 Directory.Delete(_regionsDir, recursive: true);
@@ -135,7 +145,7 @@ namespace _Project.Tests.Core.Persistence
             Assert.AreEqual(1, loaded.VegetationDeltas.Count);
             Assert.AreEqual(2UL, loaded.VegetationDeltas[0].Id);
         }
-
+        
         [Test]
         public void Load_TombstonedSlot_ReturnsEmptyNotThrow()
         {
@@ -143,15 +153,22 @@ namespace _Project.Tests.Core.Persistence
             _deltaStore.Save(coord, new ChunkDelta(default,
                 new List<VegetationInstanceDelta> { new VegetationInstanceDelta(1UL, DeltaAction.Removed, null) }));
 
-            var (regionX, regionZ, slot) = ((int, int, int))typeof(ChunkDeltaStore)
-                .Assembly.GetType("_Project.Features.Core.Persistence.Regions.RegionAddressing")
-                .GetMethod("ToSlot")!
-                .Invoke(null, new object[] { coord });
-
-            _fileStore.DeleteSlot(regionX, regionZ, slot);
+            _fileStore.DeleteSlot(0, 0, 0);
 
             Assert.DoesNotThrow(() => _deltaStore.Load(coord));
             Assert.IsTrue(_deltaStore.Load(coord).IsEmpty);
+        }
+
+        
+        sealed class FakeWorldSettings : IWorldSettings
+        {
+            public string Name { get; set; } = "Test-World";
+            public int Seed { get; set; }
+            public int Octaves { get; set; }
+            public float Scale { get; set; }
+            public float Persistence { get; set; }
+            public float Lacunarity { get; set; }
+            public float RedistributionPower { get; set; }
         }
     }
 }

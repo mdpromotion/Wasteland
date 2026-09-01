@@ -17,7 +17,8 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
                 .As<ICameraMotor>();
 
             builder.Register<CameraController>(Lifetime.Singleton)
-                .As<ILateTickable>();
+                .As<ILateTickable>()
+                .As<ICameraController>();
 
             builder.Register<CameraWorldRebaseSync>(Lifetime.Singleton)
                 .AsImplementedInterfaces();

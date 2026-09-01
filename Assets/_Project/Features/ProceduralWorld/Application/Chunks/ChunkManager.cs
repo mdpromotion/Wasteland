@@ -13,6 +13,7 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
     public interface IChunkManager
     {
         bool IsReady { get; }
+        bool IsChunkLoaded(ChunkCoordinate coordinate);
     }
 
     /// <summary>
@@ -40,6 +41,8 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
         private readonly Action<ChunkCoordinate> _completedAction;
 
         public bool IsReady { get; private set; }
+        public bool IsChunkLoaded(ChunkCoordinate coordinate) =>
+            _repository.Contains(coordinate);
         
 
         public ChunkManager(

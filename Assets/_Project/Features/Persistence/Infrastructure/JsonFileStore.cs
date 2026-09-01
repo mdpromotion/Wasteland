@@ -2,9 +2,8 @@ using System;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using UnityEngine;
 
-namespace _Project.Features.Core.Persistence
+namespace _Project.Features.Persistence.Infrastructure
 {
     public interface IJsonWriter
     {
@@ -34,6 +33,10 @@ namespace _Project.Features.Core.Persistence
         {
             var path = GetPath(category);
             var tmpPath = path + ".tmp";
+
+            var directory = Path.GetDirectoryName(path);
+            if (!string.IsNullOrEmpty(directory))
+                Directory.CreateDirectory(directory);
 
             var json = JsonConvert.SerializeObject(
                 data,
