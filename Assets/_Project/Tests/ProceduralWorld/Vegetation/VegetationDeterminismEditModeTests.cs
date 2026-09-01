@@ -175,6 +175,73 @@ namespace _Project.Tests.ProceduralWorld.Vegetation
             }
         }
 
+        [Test]
+        public void VegetationGeneration_ExtremeCoordinates_MaintainsPrecision()
+        {
+            const int resolution = 32;
+            const int seed = 424242;
+            
+            int maxSafeChunk = (int.MaxValue / resolution) - 2;
+            int2 extremeChunkCoordinate = new int2(maxSafeChunk, -maxSafeChunk);
+
+            VegetationGenerationParams parameters = new VegetationGenerationParams
+            {
+                Priority = 0,
+                PatchNoiseFrequency = 0.05f,
+                PatchNoiseOctaves = 3,
+                Coverage = 0.5f,
+                EdgeSmoothing = 0.1f,
+                Density = 0.7f,
+                MinSlopeAngle = 0f,
+                MaxSlopeAngle = 100f,
+                MinScale = 1f,
+                MaxScale = 2f,
+                OccupancyRadius = 1f
+            };
+
+            List<VegetationInstanceData> firstRun = Generate(
+                resolution,
+                extremeChunkCoordinate,
+                seed,
+                parameters);
+
+            List<VegetationInstanceData> secondRun = Generate(
+                resolution,
+                extremeChunkCoordinate,
+                seed,
+                parameters);
+
+            try
+            {
+                Assert.That(secondRun.Count, Is.EqualTo(firstRun.Count), "The number of instances does not match.");
+
+                for (int i = 0; i < firstRun.Count; i++)
+                {
+                    Assert.That(secondRun[i].Id, Is.EqualTo(firstRun[i].Id));
+                    Assert.That(secondRun[i].Position, Is.EqualTo(firstRun[i].Position));
+                }
+                
+                int cellCount = resolution * resolution;
+                Assert.That(firstRun.Count, Is.GreaterThan(0), 
+                    "The generator did not create any instances. Noise may have collapsed due to precision loss.");
+                
+                Assert.That(firstRun.Count, Is.LessThan(cellCount), 
+                    "The generator populated every cell. Noise is not differentiating between cells (precision loss).");
+                
+                var uniquePositions = new HashSet<float3>();
+                foreach (var instance in firstRun)
+                {
+                    bool isUnique = uniquePositions.Add(instance.Position);
+                    Assert.That(isUnique, Is.True, "Multiple vegetation instances have the same local position. Cell hashes may have collapsed.");
+                }
+            }
+            finally
+            {
+                firstRun.Clear();
+                secondRun.Clear();
+            }
+        }
+
         private static List<VegetationInstanceData> Generate(
             int resolution,
             int2 chunkCoordinate,
@@ -208,7 +275,7 @@ namespace _Project.Tests.ProceduralWorld.Vegetation
                 Allocator.TempJob);
 
             NativeList<VegetationInstanceData> accepted = new NativeList<VegetationInstanceData>(
-                cellCount / 4,
+                cellCount,
                 Allocator.TempJob);
 
             try
@@ -264,27 +331,13 @@ namespace _Project.Tests.ProceduralWorld.Vegetation
             }
             catch
             {
-                if (accepted.IsCreated)
-                    accepted.Dispose();
-
-                if (candidates.IsCreated)
-                    candidates.Dispose();
-
-                if (candidateMask.IsCreated)
-                    candidateMask.Dispose();
-
-                if (occupancy.IsCreated)
-                    occupancy.Dispose();
-
-                if (heights.IsCreated)
-                    heights.Dispose();
-
-                if (waterSurfaceHeight.IsCreated)
-                    waterSurfaceHeight.Dispose();
-
-                if (riverMask.IsCreated)
-                    riverMask.Dispose();
-
+                if (accepted.IsCreated) accepted.Dispose();
+                if (candidates.IsCreated) candidates.Dispose();
+                if (candidateMask.IsCreated) candidateMask.Dispose();
+                if (occupancy.IsCreated) occupancy.Dispose();
+                if (heights.IsCreated) heights.Dispose();
+                if (waterSurfaceHeight.IsCreated) waterSurfaceHeight.Dispose();
+                if (riverMask.IsCreated) riverMask.Dispose();
                 throw;
             }
         }
