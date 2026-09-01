@@ -34,10 +34,13 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
 
             builder.Register<WorldSaveService>(Lifetime.Singleton)
                 .As<IWorldSaveService>();
+            
+            builder.Register<PlayerFileStore>(Lifetime.Singleton)
+                .As<IPlayerSaveReader>()
+                .As<IPlayerSaveWriter>();
 
-            builder.Register<WorldAutoSaveSystem>(Lifetime.Singleton)
-                .As<ITickable>()
-                .AsSelf();
+            builder.Register<PlayerPersistenceService>(Lifetime.Singleton)
+                .As<IPlayerPersistence>();
 
             builder.Register<DeltaApplicationStage>(Lifetime.Singleton)
                 .As<IDeltaStage>();
