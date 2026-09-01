@@ -60,13 +60,13 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Jobs.Vegetation
             int localX = index % _resolution;
             int localZ = index / _resolution;
             
-            double2 globalCell = new double2(_chunkCoordinate.x, _chunkCoordinate.y) * _resolution + new double2(localX, localZ);
-            
-            uint cellHash = math.hash(new double3(globalCell.x, globalCell.y, _worldSeed));
+            uint cellHash = (uint)math.hash(new int4(_chunkCoordinate.x, _chunkCoordinate.y, index, _worldSeed));
             Random random = Random.CreateFromIndex(cellHash);
+            
+            double2 globalCellDouble = new double2(_chunkCoordinate.x, _chunkCoordinate.y) * _resolution + new double2(localX, localZ);
 
             float rawSum = FractalNoiseSum(
-                globalCell,
+                globalCellDouble,
                 _species.PatchNoiseFrequency,
                 _species.PatchNoiseOctaves,
                 _worldSeed,
@@ -107,15 +107,11 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Jobs.Vegetation
             float scale = random.NextFloat(_species.MinScale, _species.MaxScale);
             float rotation = random.NextFloat(0f, math.PI * 2f);
             
-            float offsetX = random.NextFloat(0f, 1f);
-            float offsetZ = random.NextFloat(0f, 1f);
-            
-            float posX = localX + offsetX;
-            float posZ = localZ + offsetZ;
+            int2 globalCell = new int2((int)globalCellDouble.x, (int)globalCellDouble.y);
 
             _candidates[index] = new VegetationInstanceData
             {
-                Id = VegetationInstanceIdUtility.FromGlobalCell(new int2((int)globalCell.x, (int)globalCell.y)),
+                Id = VegetationInstanceIdUtility.FromGlobalCell(globalCell),
                 Position = new float3(localX * _cellSize, height, localZ * _cellSize),
                 Rotation = rotation,
                 Scale = scale,
