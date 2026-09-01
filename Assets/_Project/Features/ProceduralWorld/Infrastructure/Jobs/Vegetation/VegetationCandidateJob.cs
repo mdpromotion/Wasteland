@@ -59,10 +59,10 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Jobs.Vegetation
 
             int localX = index % _resolution;
             int localZ = index / _resolution;
-
-            int2 globalCell = _chunkCoordinate * _resolution + new int2(localX, localZ);
-
-            uint cellHash = (uint)math.hash(new int3(globalCell, _worldSeed));
+            
+            double2 globalCell = new double2(_chunkCoordinate.x, _chunkCoordinate.y) * _resolution + new double2(localX, localZ);
+            
+            uint cellHash = math.hash(new double3(globalCell.x, globalCell.y, _worldSeed));
             Random random = Random.CreateFromIndex(cellHash);
 
             float rawSum = FractalNoiseSum(
@@ -115,7 +115,7 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Jobs.Vegetation
 
             _candidates[index] = new VegetationInstanceData
             {
-                Id = VegetationInstanceIdUtility.FromGlobalCell(globalCell),
+                Id = VegetationInstanceIdUtility.FromGlobalCell(new int2((int)globalCell.x, (int)globalCell.y)),
                 Position = new float3(localX * _cellSize, height, localZ * _cellSize),
                 Rotation = rotation,
                 Scale = scale,
@@ -126,20 +126,25 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Jobs.Vegetation
         }
 
         private const float SingleOctaveNoiseStd = 0.29f;
-
-        private static float FractalNoiseSum(int2 cell, float frequency, int octaves, int seed, out float stdDev)
+        
+        private static float FractalNoiseSum(double2 cell, double frequency, int octaves, int seed, out float stdDev)
         {
             float value = 0f;
             float amplitude = 0.5f;
             float sumSquaredAmplitude = 0f;
-            float freq = frequency;
-            float2 offset = SeedToOffset(seed);
+            double freq = frequency;
+            double2 offset = SeedToOffsetDouble(seed);
 
             for (int i = 0; i < octaves; i++)
             {
-                value += noise.cnoise((float2)cell * freq + offset) * amplitude;
+                double2 sampleCoord = cell * freq + offset;
+                
+                float2 floatCoord = ToNoiseFloat2(sampleCoord);
+        
+                value += noise.cnoise(floatCoord) * amplitude;
+        
                 sumSquaredAmplitude += amplitude * amplitude;
-                freq *= 2f;
+                freq *= 2.0;
                 amplitude *= 0.5f;
             }
 
@@ -149,11 +154,21 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Jobs.Vegetation
             return value;
         }
 
-        private static float2 SeedToOffset(int seed)
+        private static float2 ToNoiseFloat2(double2 coord)
+        {
+            double2 floorCoord = math.floor(coord);
+            double2 fracCoord = coord - floorCoord;
+            
+            double2 modFloor = floorCoord - math.floor(floorCoord / 289.0) * 289.0;
+    
+            return (float2)(modFloor + fracCoord);
+        }
+        
+        private static double2 SeedToOffsetDouble(int seed)
         {
             uint h = math.hash(new int2(seed, seed * 7 + 13));
             Random rnd = Random.CreateFromIndex(h);
-            return new float2(rnd.NextFloat(0f, 1000f), rnd.NextFloat(0f, 1000f));
+            return new double2(rnd.NextDouble(0.0, 1000.0), rnd.NextDouble(0.0, 1000.0));
         }
 
         private static float NormalCdf(float z)
