@@ -131,14 +131,16 @@ namespace _Project.Tests.ProceduralWorld.Persistence
         }
 
         [Test]
-        public void SaveAllDirty_OnEmptyRegistry_DoesNotThrowAndRaisesWorldSaved()
+        public void SaveAllDirty_OnEmptyRegistry_DoesNotThrowAndDoesNotRaiseWorldSaved()
         {
             bool raised = false;
             _saveService.WorldSaved += () => raised = true;
-
+            
             Assert.DoesNotThrow(() => _saveService.SaveAllDirty());
-            Assert.IsTrue(raised);
+            Assert.IsFalse(raised);
+
         }
+
 
         [Test]
         public void SaveAllDirty_DirtyButNoPendingDelta_StillMarksClean()
