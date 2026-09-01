@@ -58,7 +58,11 @@ namespace _Project.Features.ProceduralWorld.Application.Persistence
 
         public void SaveAllDirty()
         {
-            foreach (var coord in _dirtyRegistry.DirtyChunks.ToArray())
+            var dirty = _dirtyRegistry.DirtyChunks.ToArray();
+            if (dirty.Length == 0)
+                return;
+
+            foreach (var coord in dirty)
                 SaveChunk(coord);
 
             WorldSaved?.Invoke();
