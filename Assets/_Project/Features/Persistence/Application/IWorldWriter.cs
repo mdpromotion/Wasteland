@@ -5,6 +5,7 @@ namespace _Project.Features.Persistence.Application
     public interface IWorldWriter
     {
         void CreateWorld(string worldName, int seed);
+        void DeleteWorld(string worldName);
     }
 
     public interface IWorldReader

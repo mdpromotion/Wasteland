@@ -8,6 +8,7 @@ namespace _Project.Features.Persistence.Application
         string[] GetWorldNames();
         WorldDescriptor GetWorld(string worldName);
         WorldDescriptor CreateWorld(string worldName, int seed);
+        void DeleteWorld(string worldName);
         string GetAvailableWorldName();
     }
     
@@ -38,6 +39,17 @@ namespace _Project.Features.Persistence.Application
 
             _writer.CreateWorld(worldName, seed);
             return _reader.ReadWorld(worldName);
+        }
+
+        public void DeleteWorld(string worldName)
+        {
+            if (string.IsNullOrWhiteSpace(worldName))
+                throw new ArgumentException("World name must not be empty.", nameof(worldName));
+
+            if (!_reader.WorldExists(worldName))
+                throw new InvalidOperationException($"World '{worldName}' does not exist.");
+
+            _writer.DeleteWorld(worldName);
         }
         
         public string GetAvailableWorldName()

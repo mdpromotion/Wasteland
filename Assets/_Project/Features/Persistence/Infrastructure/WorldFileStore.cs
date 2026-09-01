@@ -67,6 +67,16 @@ namespace _Project.Features.Persistence.Infrastructure
 
             return new WorldDescriptor(dto.Name, dto.Seed, dto.CreatedAtTicks);
         }
+        
+        public void DeleteWorld(string worldName)
+        {
+            var worldDir = GetWorldDir(worldName);
+
+            if (!Directory.Exists(worldDir))
+                throw new InvalidOperationException($"World folder '{worldName}' does not exist.");
+
+            Directory.Delete(worldDir, recursive: true);
+        }
 
         private string GetCategory(string worldName) =>
             Path.Combine("Worlds", worldName, WorldFileName);
