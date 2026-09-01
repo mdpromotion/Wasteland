@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace _Project.Features.UI.Menus.MainMenu.World
 {
-    public class CreateWorldButton : MonoBehaviour
+    public class WorldButton : MonoBehaviour
     {
         private Button _menuButton;
         

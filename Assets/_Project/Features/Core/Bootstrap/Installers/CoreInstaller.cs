@@ -23,7 +23,11 @@ namespace _Project.Features.Core.Bootstrap.Installers
                 .As<IInitializable>();
 
             builder.Register<SceneTransitionService>(Lifetime.Singleton);
+            
             builder.Register<LoadSceneController>(Lifetime.Singleton);
+            
+            builder.Register<PlayWorldUseCase>(Lifetime.Singleton)
+                .As<IPlayWorldUseCase>();
         }
     }
 }
