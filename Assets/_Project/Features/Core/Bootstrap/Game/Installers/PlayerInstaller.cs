@@ -64,6 +64,9 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
 
             builder.RegisterInstance(playerSoundSet);
             
+            builder.Register<LocalMachinePlayerIdentityProvider>(Lifetime.Singleton)
+                .As<IPlayerIdentityProvider>();
+            
             builder.Register<BreakableHitHandler>(Lifetime.Singleton).
                 As<IHitHandler>()
                 .AsSelf();

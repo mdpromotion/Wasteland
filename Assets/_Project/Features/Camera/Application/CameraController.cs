@@ -8,7 +8,13 @@ using VContainer.Unity;
 
 namespace _Project.Features.Camera.Application
 {
-    public class CameraController : ILateTickable
+    public interface ICameraController
+    {
+        float Pitch { get; }
+        void SyncPitch(float pitch);
+    }
+    
+    public class CameraController : ILateTickable, ICameraController
     {
         private readonly ICameraMotor _cameraMotor;
         private readonly PlayerCameraConfig _cameraConfig;
@@ -49,6 +55,13 @@ namespace _Project.Features.Camera.Application
             UpdateLook();
 
             UpdateCameraHeight();
+        }
+        
+        public float Pitch => _pitch;
+
+        public void SyncPitch(float pitch)
+        {
+            _pitch = pitch;
         }
         
         private void UpdateLook()

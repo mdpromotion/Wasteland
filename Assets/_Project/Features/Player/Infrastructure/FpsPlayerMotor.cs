@@ -14,9 +14,21 @@ namespace _Project.Features.Player.Infrastructure
 
         private Rigidbody _rb;
         private Collider _collider;
+        private bool _initialized;
 
         public Vector3 CurrentVelocity =>
             _rb.linearVelocity;
+
+        public Vector3 CurrentPosition
+        {
+            get
+            {
+                EnsureInitialized();
+                return _rb.position;
+            }
+        }
+        
+        public bool IsAlive => this;
 
         public void Freeze(bool state)
         {
@@ -35,23 +47,34 @@ namespace _Project.Features.Player.Infrastructure
             }
         }
 
+        
         private void Awake()
         {
+            EnsureInitialized();
+            _rb.interpolation = RigidbodyInterpolation.Interpolate;
+        }
+        
+        private void EnsureInitialized()
+        {
+            if (_initialized)
+                return;
+
             _rb = GetComponent<Rigidbody>();
             _collider = GetComponent<Collider>();
-
-            _rb.interpolation =
-                RigidbodyInterpolation.Interpolate;
+            _initialized = true;
         }
 
         public void SetVelocity(Vector3 velocity)
         {
-            _rb.linearVelocity =
-                velocity;
+            EnsureInitialized();
+            
+            _rb.linearVelocity = velocity;
         }
 
         public void SetRotation(Quaternion rotation)
         {
+            EnsureInitialized();
+            
             _rb.MoveRotation(rotation);
         }
 
@@ -64,9 +87,10 @@ namespace _Project.Features.Player.Infrastructure
                 QueryTriggerInteraction.Ignore);
         }
 
-        public bool TryGetSafeGroundPosition(
-            out Vector3 position)
+        public bool TryGetSafeGroundPosition(out Vector3 position)
         {
+            EnsureInitialized();
+            
             Bounds bounds =
                 _collider.bounds;
 
@@ -104,14 +128,12 @@ namespace _Project.Features.Player.Infrastructure
             return false;
         }
 
-        public void TeleportToPosition(
-            Vector3 position)
+        public void TeleportToPosition(Vector3 position)
         {
-            _rb.position =
-                position;
+            EnsureInitialized();
 
-            _rb.linearVelocity =
-                Vector3.zero;
+            _rb.position = position;
+            _rb.linearVelocity = Vector3.zero;
         }
         
         public void ApplyOriginShift(Vector3 delta)
