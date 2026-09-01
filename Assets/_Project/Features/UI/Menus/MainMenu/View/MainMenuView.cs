@@ -18,7 +18,7 @@ namespace _Project.Features.UI.Menus.MainMenu.View
         public void ToggleMenu(bool state)
         {
             MenuToggled?.Invoke(state);
-            _currentMenu.SetActive(state);   
+            gameObject.SetActive(state);   
         }
     }
 }
