@@ -17,6 +17,9 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
             builder.Register<GameTimeController>(Lifetime.Singleton)
                 .As<IInitializable>();
 
+            builder.Register<GameTimeSaveService>(Lifetime.Singleton)
+                .As<IGameTimeSaveService>();
+
             builder.RegisterComponentInHierarchy<GameTimePresenter>();
         }
     }

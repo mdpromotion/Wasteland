@@ -6,7 +6,7 @@ namespace _Project.Features.GameTime.Domain
     {
         private const float TickPerDay = 24_000f;
         
-        public float CurrentTime { get; private set; } = TickPerDay / 4;
+        public float CurrentTime { get; private set; }
         public float TicksPerDay => TickPerDay;
 
         public event Action<float> TimeChanged;
@@ -27,6 +27,9 @@ namespace _Project.Features.GameTime.Domain
 
             TimeChanged?.Invoke(CurrentTime);
         }
+
+        public float GetDefaultTime()
+            => TickPerDay / 4;
 
         public void SetTime(float time)
         {

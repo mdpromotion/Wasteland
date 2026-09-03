@@ -1,4 +1,5 @@
 using System;
+using _Project.Features.GameTime.Application;
 using _Project.Features.Persistence.Application;
 using _Project.Features.Player.Application;
 using _Project.Features.ProceduralWorld.Application.Chunks;
@@ -12,17 +13,20 @@ namespace _Project.Features.Core.Application
         private readonly IPlayerController _player;
         private readonly IPlayerPersistence _playerPersistence;
         private readonly IPlayerPositionService _positionService;
+        private readonly IGameTimeSaveService _gameTimeSaveService;
         private readonly IChunkManager _chunkManager;
 
         public GameLoadService(
             IPlayerController player,
             IPlayerPersistence playerPersistence,
             IPlayerPositionService positionService,
+            IGameTimeSaveService gameTimeSaveService,
             IChunkManager chunkManager)
         {
             _player = player;
             _playerPersistence = playerPersistence;
             _positionService = positionService;
+            _gameTimeSaveService = gameTimeSaveService;
             _chunkManager = chunkManager;
         }
 
@@ -30,6 +34,8 @@ namespace _Project.Features.Core.Application
         {
             _player.Freeze(true);
 
+            _gameTimeSaveService.Load();
+            
             if (_playerPersistence.TryLoadPlayer())
                 await WaitForPlayerChunkAsync();
             else
