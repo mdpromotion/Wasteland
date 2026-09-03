@@ -27,7 +27,8 @@ namespace _Project.Features.Persistence.Infrastructure
             var worldDir = GetWorldDir(worldName);
 
             if (Directory.Exists(worldDir))
-                throw new InvalidOperationException($"World folder '{worldName}' already exists.");
+                throw new InvalidOperationException(
+                    $"World folder '{worldName}' already exists.");
 
             var meta = new WorldMetadataDto
             {
@@ -35,6 +36,21 @@ namespace _Project.Features.Persistence.Infrastructure
                 Seed = seed,
                 CreatedAtTicks = DateTime.UtcNow.Ticks
             };
+
+            _jsonWriter.Write(GetCategory(worldName), meta);
+        }
+
+        public void SaveCurrentTick(string worldName, float currentTick)
+        {
+            if (!_jsonReader.TryRead<WorldMetadataDto>(
+                    GetCategory(worldName),
+                    out var meta))
+            {
+                throw new FileNotFoundException(
+                    $"World '{worldName}' has no {WorldFileName}.json.");
+            }
+
+            meta.CurrentTick = currentTick;
 
             _jsonWriter.Write(GetCategory(worldName), meta);
         }
@@ -53,6 +69,7 @@ namespace _Project.Features.Persistence.Infrastructure
             for (var i = 0; i < dirs.Length; i++)
             {
                 var name = Path.GetFileName(dirs[i]);
+
                 if (File.Exists(Path.Combine(dirs[i], WorldFileName + ".json")))
                     names.Add(name);
             }
@@ -62,18 +79,28 @@ namespace _Project.Features.Persistence.Infrastructure
 
         public WorldDescriptor ReadWorld(string worldName)
         {
-            if (!_jsonReader.TryRead<WorldMetadataDto>(GetCategory(worldName), out var dto))
-                throw new FileNotFoundException($"World '{worldName}' has no {WorldFileName}.json.");
+            if (!_jsonReader.TryRead<WorldMetadataDto>(
+                    GetCategory(worldName),
+                    out var dto))
+            {
+                throw new FileNotFoundException(
+                    $"World '{worldName}' has no {WorldFileName}.json.");
+            }
 
-            return new WorldDescriptor(dto.Name, dto.Seed, dto.CreatedAtTicks);
+            return new WorldDescriptor(
+                dto.Name,
+                dto.Seed,
+                dto.CreatedAtTicks,
+                dto.CurrentTick);
         }
-        
+
         public void DeleteWorld(string worldName)
         {
             var worldDir = GetWorldDir(worldName);
 
             if (!Directory.Exists(worldDir))
-                throw new InvalidOperationException($"World folder '{worldName}' does not exist.");
+                throw new InvalidOperationException(
+                    $"World folder '{worldName}' does not exist.");
 
             Directory.Delete(worldDir, recursive: true);
         }
@@ -92,6 +119,7 @@ namespace _Project.Features.Persistence.Infrastructure
             public string Name { get; set; }
             public int Seed { get; set; }
             public long CreatedAtTicks { get; set; }
+            public float? CurrentTick { get; set; }
         }
     }
 }
