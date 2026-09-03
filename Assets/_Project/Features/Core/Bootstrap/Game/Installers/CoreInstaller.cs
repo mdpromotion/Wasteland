@@ -26,6 +26,8 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
             
             builder.Register<GameSaveService>(Lifetime.Singleton)
                 .As<IGameSaveService>();
+
+            builder.Register<GameLoadService>(Lifetime.Singleton);
             
             builder.Register<WorldAutoSaveSystem>(Lifetime.Singleton)
                 .As<ITickable>()

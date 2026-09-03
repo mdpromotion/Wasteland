@@ -7,23 +7,16 @@ namespace _Project.Features.Core.Application
 {
     public sealed class WorldAutoSaveSystem : ITickable
     {
-        private readonly IPlayerPersistence _playerPersistence;
-        private readonly IWorldSaveService _worldSaveService;
-        private readonly IDirtyChunkRegistry _dirtyRegistry;
+        private readonly IGameSaveService _saveService;
 
         private readonly float _intervalSeconds;
         private float _timer;
 
         private bool _armed;
 
-        public WorldAutoSaveSystem(
-            IPlayerPersistence playerPersistence,
-            IWorldSaveService worldSaveService,
-            IDirtyChunkRegistry dirtyRegistry)
+        public WorldAutoSaveSystem(IGameSaveService saveService)
         {
-            _playerPersistence = playerPersistence;
-            _worldSaveService = worldSaveService;
-            _dirtyRegistry = dirtyRegistry;
+            _saveService  = saveService;
 
             _intervalSeconds = 60f;
         }
@@ -41,10 +34,7 @@ namespace _Project.Features.Core.Application
 
             _timer = 0f;
 
-            _playerPersistence.SavePlayer();
-
-            if (_dirtyRegistry.HasDirtyChunks)
-                _worldSaveService.SaveAllDirty();
+            _saveService.SaveAll();
         }
     }
 }
