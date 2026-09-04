@@ -30,7 +30,6 @@ namespace _Project.Features.Persistence.Application
 
         public void SaveGame()
         {
-            // Сохранение мира, инвентаря и т.д.
             _chunkPersistence.SaveWorldState();
             _playerPersistence.SavePlayer();
         }
@@ -54,11 +53,7 @@ namespace _Project.Features.Persistence.Application
             
             Vector3 safeLocalSpawnPosition = new Vector3(localOffset.x, (float)data.Y, localOffset.y);
             
-            Debug.Log(targetChunk.X + " " + targetChunk.Y);
-            
             _chunkPersistence.InitializeOrigin(targetChunk);
-            
-            Debug.Log(safeLocalSpawnPosition + " " + data.Yaw);
             
             _playerPersistence.ApplyPlayerState(safeLocalSpawnPosition, data.Yaw, data.Pitch);
 
