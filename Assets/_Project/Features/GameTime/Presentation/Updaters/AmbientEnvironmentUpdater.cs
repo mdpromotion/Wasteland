@@ -1,34 +1,26 @@
 using _Project.Features.GameTime.Domain;
+using _Project.Features.GameTime.Presentation.Updaters;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace _Project.Features.GameTime.Presentation.Updaters
+public class AmbientEnvironmentUpdater : IGameTimeVisualUpdater
 {
-    public class AmbientEnvironmentUpdater : IGameTimeVisualUpdater
+    private const float NightAmbientIntensity = 0.5f;
+    private const float DayAmbientIntensity = 1f;
+
+    public AmbientEnvironmentUpdater()
     {
-        private DayNightPhase? _lastPhase;
+        RenderSettings.ambientMode = AmbientMode.Skybox;
+    }
 
-        public AmbientEnvironmentUpdater()
+    public void Apply(DayNightPhaseInfo phaseInfo, float rawTime)
+    {
+        RenderSettings.ambientIntensity = phaseInfo.Phase switch
         {
-            RenderSettings.ambientMode = AmbientMode.Skybox;
-        }
-
-        public void Apply(DayNightPhaseInfo phaseInfo, float rawTime)
-        {
-            bool isTransition = phaseInfo.IsTransition;
-
-            if (!isTransition && _lastPhase == phaseInfo.Phase)
-                return;
-
-            RenderSettings.ambientIntensity = phaseInfo.Phase switch
-            {
-                DayNightPhase.DayTransition => phaseInfo.T,
-                DayNightPhase.NightTransition => 1f - phaseInfo.T,
-                DayNightPhase.Day => 1f,
-                _ => 0f
-            };
-
-            _lastPhase = phaseInfo.Phase;
-        }
+            DayNightPhase.DayTransition => Mathf.Lerp(NightAmbientIntensity, DayAmbientIntensity, phaseInfo.T),
+            DayNightPhase.NightTransition => Mathf.Lerp(DayAmbientIntensity, NightAmbientIntensity, phaseInfo.T),
+            DayNightPhase.Day => DayAmbientIntensity,
+            _ => NightAmbientIntensity
+        };
     }
 }
