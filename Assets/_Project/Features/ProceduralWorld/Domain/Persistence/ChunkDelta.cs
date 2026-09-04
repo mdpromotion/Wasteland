@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace _Project.Features.ProceduralWorld.Domain.Persistence
 {
@@ -53,5 +54,26 @@ namespace _Project.Features.ProceduralWorld.Domain.Persistence
 
         public static readonly ChunkDelta Empty =
             new ChunkDelta(default, Array.Empty<VegetationInstanceDelta>());
+        
+        public ChunkDelta Merge(ChunkDelta newer)
+        {
+            if (this.IsEmpty) return newer;
+            if (newer.IsEmpty) return this;
+            
+            var mergedDict = new Dictionary<ulong, VegetationInstanceDelta>(
+                this.VegetationDeltas.Count + newer.VegetationDeltas.Count);
+
+            foreach (var delta in this.VegetationDeltas)
+            {
+                mergedDict[delta.Id] = delta;
+            }
+
+            foreach (var delta in newer.VegetationDeltas)
+            {
+                mergedDict[delta.Id] = delta;
+            }
+            
+            return new ChunkDelta(newer.Versions, mergedDict.Values.ToArray());
+        }
     }
 }

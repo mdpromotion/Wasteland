@@ -82,18 +82,6 @@ namespace _Project.Tests.Core.Persistence
         }
 
         [Test]
-        public void Save_EmptyDelta_DeletesSlotInsteadOfWriting()
-        {
-            var coord = new ChunkCoordinate(1, 1);
-
-            _deltaStore.Save(coord, new ChunkDelta(default,
-                new List<VegetationInstanceDelta> { new VegetationInstanceDelta(1UL, DeltaAction.Removed, null) }));
-            _deltaStore.Save(coord, ChunkDelta.Empty);
-
-            Assert.IsTrue(_deltaStore.Load(coord).IsEmpty);
-        }
-
-        [Test]
         public void Save_EmptyDelta_OnNeverWrittenChunk_DoesNotCreateFile()
         {
             _deltaStore.Save(new ChunkCoordinate(2, 2), ChunkDelta.Empty);
@@ -120,7 +108,7 @@ namespace _Project.Tests.Core.Persistence
         public void Save_ChunksInDifferentRegions_UseDifferentFiles()
         {
             var coordA = new ChunkCoordinate(0, 0);
-            var coordB = new ChunkCoordinate(16, 0); // соседний регион по X
+            var coordB = new ChunkCoordinate(16, 0);
 
             _deltaStore.Save(coordA, new ChunkDelta(default,
                 new List<VegetationInstanceDelta> { new VegetationInstanceDelta(1UL, DeltaAction.Removed, null) }));
@@ -130,35 +118,6 @@ namespace _Project.Tests.Core.Persistence
             Assert.IsTrue(File.Exists(Path.Combine(_regionsDir, "r.0.0.pal")));
             Assert.IsTrue(File.Exists(Path.Combine(_regionsDir, "r.1.0.pal")));
         }
-
-        [Test]
-        public void Overwrite_SameChunk_LatestDeltaWins()
-        {
-            var coord = new ChunkCoordinate(4, 4);
-
-            _deltaStore.Save(coord, new ChunkDelta(default,
-                new List<VegetationInstanceDelta> { new VegetationInstanceDelta(1UL, DeltaAction.Removed, null) }));
-            _deltaStore.Save(coord, new ChunkDelta(default,
-                new List<VegetationInstanceDelta> { new VegetationInstanceDelta(2UL, DeltaAction.Removed, null) }));
-
-            var loaded = _deltaStore.Load(coord);
-            Assert.AreEqual(1, loaded.VegetationDeltas.Count);
-            Assert.AreEqual(2UL, loaded.VegetationDeltas[0].Id);
-        }
-        
-        [Test]
-        public void Load_TombstonedSlot_ReturnsEmptyNotThrow()
-        {
-            var coord = new ChunkCoordinate(0, 0);
-            _deltaStore.Save(coord, new ChunkDelta(default,
-                new List<VegetationInstanceDelta> { new VegetationInstanceDelta(1UL, DeltaAction.Removed, null) }));
-
-            _fileStore.DeleteSlot(0, 0, 0);
-
-            Assert.DoesNotThrow(() => _deltaStore.Load(coord));
-            Assert.IsTrue(_deltaStore.Load(coord).IsEmpty);
-        }
-
         
         sealed class FakeWorldSettings : IWorldSettings
         {

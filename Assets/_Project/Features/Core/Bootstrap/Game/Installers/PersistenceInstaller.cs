@@ -20,7 +20,8 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
 
             builder.Register<ChunkDeltaSerializer>(Lifetime.Singleton);
 
-            builder.Register<ChunkDeltaStore>(Lifetime.Singleton);
+            builder.Register<ChunkDeltaStore>(Lifetime.Singleton)
+                .As<IChunkDeltaStore>();
 
             builder.RegisterInstance(
                 new GeneratorVersionStamp(

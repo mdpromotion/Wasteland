@@ -26,7 +26,7 @@ namespace _Project.Features.ProceduralWorld.Application.Persistence
     {
         private readonly IChunkMutationTracker _tracker;
         private readonly IDirtyChunkRegistry _dirtyRegistry;
-        private readonly ChunkDeltaStore _deltaStore;
+        private readonly IChunkDeltaStore _deltaStore;
 
         public event Action<ChunkCoordinate> ChunkSaved;
         public event Action WorldSaved;
@@ -34,7 +34,7 @@ namespace _Project.Features.ProceduralWorld.Application.Persistence
         public WorldSaveService(
             IChunkMutationTracker tracker,
             IDirtyChunkRegistry dirtyRegistry,
-            ChunkDeltaStore deltaStore)
+            IChunkDeltaStore deltaStore)
         {
             _tracker = tracker;
             _dirtyRegistry = dirtyRegistry;

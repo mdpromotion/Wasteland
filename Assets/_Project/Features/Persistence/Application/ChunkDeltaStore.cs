@@ -1,15 +1,25 @@
 using System;
+using System.Collections.Generic;
 using _Project.Features.Persistence.Infrastructure;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using _Project.Features.ProceduralWorld.Domain.Persistence;
 
 namespace _Project.Features.Persistence.Application
 {
-    public sealed class ChunkDeltaStore
+    public interface IChunkDeltaStore
+    {
+        ChunkDelta Load(ChunkCoordinate coord);
+        void Save(ChunkCoordinate coord, ChunkDelta incrementalDelta);
+        void Unload(ChunkCoordinate coord);
+    }
+    
+    public sealed class ChunkDeltaStore : IChunkDeltaStore
     {
         private readonly IPalRegionReader _reader;
         private readonly IPalRegionWriter _writer;
         private readonly ChunkDeltaSerializer _serializer;
+        
+        private readonly Dictionary<ChunkCoordinate, ChunkDelta> _cache = new();
 
         public ChunkDeltaStore(IPalRegionReader reader, IPalRegionWriter writer, ChunkDeltaSerializer serializer)
         {
@@ -20,10 +30,15 @@ namespace _Project.Features.Persistence.Application
 
         public ChunkDelta Load(ChunkCoordinate coord)
         {
+            if (_cache.TryGetValue(coord, out var cachedDelta))
+            {
+                return cachedDelta;
+            }
+            
             var (regionX, regionZ, slot) = RegionAddressing.ToSlot(coord);
             var result = _reader.ReadSlot(regionX, regionZ, slot);
 
-            return result.State switch
+            var delta = result.State switch
             {
                 PalSlotState.Present => _serializer.Deserialize(result.Payload),
                 PalSlotState.Missing => ChunkDelta.Empty,
@@ -31,20 +46,35 @@ namespace _Project.Features.Persistence.Application
                 PalSlotState.Corrupted => ChunkDelta.Empty, // TODO: сигнал наверх, не молчать
                 _ => ChunkDelta.Empty
             };
+            
+            _cache[coord] = delta;
+            
+            return delta;
         }
 
-        public void Save(ChunkCoordinate coord, ChunkDelta delta)
+        public void Save(ChunkCoordinate coord, ChunkDelta incrementalDelta)
         {
+            var existingDelta = Load(coord);
+            
+            var finalDelta = existingDelta.Merge(incrementalDelta);
+            
+            _cache[coord] = finalDelta;
+            
             var (regionX, regionZ, slot) = RegionAddressing.ToSlot(coord);
 
-            if (delta.IsEmpty)
+            if (finalDelta.IsEmpty)
             {
                 _writer.DeleteSlot(regionX, regionZ, slot);
                 return;
             }
 
-            var payload = _serializer.Serialize(delta);
+            var payload = _serializer.Serialize(finalDelta);
             _writer.WriteSlot(regionX, regionZ, slot, payload);
+        }
+        
+        public void Unload(ChunkCoordinate coord)
+        {
+            _cache.Remove(coord);
         }
     }
 

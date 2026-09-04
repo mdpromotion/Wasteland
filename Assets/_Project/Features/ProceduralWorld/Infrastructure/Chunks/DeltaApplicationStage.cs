@@ -22,9 +22,9 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Chunks
     /// </remarks>
     public sealed class DeltaApplicationStage : IDeltaStage
     {
-        private readonly ChunkDeltaStore _store;
+        private readonly IChunkDeltaStore _store;
 
-        public DeltaApplicationStage(ChunkDeltaStore store) => _store = store;
+        public DeltaApplicationStage(IChunkDeltaStore store) => _store = store;
 
         public void Apply(ChunkCoordinate coordinate, VegetationData vegetation)
         {

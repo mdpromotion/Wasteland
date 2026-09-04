@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using _Project.Features.Persistence.Application;
 using _Project.Features.ProceduralWorld.Application.Chunks.Generation;
 using _Project.Features.ProceduralWorld.Application.Persistence;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
@@ -31,6 +32,7 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
         private readonly ChunkRepository _repository;
 
         private readonly ILandscapeFactory _factory;
+        private readonly IChunkDeltaStore _deltaStore;
         private readonly ChunkNeighborConnector _neighborConnector;
         private readonly IDeltaStage _deltaStage;
         private readonly IWorldSaveService _saveService;
@@ -50,6 +52,7 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
             ChunkRepository repository,
             ILandscapeApplier applier,
             ILandscapeFactory factory,
+            IChunkDeltaStore deltaStore,
             ChunkNeighborConnector neighborConnector,
             IDeltaStage deltaStage,
             IWorldSaveService saveService)
@@ -57,6 +60,7 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
             _scheduler = scheduler;
             _repository = repository;
             _factory = factory;
+            _deltaStore = deltaStore;
             _neighborConnector = neighborConnector;
             _deltaStage = deltaStage;
             _saveService = saveService;
@@ -136,10 +140,11 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
             if (!_repository.TryGet(coordinate, out ChunkInstance chunk))
                 return;
 
-            _saveService.SaveChunk(coordinate); // flush pending mutations перед выгрузкой
+            _saveService.SaveChunk(coordinate);
 
             _neighborConnector.Disconnect(_repository, coordinate);
             _repository.Remove(coordinate);
+            _deltaStore.Unload(coordinate);
 
             chunk.Landscape.Dispose();
             chunk.Hydrology.Dispose();

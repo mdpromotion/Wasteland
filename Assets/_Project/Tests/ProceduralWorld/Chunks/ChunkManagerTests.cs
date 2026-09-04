@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using _Project.Features.Core.Infrastructure;
+using _Project.Features.Persistence.Application;
 using _Project.Features.ProceduralWorld.Application.Chunks;
 using _Project.Features.ProceduralWorld.Application.Chunks.Generation;
 using _Project.Features.ProceduralWorld.Application.Persistence;
 using _Project.Features.ProceduralWorld.Domain;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
+using _Project.Features.ProceduralWorld.Domain.Persistence;
 using _Project.Features.ProceduralWorld.Domain.Vegetation;
 using _Project.Features.ProceduralWorld.Infrastructure.Chunks;
 using _Project.Features.ProceduralWorld.Infrastructure.Interfaces;
@@ -37,6 +39,7 @@ namespace _Project.Tests.ProceduralWorld.Chunks
                     repository,
                     applier,
                     new FakeLandscapeFactory(),
+                    new FakeDeltaStore(),
                     new ChunkNeighborConnector(
                         new FakeLandscapeFactory()),
                     new FakeDeltaStage(),
@@ -85,6 +88,7 @@ namespace _Project.Tests.ProceduralWorld.Chunks
                     repository,
                     new RecordingApplier(),
                     new FakeLandscapeFactory(),
+                    new FakeDeltaStore(),
                     new ChunkNeighborConnector(
                         new FakeLandscapeFactory()),
                     new FakeDeltaStage(),
@@ -126,6 +130,7 @@ namespace _Project.Tests.ProceduralWorld.Chunks
                 repository,
                 new RecordingApplier(),
                 new FakeLandscapeFactory(),
+                new FakeDeltaStore(),
                 new ChunkNeighborConnector(new FakeLandscapeFactory()),
                 new FakeDeltaStage(),
                 saveService);
@@ -183,6 +188,22 @@ namespace _Project.Tests.ProceduralWorld.Chunks
             public void Apply(ChunkGenerationResult result)
             {
                 Results.Add(result);
+            }
+        }
+
+        private sealed class FakeDeltaStore : IChunkDeltaStore
+        {
+            public ChunkDelta Load(ChunkCoordinate coord)
+            {
+                return ChunkDelta.Empty;
+            }
+
+            public void Save(ChunkCoordinate coord, ChunkDelta incrementalDelta)
+            {
+            }
+
+            public void Unload(ChunkCoordinate coord)
+            {
             }
         }
 
