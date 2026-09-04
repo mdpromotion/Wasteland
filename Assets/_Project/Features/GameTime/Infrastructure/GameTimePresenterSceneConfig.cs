@@ -32,5 +32,15 @@ namespace _Project.Features.GameTime.Infrastructure
 
         public GameTimeTransition DayTransition => _dayTransition;
         public GameTimeTransition NightTransition => _nightTransition;
+        
+#if UNITY_INCLUDE_TESTS
+        public void SetForTest(float sunRotationOffset, float transitionDurationHours, float dayHour, float nightHour)
+        {
+            _sunRotationOffset = sunRotationOffset;
+            _transitionDurationHours = transitionDurationHours;
+            _dayTransition = new GameTimeTransition { Hour = dayHour };
+            _nightTransition = new GameTimeTransition { Hour = nightHour };
+        }
+#endif
     }
 }
