@@ -13,7 +13,8 @@ namespace _Project.Features.Persistence.Application
     public interface IPlayerPersistence
     {
         void SavePlayer();
-        bool TryLoadPlayer();
+        bool TryGetSaveData(out PlayerSaveData data);
+        void ApplyPlayerState(Vector3 localPosition, float yaw, float pitch);
     }
 
     public sealed class PlayerPersistenceService : IPlayerPersistence
@@ -66,22 +67,19 @@ namespace _Project.Features.Persistence.Application
             _writer.SavePlayer(_worldSettings.Name, playerId, data);
         }
 
-        public bool TryLoadPlayer()
+        public bool TryGetSaveData(out PlayerSaveData data)
         {
             var playerId = _identity.GetPlayerId();
+            return _reader.TryReadPlayer(_worldSettings.Name, playerId, out data);
+        }
 
-            if (!_reader.TryReadPlayer(_worldSettings.Name, playerId, out var data))
-                return false;
+        public void ApplyPlayerState(Vector3 localPosition, float yaw, float pitch)
+        {
+            _motor.TeleportToPosition(localPosition);
+            _motor.SetRotation(Quaternion.Euler(0f, yaw, 0f));
 
-            var spawnPosition = new Vector3((float)data.X, data.Y, (float)data.Z);
-
-            _motor.TeleportToPosition(spawnPosition);
-            _motor.SetRotation(Quaternion.Euler(0f, data.Yaw, 0f));
-
-            _player.SyncYaw(data.Yaw);
-            _camera.SyncPitch(data.Pitch);
-
-            return true;
+            _player.SyncYaw(yaw);
+            _camera.SyncPitch(pitch);
         }
     }
 }

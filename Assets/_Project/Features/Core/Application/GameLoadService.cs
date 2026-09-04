@@ -11,20 +11,20 @@ namespace _Project.Features.Core.Application
     public sealed class GameLoadService
     {
         private readonly IPlayerController _player;
-        private readonly IPlayerPersistence _playerPersistence;
+        private readonly IGamePersistenceCoordinator _gamePersistenceCoordinator;
         private readonly IPlayerPositionService _positionService;
         private readonly IGameTimeSaveService _gameTimeSaveService;
         private readonly IChunkManager _chunkManager;
 
         public GameLoadService(
             IPlayerController player,
-            IPlayerPersistence playerPersistence,
+            IGamePersistenceCoordinator gamePersistenceCoordinator,
             IPlayerPositionService positionService,
             IGameTimeSaveService gameTimeSaveService,
             IChunkManager chunkManager)
         {
             _player = player;
-            _playerPersistence = playerPersistence;
+            _gamePersistenceCoordinator = gamePersistenceCoordinator;
             _positionService = positionService;
             _gameTimeSaveService = gameTimeSaveService;
             _chunkManager = chunkManager;
@@ -36,7 +36,7 @@ namespace _Project.Features.Core.Application
 
             _gameTimeSaveService.Load();
             
-            if (_playerPersistence.TryLoadPlayer())
+            if (_gamePersistenceCoordinator.TryLoadGame())
                 await WaitForPlayerChunkAsync();
             else
                 await PrepareNewPlayerAsync();

@@ -41,6 +41,12 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
 
             builder.Register<PlayerPersistenceService>(Lifetime.Singleton)
                 .As<IPlayerPersistence>();
+            
+            builder.Register<ChunkPersistenceService>(Lifetime.Singleton)
+                .As<IChunkPersistence>();
+            
+            builder.Register<GamePersistenceCoordinator>(Lifetime.Singleton)
+                .As<IGamePersistenceCoordinator>();
 
             builder.Register<DeltaApplicationStage>(Lifetime.Singleton)
                 .As<IDeltaStage>();
