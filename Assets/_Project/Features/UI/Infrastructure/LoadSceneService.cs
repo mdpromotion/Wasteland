@@ -56,18 +56,19 @@ namespace _Project.Features.UI.Infrastructure
 
             if (_handles.TryGetValue(sceneAddress, out var handle))
             {
-                await Addressables.UnloadSceneAsync(handle).ToUniTask();
+                await Addressables.UnloadSceneAsync(handle).Task;
                 _handles.Remove(sceneAddress);
                 return;
             }
-            
+
             Scene scene = SceneManager.GetSceneByPath(sceneAddress);
+
             if (!scene.IsValid())
                 scene = SceneManager.GetSceneByName(GetSceneNameFromAddress(sceneAddress));
 
             if (scene.IsValid() && scene.isLoaded)
             {
-                await SceneManager.UnloadSceneAsync(scene).ToUniTask();
+                await SceneManager.UnloadSceneAsync(scene);
             }
         }
 
