@@ -1,3 +1,5 @@
+<img width="1774" height="887" alt="Wasteland Preview" src="https://github.com/user-attachments/assets/83863960-48b4-407d-8ac3-7566a9421702"/>
+
 # Wasteland ![Unity Tests](https://github.com/mdpromotion/Wasteland/actions/workflows/tests.yml/badge.svg)
 
 [English Version](#-english-version) | [Русская версия](#-русская-версия)
