@@ -48,7 +48,6 @@ namespace _Project.Features.Items.Presentation
             _lastSelectedSlot = _inventory.SelectedSlot;
             _inventory.Changed += Render;
             Render();
-            Debug.Log($"[HotbarHUD] Presenter started at slot {_inventory.SelectedSlot + 1}.");
         }
 
         private Canvas CreateCanvas()
@@ -213,9 +212,6 @@ namespace _Project.Features.Items.Presentation
 
             if (_lastSelectedSlot != _inventory.SelectedSlot)
             {
-                string itemName = selectedItem?.DisplayName ?? "<empty>";
-                Debug.Log(
-                    $"[HotbarHUD] Rendering selected slot {_inventory.SelectedSlot + 1}; item={itemName}.");
                 _lastSelectedSlot = _inventory.SelectedSlot;
                 ShowSelectionToast(selectedItem);
             }

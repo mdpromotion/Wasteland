@@ -66,29 +66,21 @@ namespace _Project.Features.Core.Presentation
                 int selectedSlot = slot - 1;
                 InputAction action = _inputActions.Player.Get().FindAction($"HotbarSlot{slot}", true);
                 Action<InputAction.CallbackContext> callback =
-                    context => OnHotbarSlotPerformed(context, action, selectedSlot);
+                    context => OnHotbarSlotPerformed(context, selectedSlot);
 
                 action.performed += callback;
                 _hotbarSlotActions[selectedSlot] = action;
                 _hotbarSlotCallbacks[selectedSlot] = callback;
-                Debug.Log(
-                    $"[HotbarInput] Registered {action.name}, enabled={action.enabled}, binding={action.bindings[0].effectivePath}.");
             }
 
             _inputActions.Player.RightMouse.performed += OnRightMousePerformed;
             _inputActions.UI.InGameMenu.canceled += OnPauseReleased;
-            Debug.Log("[HotbarInput] InputReader initialized.");
         }
 
         private void OnHotbarSlotPerformed(
             InputAction.CallbackContext context,
-            InputAction action,
             int selectedSlot)
         {
-            int listeners = HotbarSlotSelected?.GetInvocationList().Length ?? 0;
-            Debug.Log(
-                $"[HotbarInput] {context.control.path} performed {action.name}; " +
-                $"emitting slot {selectedSlot + 1} to {listeners} listener(s).");
             HotbarSlotSelected?.Invoke(selectedSlot);
         }
 
