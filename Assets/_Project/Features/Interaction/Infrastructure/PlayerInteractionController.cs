@@ -31,12 +31,42 @@ namespace _Project.Features.Interaction.Infrastructure
         private IEnumerable<IHitHandler> _hitHandlers;
         private UnityEngine.Camera _interactionCamera;
         private Inventory _inventory;
+        private readonly HashSet<IItemPickupTarget> _nearbyPickups = new HashSet<IItemPickupTarget>();
 
         private float _timer;
 
         public event Action<float> PlayerInteracted; 
 
         public bool TryCollect(ItemId itemId) => _inventory != null && _inventory.TryAdd(itemId, 1);
+
+        public void RegisterNearbyPickup(IItemPickupTarget pickup)
+        {
+            if (pickup != null)
+                _nearbyPickups.Add(pickup);
+        }
+
+        public void UnregisterNearbyPickup(IItemPickupTarget pickup)
+        {
+            if (pickup != null)
+                _nearbyPickups.Remove(pickup);
+        }
+
+        public bool TryCollectNearestPickup()
+        {
+            IItemPickupTarget nearestPickup = null;
+            float nearestDistance = float.PositiveInfinity;
+
+            foreach (IItemPickupTarget pickup in _nearbyPickups)
+            {
+                if (pickup.Distance >= nearestDistance)
+                    continue;
+
+                nearestPickup = pickup;
+                nearestDistance = pickup.Distance;
+            }
+
+            return nearestPickup != null && nearestPickup.TryCollect(this);
+        }
         
         [Inject]
         public void Construct(

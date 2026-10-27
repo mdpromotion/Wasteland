@@ -1,5 +1,6 @@
 using _Project.Features.Items.Application;
 using _Project.Features.Items.Domain;
+using _Project.Features.Items.Presentation;
 using UnityEngine;
 
 namespace _Project.Features.Items.Infrastructure
@@ -12,16 +13,19 @@ namespace _Project.Features.Items.Infrastructure
         private readonly Inventory _inventory;
         private readonly ItemCatalogAsset _catalog;
         private readonly ItemDropSettings _settings;
+        private readonly HotbarHudSettings _hudSettings;
         private UnityEngine.Camera _camera;
 
         public ItemDropService(
             Inventory inventory,
             ItemCatalogAsset catalog,
-            ItemDropSettings settings)
+            ItemDropSettings settings,
+            HotbarHudSettings hudSettings)
         {
             _inventory = inventory;
             _catalog = catalog;
             _settings = settings;
+            _hudSettings = hudSettings;
         }
 
         public bool TryDropSelected()
@@ -42,7 +46,7 @@ namespace _Project.Features.Items.Infrastructure
                 : CreateFallbackItem(definition, spawnPosition);
 
             droppedObject.name = $"Dropped {definition.DisplayName}";
-            ConfigureCollider(droppedObject);
+            ConfigureCollider(droppedObject, _settings.PickupRange);
             Rigidbody body = droppedObject.GetComponent<Rigidbody>();
             if (body == null)
                 body = droppedObject.AddComponent<Rigidbody>();
@@ -55,7 +59,12 @@ namespace _Project.Features.Items.Infrastructure
             WorldItemPickup pickup = droppedObject.GetComponent<WorldItemPickup>();
             if (pickup == null)
                 pickup = droppedObject.AddComponent<WorldItemPickup>();
-            pickup.Initialize(stack.Item.Id);
+
+            WorldItemPickupBillboard billboard = droppedObject.GetComponent<WorldItemPickupBillboard>();
+            if (billboard == null)
+                billboard = droppedObject.AddComponent<WorldItemPickupBillboard>();
+            billboard.Initialize(definition, _hudSettings);
+            pickup.Initialize(stack.Item.Id, billboard);
 
             if (!_inventory.TryRemoveSelectedOne(out _))
             {
@@ -87,27 +96,28 @@ namespace _Project.Features.Items.Infrastructure
             return item;
         }
 
-        private static void ConfigureCollider(GameObject item)
+        private static void ConfigureCollider(GameObject item, float pickupRange)
         {
             Collider[] colliders = item.GetComponentsInChildren<Collider>();
             bool hasSolidCollider = false;
-            bool hasTriggerCollider = false;
+            SphereCollider pickupTrigger = null;
             for (int i = 0; i < colliders.Length; i++)
             {
                 hasSolidCollider |= !colliders[i].isTrigger;
-                hasTriggerCollider |= colliders[i].isTrigger;
+                if (pickupTrigger == null && colliders[i].isTrigger && colliders[i] is SphereCollider sphere)
+                    pickupTrigger = sphere;
             }
 
             if (!hasSolidCollider)
                 item.AddComponent<BoxCollider>();
 
-            if (!hasTriggerCollider)
+            if (pickupTrigger == null)
             {
-                SphereCollider pickupTrigger = item.AddComponent<SphereCollider>();
-                pickupTrigger.radius = 0.45f;
+                pickupTrigger = item.AddComponent<SphereCollider>();
                 pickupTrigger.isTrigger = true;
             }
 
+            pickupTrigger.radius = pickupRange;
         }
     }
 }

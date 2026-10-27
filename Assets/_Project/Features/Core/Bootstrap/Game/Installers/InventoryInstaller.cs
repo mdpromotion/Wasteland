@@ -31,6 +31,7 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
             builder.Register<ItemDropService>(Lifetime.Singleton)
                 .As<IItemDropService>();
             builder.RegisterEntryPoint<DropItemController>();
+            builder.RegisterEntryPoint<PickupItemController>();
         }
     }
 }

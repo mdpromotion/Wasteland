@@ -14,6 +14,7 @@ namespace _Project.Features.Core.Bootstrap.Installers
                 .As<IPlayerInputReader>()
                 .As<IPlayerUIInputReader>()
                 .As<IPlayerDropInputReader>()
+                .As<IPlayerPickupInputReader>()
                 .As<IInitializable>();
         }
     }

@@ -36,6 +36,15 @@ namespace _Project.Features.Items.Presentation
         [SerializeField] private Vector3 stowedItemPosition = new Vector3(0.42f, -0.9f, 0.35f);
         [SerializeField, Min(0.01f)] private float equipDuration = 0.28f;
 
+        [Header("Pickup Billboard")]
+        [SerializeField] private Vector2 pickupBillboardSize = new Vector2(310f, 96f);
+        [SerializeField, Min(0.001f)] private float pickupBillboardWorldScale = 0.005f;
+        [SerializeField] private Vector3 pickupBillboardOffset = new Vector3(0f, 1f, 0f);
+        [SerializeField] private float pickupIconSize = 54f;
+        [SerializeField] private int pickupTitleFontSize = 20;
+        [SerializeField] private int pickupPromptFontSize = 16;
+        [SerializeField] private string pickupPromptText = "Подобрать";
+
         public Vector2 ReferenceResolution => referenceResolution;
         public Vector2 HotbarSize => hotbarSize;
         public Vector2 SlotSize => slotSize;
@@ -59,5 +68,12 @@ namespace _Project.Features.Items.Presentation
         public Vector3 HeldItemScale => heldItemScale;
         public Vector3 StowedItemPosition => stowedItemPosition;
         public float EquipDuration => equipDuration;
+        public Vector2 PickupBillboardSize => pickupBillboardSize;
+        public float PickupBillboardWorldScale => pickupBillboardWorldScale;
+        public Vector3 PickupBillboardOffset => pickupBillboardOffset;
+        public float PickupIconSize => pickupIconSize;
+        public int PickupTitleFontSize => pickupTitleFontSize;
+        public int PickupPromptFontSize => pickupPromptFontSize;
+        public string PickupPromptText => pickupPromptText;
     }
 }

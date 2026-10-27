@@ -16,3 +16,4 @@ MonoBehaviour:
   forwardSpeed: 3
   upwardSpeed: 1.2
   worldObjectLifetime: 90
+  pickupRange: 2.5

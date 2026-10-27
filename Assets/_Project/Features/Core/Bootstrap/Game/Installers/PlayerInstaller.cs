@@ -1,4 +1,5 @@
 using _Project.Features.Interaction.Infrastructure;
+using _Project.Features.Items.Application;
 using _Project.Features.Player.Application;
 using _Project.Features.Player.Application.UseCases;
 using _Project.Features.Player.Domain;
@@ -72,7 +73,8 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
                 .AsSelf();
 
             builder.RegisterComponentInHierarchy<PlayerInteractionController>()
-                .As<IPlayerInteractionController>();
+                .As<IPlayerInteractionController>()
+                .As<IItemCollector>();
             
             builder.RegisterComponentInHierarchy<FootstepController>();
         }

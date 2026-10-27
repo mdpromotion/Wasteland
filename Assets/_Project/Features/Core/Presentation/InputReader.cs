@@ -28,10 +28,16 @@ namespace _Project.Features.Core.Presentation
         event Action DropItemRequested;
     }
 
+    public interface IPlayerPickupInputReader
+    {
+        event Action PickupItemRequested;
+    }
+
     public sealed class InputReader :
         IPlayerInputReader,
         IPlayerUIInputReader,
         IPlayerDropInputReader,
+        IPlayerPickupInputReader,
         IInitializable,
         IDisposable
     {
@@ -60,6 +66,7 @@ namespace _Project.Features.Core.Presentation
         
         public event Action PauseClicked;
         public event Action DropItemRequested;
+        public event Action PickupItemRequested;
 
         public void Initialize()
         {
@@ -84,6 +91,7 @@ namespace _Project.Features.Core.Presentation
             _inputActions.Player.RightMouse.performed += OnRightMousePerformed;
             _dropItemAction = _inputActions.Player.Get().FindAction("DropItem", true);
             _dropItemAction.performed += OnDropItemPerformed;
+            _inputActions.Player.Interact.started += OnPickupStarted;
             _inputActions.UI.InGameMenu.canceled += OnPauseReleased;
         }
 
@@ -107,12 +115,18 @@ namespace _Project.Features.Core.Presentation
             DropItemRequested?.Invoke();
         }
 
+        private void OnPickupStarted(InputAction.CallbackContext context)
+        {
+            PickupItemRequested?.Invoke();
+        }
+
         public void Dispose()
         {
             _inputActions.Player.RightMouse.performed -= OnRightMousePerformed;
             if (_dropItemAction != null)
                 _dropItemAction.performed -= OnDropItemPerformed;
             _dropItemAction = null;
+            _inputActions.Player.Interact.started -= OnPickupStarted;
             _inputActions.UI.InGameMenu.canceled -= OnPauseReleased;
 
             for (int slot = 0; slot < _hotbarSlotActions.Length; slot++)
