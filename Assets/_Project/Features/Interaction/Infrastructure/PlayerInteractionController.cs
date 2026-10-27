@@ -68,7 +68,9 @@ namespace _Project.Features.Interaction.Infrastructure
             PlayerInteracted?.Invoke(interval);
 
             ItemDefinition selectedItem = _inventory.SelectedItem;
-            if (selectedItem == null || !selectedItem.CanChopTrees)
+            TreeChoppingItemBehavior choppingBehavior =
+                selectedItem?.GetBehavior<TreeChoppingItemBehavior>();
+            if (choppingBehavior == null)
                 return;
 
             if (!_interactionCamera)
@@ -89,7 +91,7 @@ namespace _Project.Features.Interaction.Infrastructure
                 if (!handler.CanHandle(rayHit))
                     continue;
 
-                handler.Handle(rayHit, selectedItem.ToolDamage);
+                handler.Handle(rayHit, choppingBehavior.Damage);
                 break;
             }
         }

@@ -93,9 +93,22 @@ namespace _Project.Features.Items.Domain
         public bool TryConsumeSelected()
         {
             InventoryStack stack = _slots[SelectedSlot];
-            if (stack == null || !stack.Item.CanConsume)
+            if (stack == null || stack.Item.GetBehavior<ConsumableItemBehavior>() == null)
                 return false;
 
+            return TryRemoveSelectedOne(out _);
+        }
+
+        public bool TryRemoveSelectedOne(out ItemDefinition item)
+        {
+            InventoryStack stack = _slots[SelectedSlot];
+            if (stack == null)
+            {
+                item = null;
+                return false;
+            }
+
+            item = stack.Item;
             _slots[SelectedSlot] = stack.Count == 1
                 ? null
                 : new InventoryStack(stack.Item, stack.Count - 1);
