@@ -16,3 +16,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ca229769b74a4a7a9a8a6a3b7f4386ca, type: 2}
   - {fileID: 11400000, guid: df15741311b342f99ed33811dc655340, type: 2}
   - {fileID: 11400000, guid: a542eb7d52e14409a982c06d7fb43e10, type: 2}
+  startingItems:
+  - item: {fileID: 11400000, guid: ca229769b74a4a7a9a8a6a3b7f4386ca, type: 2}
+    count: 1
+  - item: {fileID: 11400000, guid: df15741311b342f99ed33811dc655340, type: 2}
+    count: 50
+  - item: {fileID: 11400000, guid: a542eb7d52e14409a982c06d7fb43e10, type: 2}
+    count: 3

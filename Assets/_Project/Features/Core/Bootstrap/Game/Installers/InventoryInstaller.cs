@@ -12,19 +12,16 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
         public static void Install(
             IContainerBuilder builder,
             ItemCatalogAsset catalogAsset,
-            StartingInventoryAsset startingInventoryAsset,
             ItemDropSettings itemDropSettings)
         {
             if (catalogAsset == null)
                 throw new ArgumentNullException(nameof(catalogAsset));
-            if (startingInventoryAsset == null)
-                throw new ArgumentNullException(nameof(startingInventoryAsset));
             if (itemDropSettings == null)
                 throw new ArgumentNullException(nameof(itemDropSettings));
 
             ItemCatalog catalog = catalogAsset.CreateDomainCatalog();
 
-            Inventory inventory = startingInventoryAsset.Create(catalog);
+            Inventory inventory = catalogAsset.CreateStartingInventory(catalog);
 
             builder.RegisterInstance(catalogAsset);
             builder.RegisterInstance(itemDropSettings);

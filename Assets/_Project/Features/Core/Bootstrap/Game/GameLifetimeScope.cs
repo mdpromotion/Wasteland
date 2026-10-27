@@ -37,7 +37,6 @@ namespace _Project.Features.Core.Bootstrap.Game
 
         [Header("Inventory UI")]
         [SerializeField] private ItemCatalogAsset itemCatalogAsset;
-        [SerializeField] private StartingInventoryAsset startingInventoryAsset;
         [SerializeField] private ItemDropSettings itemDropSettings;
         [SerializeField] private HotbarHudSettings hotbarHudSettings;
 
@@ -51,7 +50,7 @@ namespace _Project.Features.Core.Bootstrap.Game
                 database,
                 globalMaxVoices);
 
-            InventoryInstaller.Install(builder, itemCatalogAsset, startingInventoryAsset, itemDropSettings);
+            InventoryInstaller.Install(builder, itemCatalogAsset, itemDropSettings);
 
             PlayerInstaller.Install(
                 builder,
