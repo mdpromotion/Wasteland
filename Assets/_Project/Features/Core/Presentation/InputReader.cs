@@ -9,6 +9,8 @@ namespace _Project.Features.Core.Presentation
     {
         bool LeftMouseButtonPressed { get; }
         bool RightMouseButtonPressed { get; }
+        event Action<int> HotbarSlotSelected;
+        event Action UseItemRequested;
         Vector2 Move { get; }
         Vector2 Look { get; }
         bool JumpPressed { get; }
@@ -28,6 +30,7 @@ namespace _Project.Features.Core.Presentation
         IDisposable
     {
         private readonly InputSystem_Actions _inputActions;
+        private readonly InputAction _hotbarSlotAction = new InputAction("HotbarSlot", InputActionType.Button);
 
         public InputReader(InputSystem_Actions inputActions)
         {
@@ -41,14 +44,34 @@ namespace _Project.Features.Core.Presentation
         public bool JumpPressed => _inputActions.Player.Jump.IsPressed();
         public bool SprintPressed => _inputActions.Player.Sprint.IsPressed();
         public bool CrouchPressed => _inputActions.Player.Crouch.IsPressed();
+
+        public event Action<int> HotbarSlotSelected;
+        public event Action UseItemRequested;
         
         public event Action PauseClicked;
 
         public void Initialize()
         {
             _inputActions.Enable();
-            
+
+            for (int slot = 1; slot <= 9; slot++)
+                _hotbarSlotAction.AddBinding($"<Keyboard>/{slot}");
+
+            _hotbarSlotAction.performed += OnHotbarSlotPerformed;
+            _hotbarSlotAction.Enable();
+            _inputActions.Player.RightMouse.performed += OnRightMousePerformed;
             _inputActions.UI.InGameMenu.canceled += OnPauseReleased;
+        }
+
+        private void OnHotbarSlotPerformed(InputAction.CallbackContext context)
+        {
+            if (int.TryParse(context.control.name, out int slot))
+                HotbarSlotSelected?.Invoke(slot - 1);
+        }
+
+        private void OnRightMousePerformed(InputAction.CallbackContext context)
+        {
+            UseItemRequested?.Invoke();
         }
 
         private void OnPauseReleased(InputAction.CallbackContext context)
@@ -58,8 +81,11 @@ namespace _Project.Features.Core.Presentation
 
         public void Dispose()
         {
+            _inputActions.Player.RightMouse.performed -= OnRightMousePerformed;
             _inputActions.UI.InGameMenu.canceled -= OnPauseReleased;
-            
+
+            _hotbarSlotAction.performed -= OnHotbarSlotPerformed;
+            _hotbarSlotAction.Dispose();
             _inputActions.Disable();
             _inputActions.Dispose();
         }

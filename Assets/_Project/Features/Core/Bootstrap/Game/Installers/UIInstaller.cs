@@ -1,4 +1,5 @@
 using _Project.Features.Core.Infrastructure;
+using _Project.Features.Items.Presentation;
 using _Project.Features.Player.Application;
 using _Project.Features.UI.Hud.CooldownBar;
 using _Project.Features.UI.Infrastructure;
@@ -28,6 +29,8 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
             builder.RegisterComponentInHierarchy<InGameMenuPresenter>();
 
             builder.RegisterComponentInHierarchy<SettingsMenuPresenter>();
+
+            builder.RegisterEntryPoint<HotbarHudPresenter>();
         }
     }
 }

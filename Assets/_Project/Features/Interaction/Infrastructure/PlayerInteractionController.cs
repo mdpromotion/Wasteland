@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using _Project.Features.Core.Domain;
 using _Project.Features.Core.Presentation;
+using _Project.Features.Items.Domain;
 using UnityEngine;
 using VContainer;
 
@@ -28,22 +29,23 @@ namespace _Project.Features.Interaction.Infrastructure
         private IPlayerInputReader _playerInputReader;
         private IEnumerable<IHitHandler> _hitHandlers;
         private UnityEngine.Camera _interactionCamera;
+        private Inventory _inventory;
 
         private float _timer;
 
-        private const float Damage = 1f; // TODO: Refactor this into Inventory/Item feature. 
-        
         public event Action<float> PlayerInteracted; 
         
         [Inject]
         public void Construct(
             IGameState gameState,
             IPlayerInputReader playerInputReader,
-            IEnumerable<IHitHandler> hitHandlers)
+            IEnumerable<IHitHandler> hitHandlers,
+            Inventory inventory)
         {
             _gameState = gameState;
             _playerInputReader = playerInputReader;
             _hitHandlers = hitHandlers;
+            _inventory = inventory;
             _interactionCamera = UnityEngine.Camera.main;
         }
 
@@ -65,6 +67,10 @@ namespace _Project.Features.Interaction.Infrastructure
         {
             PlayerInteracted?.Invoke(interval);
 
+            ItemDefinition selectedItem = _inventory.SelectedItem;
+            if (selectedItem == null || !selectedItem.CanChopTrees)
+                return;
+
             if (!_interactionCamera)
                 _interactionCamera = UnityEngine.Camera.main;
 
@@ -83,7 +89,7 @@ namespace _Project.Features.Interaction.Infrastructure
                 if (!handler.CanHandle(rayHit))
                     continue;
 
-                handler.Handle(rayHit, Damage);
+                handler.Handle(rayHit, selectedItem.ToolDamage);
                 break;
             }
         }
