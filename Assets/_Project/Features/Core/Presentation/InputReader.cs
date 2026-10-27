@@ -23,9 +23,15 @@ namespace _Project.Features.Core.Presentation
         event Action PauseClicked;
     }
 
+    public interface IPlayerDropInputReader
+    {
+        event Action DropItemRequested;
+    }
+
     public sealed class InputReader :
         IPlayerInputReader,
         IPlayerUIInputReader,
+        IPlayerDropInputReader,
         IInitializable,
         IDisposable
     {
@@ -33,6 +39,7 @@ namespace _Project.Features.Core.Presentation
         private readonly InputAction[] _hotbarSlotActions = new InputAction[9];
         private readonly Action<InputAction.CallbackContext>[] _hotbarSlotCallbacks =
             new Action<InputAction.CallbackContext>[9];
+        private InputAction _dropItemAction;
         private bool _initialized;
 
         public InputReader(InputSystem_Actions inputActions)
@@ -52,6 +59,7 @@ namespace _Project.Features.Core.Presentation
         public event Action UseItemRequested;
         
         public event Action PauseClicked;
+        public event Action DropItemRequested;
 
         public void Initialize()
         {
@@ -66,7 +74,7 @@ namespace _Project.Features.Core.Presentation
                 int selectedSlot = slot - 1;
                 InputAction action = _inputActions.Player.Get().FindAction($"HotbarSlot{slot}", true);
                 Action<InputAction.CallbackContext> callback =
-                    context => OnHotbarSlotPerformed(context, selectedSlot);
+                    _ => OnHotbarSlotPerformed(selectedSlot);
 
                 action.performed += callback;
                 _hotbarSlotActions[selectedSlot] = action;
@@ -74,12 +82,12 @@ namespace _Project.Features.Core.Presentation
             }
 
             _inputActions.Player.RightMouse.performed += OnRightMousePerformed;
+            _dropItemAction = _inputActions.Player.Get().FindAction("DropItem", true);
+            _dropItemAction.performed += OnDropItemPerformed;
             _inputActions.UI.InGameMenu.canceled += OnPauseReleased;
         }
 
-        private void OnHotbarSlotPerformed(
-            InputAction.CallbackContext context,
-            int selectedSlot)
+        private void OnHotbarSlotPerformed(int selectedSlot)
         {
             HotbarSlotSelected?.Invoke(selectedSlot);
         }
@@ -94,9 +102,17 @@ namespace _Project.Features.Core.Presentation
             PauseClicked?.Invoke();
         }
 
+        private void OnDropItemPerformed(InputAction.CallbackContext context)
+        {
+            DropItemRequested?.Invoke();
+        }
+
         public void Dispose()
         {
             _inputActions.Player.RightMouse.performed -= OnRightMousePerformed;
+            if (_dropItemAction != null)
+                _dropItemAction.performed -= OnDropItemPerformed;
+            _dropItemAction = null;
             _inputActions.UI.InGameMenu.canceled -= OnPauseReleased;
 
             for (int slot = 0; slot < _hotbarSlotActions.Length; slot++)

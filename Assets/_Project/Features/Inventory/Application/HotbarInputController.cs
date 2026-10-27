@@ -21,16 +21,22 @@ namespace _Project.Features.Items.Application
             _inputReader = inputReader;
             _gameState = gameState;
             _inventory = inventory;
+            Subscribe();
         }
 
         public void Initialize()
         {
+            Subscribe();
+        }
+
+        private void Subscribe()
+        {
             if (_initialized)
                 return;
 
-            _initialized = true;
             _inputReader.HotbarSlotSelected += OnHotbarSlotSelected;
             _inputReader.UseItemRequested += OnUseItemRequested;
+            _initialized = true;
         }
 
         private void OnHotbarSlotSelected(int slot)

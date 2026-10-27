@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using _Project.Features.Core.Domain;
 using _Project.Features.Core.Presentation;
+using _Project.Features.Items.Application;
 using _Project.Features.Items.Domain;
 using UnityEngine;
 using VContainer;
@@ -19,7 +20,7 @@ namespace _Project.Features.Interaction.Infrastructure
         event Action<float> PlayerInteracted;
     }
     
-    public sealed class PlayerInteractionController : MonoBehaviour, IPlayerInteractionController
+    public sealed class PlayerInteractionController : MonoBehaviour, IPlayerInteractionController, IItemCollector
     {
         [SerializeField] private float interval = 1f;
         [SerializeField] private float rayDistance = 5f;
@@ -34,6 +35,8 @@ namespace _Project.Features.Interaction.Infrastructure
         private float _timer;
 
         public event Action<float> PlayerInteracted; 
+
+        public bool TryCollect(ItemId itemId) => _inventory != null && _inventory.TryAdd(itemId, 1);
         
         [Inject]
         public void Construct(

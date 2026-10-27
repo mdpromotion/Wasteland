@@ -8,15 +8,10 @@ namespace _Project.Features.Items.Presentation
 {
     public sealed class HotbarHudPresenter : IStartable, ITickable, IDisposable
     {
-        private const float SelectionToastDuration = 2.5f;
-        private const float SelectionToastFadeDuration = 0.45f;
-        private static readonly Color SlotColor = new Color(0.08f, 0.1f, 0.12f, 0.88f);
-        private static readonly Color SelectedSlotColor = new Color(0.16f, 0.2f, 0.22f, 0.96f);
-        private static readonly Color HighlightColor = new Color(0.95f, 0.72f, 0.24f, 1f);
-
         private readonly Inventory _inventory;
         private readonly HotbarHudRoot _hotbarHudRoot;
         private readonly IItemIconProvider _itemIconProvider;
+        private readonly HotbarHudSettings _settings;
         private readonly Image[] _slotBackgrounds = new Image[Inventory.HotbarSize];
         private readonly Image[] _slotIcons = new Image[Inventory.HotbarSize];
         private readonly Outline[] _slotOutlines = new Outline[Inventory.HotbarSize];
@@ -31,11 +26,13 @@ namespace _Project.Features.Items.Presentation
         public HotbarHudPresenter(
             Inventory inventory,
             HotbarHudRoot hotbarHudRoot,
-            IItemIconProvider itemIconProvider)
+            IItemIconProvider itemIconProvider,
+            HotbarHudSettings settings)
         {
             _inventory = inventory;
             _hotbarHudRoot = hotbarHudRoot;
             _itemIconProvider = itemIconProvider;
+            _settings = settings;
         }
 
         public void Start()
@@ -66,7 +63,7 @@ namespace _Project.Features.Items.Presentation
 
             CanvasScaler scaler = _canvasObject.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.referenceResolution = _settings.ReferenceResolution;
             scaler.matchWidthOrHeight = 0.5f;
             return canvas;
         }
@@ -79,8 +76,8 @@ namespace _Project.Features.Items.Presentation
             root.anchorMin = new Vector2(0.5f, 0f);
             root.anchorMax = new Vector2(0.5f, 0f);
             root.pivot = new Vector2(0.5f, 0f);
-            root.sizeDelta = new Vector2(720f, 98f);
-            root.anchoredPosition = new Vector2(0f, 20f);
+            root.sizeDelta = _settings.HotbarSize;
+            root.anchoredPosition = new Vector2(0f, _settings.BottomOffset);
 
             for (int slot = 0; slot < Inventory.HotbarSize; slot++)
                 CreateSlot(root, slot);
@@ -94,20 +91,36 @@ namespace _Project.Features.Items.Presentation
             rect.anchorMin = new Vector2(0.5f, 0f);
             rect.anchorMax = new Vector2(0.5f, 0f);
             rect.pivot = new Vector2(0.5f, 0f);
-            rect.sizeDelta = new Vector2(72f, 82f);
-            rect.anchoredPosition = new Vector2((slot - 4) * 79f, 8f);
+            rect.sizeDelta = _settings.SlotSize;
+            rect.anchoredPosition = new Vector2(
+                (slot - (Inventory.HotbarSize - 1) * 0.5f) * (_settings.SlotSize.x + _settings.SlotSpacing),
+                8f);
 
             _slotBackgrounds[slot] = slotObject.GetComponent<Image>();
-            _slotBackgrounds[slot].color = SlotColor;
+            _slotBackgrounds[slot].color = _settings.SlotColor;
             _slotBackgrounds[slot].raycastTarget = false;
 
             _slotOutlines[slot] = slotObject.GetComponent<Outline>();
-            _slotOutlines[slot].effectColor = HighlightColor;
+            _slotOutlines[slot].effectColor = _settings.HighlightColor;
             _slotOutlines[slot].effectDistance = new Vector2(2f, 2f);
 
-            CreateLabel(rect, $"Key {slot + 1}", (slot + 1).ToString(), 0.76f, 1f, 12, TextAnchor.UpperCenter);
+            CreateLabel(
+                rect,
+                $"Key {slot + 1}",
+                (slot + 1).ToString(),
+                0.76f,
+                1f,
+                _settings.KeyFontSize,
+                TextAnchor.UpperCenter);
             _slotIcons[slot] = CreateSlotIcon(rect, slot);
-            _countLabels[slot] = CreateLabel(rect, $"Count {slot + 1}", string.Empty, 0f, 0.24f, 12, TextAnchor.LowerRight);
+            _countLabels[slot] = CreateLabel(
+                rect,
+                $"Count {slot + 1}",
+                string.Empty,
+                0f,
+                0.24f,
+                _settings.CountFontSize,
+                TextAnchor.LowerRight);
         }
 
         private static Image CreateSlotIcon(RectTransform parent, int slot)
@@ -136,11 +149,14 @@ namespace _Project.Features.Items.Presentation
             rect.anchorMax = new Vector2(0.5f, 0f);
             rect.pivot = new Vector2(0.5f, 0f);
             rect.sizeDelta = new Vector2(480f, 42f);
-            rect.anchoredPosition = new Vector2(0f, 124f);
+            rect.anchoredPosition = new Vector2(0f, _settings.SelectionToastOffset);
 
             _selectionToastGroup = toastObject.GetComponent<CanvasGroup>();
             _selectionToastGroup.alpha = 0f;
-            _selectionToastLabel = ConfigureLabel(toastObject.GetComponent<Text>(), 24, TextAnchor.MiddleCenter);
+            _selectionToastLabel = ConfigureLabel(
+                toastObject.GetComponent<Text>(),
+                _settings.ToastFontSize,
+                TextAnchor.MiddleCenter);
         }
 
         private void CreateHeldItemLabel(Transform canvas)
@@ -152,12 +168,17 @@ namespace _Project.Features.Items.Presentation
             rect.anchorMax = new Vector2(1f, 0f);
             rect.pivot = new Vector2(1f, 0f);
             rect.sizeDelta = new Vector2(520f, 42f);
-            rect.anchoredPosition = new Vector2(-24f, 24f);
+            rect.anchoredPosition = new Vector2(
+                -_settings.HeldItemLabelRightOffset,
+                _settings.HeldItemLabelBottomOffset);
 
-            _heldItemLabel = ConfigureLabel(heldItemObject.GetComponent<Text>(), 20, TextAnchor.LowerRight);
+            _heldItemLabel = ConfigureLabel(
+                heldItemObject.GetComponent<Text>(),
+                _settings.HeldItemFontSize,
+                TextAnchor.LowerRight);
         }
 
-        private static Text CreateLabel(
+        private Text CreateLabel(
             RectTransform parent,
             string name,
             string value,
@@ -179,9 +200,11 @@ namespace _Project.Features.Items.Presentation
             return label;
         }
 
-        private static Text ConfigureLabel(Text label, int fontSize, TextAnchor alignment)
+        private Text ConfigureLabel(Text label, int fontSize, TextAnchor alignment)
         {
-            label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            label.font = _settings.Font != null
+                ? _settings.Font
+                : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             label.fontSize = fontSize;
             label.color = Color.white;
             label.alignment = alignment;
@@ -198,7 +221,9 @@ namespace _Project.Features.Items.Presentation
                 InventoryStack stack = _inventory.GetSlot(slot);
                 bool selected = slot == _inventory.SelectedSlot;
 
-                _slotBackgrounds[slot].color = selected ? SelectedSlotColor : SlotColor;
+                _slotBackgrounds[slot].color = selected
+                    ? _settings.SelectedSlotColor
+                    : _settings.SlotColor;
                 _slotOutlines[slot].enabled = selected;
                 _slotIcons[slot].sprite = stack == null ? null : _itemIconProvider.GetIcon(stack.Item.Id);
                 _slotIcons[slot].enabled = _slotIcons[slot].sprite != null;
@@ -228,8 +253,10 @@ namespace _Project.Features.Items.Presentation
             }
 
             _selectionToastLabel.text = item.DisplayName;
-            _selectionToastGroup.alpha = 1f;
-            _selectionToastTimeRemaining = SelectionToastDuration;
+            _selectionToastTimeRemaining = _settings.SelectionToastDuration;
+            _selectionToastGroup.alpha = _selectionToastTimeRemaining > 0f ? 1f : 0f;
+            if (_selectionToastTimeRemaining <= 0f)
+                _selectionToastLabel.text = string.Empty;
         }
 
         public void Tick()
@@ -238,8 +265,10 @@ namespace _Project.Features.Items.Presentation
                 return;
 
             _selectionToastTimeRemaining = Mathf.Max(0f, _selectionToastTimeRemaining - Time.unscaledDeltaTime);
-            _selectionToastGroup.alpha = _selectionToastTimeRemaining <= SelectionToastFadeDuration
-                ? _selectionToastTimeRemaining / SelectionToastFadeDuration
+            _selectionToastGroup.alpha = _settings.SelectionToastFadeDuration <= 0f
+                ? 0f
+                : _selectionToastTimeRemaining <= _settings.SelectionToastFadeDuration
+                    ? _selectionToastTimeRemaining / _settings.SelectionToastFadeDuration
                 : 1f;
 
             if (_selectionToastTimeRemaining <= 0f)

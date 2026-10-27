@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using _Project.Features.Items.Domain;
+using _Project.Features.Items.Infrastructure;
 using UnityEngine;
 
 namespace _Project.Features.Items.Presentation
@@ -11,21 +11,16 @@ namespace _Project.Features.Items.Presentation
 
     public sealed class ItemIconProvider : IItemIconProvider
     {
-        private readonly IReadOnlyDictionary<ItemId, Sprite> _icons;
+        private readonly ItemCatalogAsset _catalog;
 
-        public ItemIconProvider(Sprite ironAxe, Sprite wood, Sprite apple)
+        public ItemIconProvider(ItemCatalogAsset catalog)
         {
-            _icons = new Dictionary<ItemId, Sprite>
-            {
-                [ItemId.IronAxe] = ironAxe,
-                [ItemId.Wood] = wood,
-                [ItemId.Apple] = apple
-            };
+            _catalog = catalog;
         }
 
         public Sprite GetIcon(ItemId itemId)
         {
-            return _icons.TryGetValue(itemId, out Sprite icon) ? icon : null;
+            return _catalog.Get(itemId).Icon;
         }
     }
 }
