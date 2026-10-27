@@ -1,5 +1,6 @@
 using _Project.Features.Player.Domain;
 using _Project.Features.Player.Infrastructure;
+using _Project.Features.Sound.Application;
 using _Project.Features.Sound.Domain;
 using _Project.Features.Sound.Presentation;
 using UnityEngine;
@@ -41,20 +42,24 @@ namespace _Project.Features.Player.Presentation
 
         private void HandleEnterWater(WaterEnterInfo info)
         {
-            SoundKey key = _playerSoundSet.WaterEnter;
-            
-            _soundService.PlayAt(
-                key,
-                _player.Position);
+            PlayWaterSound(_playerSoundSet.WaterEnter);
         }
-        
+
         private void HandleExitWater()
         {
-            SoundKey key = _playerSoundSet.WaterExit;
-            
-            _soundService.PlayAt(
+            PlayWaterSound(_playerSoundSet.WaterExit);
+        }
+
+        private void PlayWaterSound(SoundKey key)
+        {
+            float maxVelocity = _playerSoundSet.WaterSoundMaxVelocity;
+            float volumeScale = maxVelocity > 0f
+                ? Mathf.Clamp01(_player.Velocity.magnitude / maxVelocity) * 0.5f
+                : 0f;
+
+            _soundService.Play(
                 key,
-                _player.Position);
+                new SoundPlayOptions(_player.Position, volumeScale, false));
         }
     }
 }

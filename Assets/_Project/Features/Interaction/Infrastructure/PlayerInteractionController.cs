@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using _Project.Features.Core.Domain;
 using _Project.Features.Core.Presentation;
-using _Project.Features.Player.Domain;
-using Unity.VisualScripting;
 using UnityEngine;
 using VContainer;
 
@@ -28,10 +25,9 @@ namespace _Project.Features.Interaction.Infrastructure
         [SerializeField] private LayerMask raycastMask;
 
         private IGameState _gameState;
-        private IPlayerReadOnly _player;
         private IPlayerInputReader _playerInputReader;
-        
         private IEnumerable<IHitHandler> _hitHandlers;
+        private UnityEngine.Camera _interactionCamera;
 
         private float _timer;
 
@@ -42,14 +38,13 @@ namespace _Project.Features.Interaction.Infrastructure
         [Inject]
         public void Construct(
             IGameState gameState,
-            IPlayerReadOnly player,
             IPlayerInputReader playerInputReader,
             IEnumerable<IHitHandler> hitHandlers)
         {
             _gameState = gameState;
-            _player = player;
             _playerInputReader = playerInputReader;
             _hitHandlers = hitHandlers;
+            _interactionCamera = UnityEngine.Camera.main;
         }
 
         private void Update()
@@ -69,22 +64,27 @@ namespace _Project.Features.Interaction.Infrastructure
         private void TryInteract()
         {
             PlayerInteracted?.Invoke(interval);
-            
-            Vector3 origin = _player.Position;
-            Vector3 direction = _player.Forward;
-            
-            if (!Physics.Raycast(origin, direction, out RaycastHit rayHit, rayDistance, raycastMask))
-            {
+
+            if (!_interactionCamera)
+                _interactionCamera = UnityEngine.Camera.main;
+
+            if (!_interactionCamera)
                 return;
-            }
+
+            Ray interactionRay = new Ray(
+                _interactionCamera.transform.position,
+                _interactionCamera.transform.forward);
+
+            if (!Physics.Raycast(interactionRay, out RaycastHit rayHit, rayDistance, raycastMask))
+                return;
             
             foreach (var handler in _hitHandlers)
             {
-                if (handler.CanHandle(rayHit))
-                {
-                    handler.Handle(rayHit, Damage);
-                    break;
-                }
+                if (!handler.CanHandle(rayHit))
+                    continue;
+
+                handler.Handle(rayHit, Damage);
+                break;
             }
         }
     }

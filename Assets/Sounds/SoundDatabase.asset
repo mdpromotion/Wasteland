@@ -196,7 +196,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 08f29fdc28b155949957f3e34ed6078d, type: 3}
     _cooldown: 0
     _maxConcurrentInstances: 10
-    _volume: 0.5
+    _volume: 1
     _volumeVariance: 0
     _pitchVariance: 0
     _spatial: 1
@@ -207,7 +207,20 @@ MonoBehaviour:
     - {fileID: 8300000, guid: fc6573bdcbe4fc54a8c0eee88c8a8107, type: 3}
     _cooldown: 0
     _maxConcurrentInstances: 10
-    _volume: 0.5
+    _volume: 1
     _volumeVariance: 0
     _pitchVariance: 0
+    _spatial: 0
+  - _key:
+      _value: Tree_Chop
+    _category: 1
+    _clips:
+    - {fileID: 8300000, guid: cddf1aa4415802b4aad4fafd821f6a64, type: 3}
+    - {fileID: 8300000, guid: 1e479107acfd87f48a12d56071aec520, type: 3}
+    - {fileID: 8300000, guid: 261b4cb603073864baabeaeb31c587e2, type: 3}
+    _cooldown: 0
+    _maxConcurrentInstances: 10
+    _volume: 0.5
+    _volumeVariance: 0
+    _pitchVariance: 0.15
     _spatial: 0
