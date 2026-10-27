@@ -43,6 +43,8 @@ namespace _Project.Features.Core.Bootstrap.Game
                 database,
                 globalMaxVoices);
 
+            InventoryInstaller.Install(builder);
+
             PlayerInstaller.Install(
                 builder,
                 playerMovementConfig,
