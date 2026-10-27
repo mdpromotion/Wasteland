@@ -1390,8 +1390,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             ]
         }
     ]
-}
-");
+}");
         // Player
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
@@ -1411,6 +1410,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_HotbarSlot7 = m_Player.FindAction("HotbarSlot7", throwIfNotFound: true);
         m_Player_HotbarSlot8 = m_Player.FindAction("HotbarSlot8", throwIfNotFound: true);
         m_Player_HotbarSlot9 = m_Player.FindAction("HotbarSlot9", throwIfNotFound: true);
+        m_Player_DropItem = m_Player.FindAction("DropItem", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_LeftMouse = m_Player.FindAction("LeftMouse", throwIfNotFound: true);
         m_Player_RightMouse = m_Player.FindAction("RightMouse", throwIfNotFound: true);
@@ -1525,6 +1525,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_HotbarSlot7;
     private readonly InputAction m_Player_HotbarSlot8;
     private readonly InputAction m_Player_HotbarSlot9;
+    private readonly InputAction m_Player_DropItem;
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_LeftMouse;
     private readonly InputAction m_Player_RightMouse;
@@ -1607,6 +1608,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/HotbarSlot9".
         /// </summary>
         public InputAction @HotbarSlot9 => m_Wrapper.m_Player_HotbarSlot9;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/DropItem".
+        /// </summary>
+        public InputAction @DropItem => m_Wrapper.m_Player_DropItem;
         /// <summary>
         /// Provides access to the underlying input action "Player/Sprint".
         /// </summary>
@@ -1696,6 +1701,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @HotbarSlot9.started += instance.OnHotbarSlot9;
             @HotbarSlot9.performed += instance.OnHotbarSlot9;
             @HotbarSlot9.canceled += instance.OnHotbarSlot9;
+            @DropItem.started += instance.OnDropItem;
+            @DropItem.performed += instance.OnDropItem;
+            @DropItem.canceled += instance.OnDropItem;
             @Sprint.started += instance.OnSprint;
             @Sprint.performed += instance.OnSprint;
             @Sprint.canceled += instance.OnSprint;
@@ -1767,6 +1775,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @HotbarSlot9.started -= instance.OnHotbarSlot9;
             @HotbarSlot9.performed -= instance.OnHotbarSlot9;
             @HotbarSlot9.canceled -= instance.OnHotbarSlot9;
+            @DropItem.started -= instance.OnDropItem;
+            @DropItem.performed -= instance.OnDropItem;
+            @DropItem.canceled -= instance.OnDropItem;
             @Sprint.started -= instance.OnSprint;
             @Sprint.performed -= instance.OnSprint;
             @Sprint.canceled -= instance.OnSprint;
@@ -2206,6 +2217,13 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnHotbarSlot9(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "DropItem" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnDropItem(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Sprint" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
