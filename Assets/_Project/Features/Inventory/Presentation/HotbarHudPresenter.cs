@@ -163,7 +163,7 @@ namespace _Project.Features.Items.Presentation
 
         private void CreateHeldItemLabel(Transform canvas)
         {
-            var heldItemObject = new GameObject("Held Item Label", typeof(RectTransform), typeof(Image), typeof(Outline), typeof(Text));
+            var heldItemObject = new GameObject("Held Item Panel", typeof(RectTransform), typeof(Image), typeof(Outline));
             RectTransform rect = heldItemObject.GetComponent<RectTransform>();
             rect.SetParent(canvas, false);
             rect.anchorMin = new Vector2(1f, 0f);
@@ -181,8 +181,16 @@ namespace _Project.Features.Items.Presentation
             outline.effectColor = _settings.HighlightColor;
             outline.effectDistance = new Vector2(2f, 2f);
 
+            var labelObject = new GameObject("Held Item Details", typeof(RectTransform), typeof(Text));
+            RectTransform labelRect = labelObject.GetComponent<RectTransform>();
+            labelRect.SetParent(rect, false);
+            labelRect.anchorMin = Vector2.zero;
+            labelRect.anchorMax = Vector2.one;
+            labelRect.offsetMin = new Vector2(12f, 10f);
+            labelRect.offsetMax = new Vector2(-12f, -10f);
+
             _heldItemLabel = ConfigureLabel(
-                heldItemObject.GetComponent<Text>(),
+                labelObject.GetComponent<Text>(),
                 _settings.HeldItemFontSize,
                 TextAnchor.UpperRight);
         }
