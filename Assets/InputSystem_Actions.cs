@@ -1381,6 +1381,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Previous = m_Player.FindAction("Previous", throwIfNotFound: true);
         m_Player_Next = m_Player.FindAction("Next", throwIfNotFound: true);
+        m_Player_HotbarSlot1 = m_Player.FindAction("HotbarSlot1", throwIfNotFound: true);
+        m_Player_HotbarSlot2 = m_Player.FindAction("HotbarSlot2", throwIfNotFound: true);
+        m_Player_HotbarSlot3 = m_Player.FindAction("HotbarSlot3", throwIfNotFound: true);
+        m_Player_HotbarSlot4 = m_Player.FindAction("HotbarSlot4", throwIfNotFound: true);
+        m_Player_HotbarSlot5 = m_Player.FindAction("HotbarSlot5", throwIfNotFound: true);
+        m_Player_HotbarSlot6 = m_Player.FindAction("HotbarSlot6", throwIfNotFound: true);
+        m_Player_HotbarSlot7 = m_Player.FindAction("HotbarSlot7", throwIfNotFound: true);
+        m_Player_HotbarSlot8 = m_Player.FindAction("HotbarSlot8", throwIfNotFound: true);
+        m_Player_HotbarSlot9 = m_Player.FindAction("HotbarSlot9", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_LeftMouse = m_Player.FindAction("LeftMouse", throwIfNotFound: true);
         m_Player_RightMouse = m_Player.FindAction("RightMouse", throwIfNotFound: true);
@@ -1486,6 +1495,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Previous;
     private readonly InputAction m_Player_Next;
+    private readonly InputAction m_Player_HotbarSlot1;
+    private readonly InputAction m_Player_HotbarSlot2;
+    private readonly InputAction m_Player_HotbarSlot3;
+    private readonly InputAction m_Player_HotbarSlot4;
+    private readonly InputAction m_Player_HotbarSlot5;
+    private readonly InputAction m_Player_HotbarSlot6;
+    private readonly InputAction m_Player_HotbarSlot7;
+    private readonly InputAction m_Player_HotbarSlot8;
+    private readonly InputAction m_Player_HotbarSlot9;
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_LeftMouse;
     private readonly InputAction m_Player_RightMouse;
@@ -1532,6 +1550,42 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Next".
         /// </summary>
         public InputAction @Next => m_Wrapper.m_Player_Next;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/HotbarSlot1".
+        /// </summary>
+        public InputAction @HotbarSlot1 => m_Wrapper.m_Player_HotbarSlot1;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/HotbarSlot2".
+        /// </summary>
+        public InputAction @HotbarSlot2 => m_Wrapper.m_Player_HotbarSlot2;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/HotbarSlot3".
+        /// </summary>
+        public InputAction @HotbarSlot3 => m_Wrapper.m_Player_HotbarSlot3;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/HotbarSlot4".
+        /// </summary>
+        public InputAction @HotbarSlot4 => m_Wrapper.m_Player_HotbarSlot4;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/HotbarSlot5".
+        /// </summary>
+        public InputAction @HotbarSlot5 => m_Wrapper.m_Player_HotbarSlot5;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/HotbarSlot6".
+        /// </summary>
+        public InputAction @HotbarSlot6 => m_Wrapper.m_Player_HotbarSlot6;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/HotbarSlot7".
+        /// </summary>
+        public InputAction @HotbarSlot7 => m_Wrapper.m_Player_HotbarSlot7;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/HotbarSlot8".
+        /// </summary>
+        public InputAction @HotbarSlot8 => m_Wrapper.m_Player_HotbarSlot8;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/HotbarSlot9".
+        /// </summary>
+        public InputAction @HotbarSlot9 => m_Wrapper.m_Player_HotbarSlot9;
         /// <summary>
         /// Provides access to the underlying input action "Player/Sprint".
         /// </summary>
@@ -1594,6 +1648,33 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Next.started += instance.OnNext;
             @Next.performed += instance.OnNext;
             @Next.canceled += instance.OnNext;
+            @HotbarSlot1.started += instance.OnHotbarSlot1;
+            @HotbarSlot1.performed += instance.OnHotbarSlot1;
+            @HotbarSlot1.canceled += instance.OnHotbarSlot1;
+            @HotbarSlot2.started += instance.OnHotbarSlot2;
+            @HotbarSlot2.performed += instance.OnHotbarSlot2;
+            @HotbarSlot2.canceled += instance.OnHotbarSlot2;
+            @HotbarSlot3.started += instance.OnHotbarSlot3;
+            @HotbarSlot3.performed += instance.OnHotbarSlot3;
+            @HotbarSlot3.canceled += instance.OnHotbarSlot3;
+            @HotbarSlot4.started += instance.OnHotbarSlot4;
+            @HotbarSlot4.performed += instance.OnHotbarSlot4;
+            @HotbarSlot4.canceled += instance.OnHotbarSlot4;
+            @HotbarSlot5.started += instance.OnHotbarSlot5;
+            @HotbarSlot5.performed += instance.OnHotbarSlot5;
+            @HotbarSlot5.canceled += instance.OnHotbarSlot5;
+            @HotbarSlot6.started += instance.OnHotbarSlot6;
+            @HotbarSlot6.performed += instance.OnHotbarSlot6;
+            @HotbarSlot6.canceled += instance.OnHotbarSlot6;
+            @HotbarSlot7.started += instance.OnHotbarSlot7;
+            @HotbarSlot7.performed += instance.OnHotbarSlot7;
+            @HotbarSlot7.canceled += instance.OnHotbarSlot7;
+            @HotbarSlot8.started += instance.OnHotbarSlot8;
+            @HotbarSlot8.performed += instance.OnHotbarSlot8;
+            @HotbarSlot8.canceled += instance.OnHotbarSlot8;
+            @HotbarSlot9.started += instance.OnHotbarSlot9;
+            @HotbarSlot9.performed += instance.OnHotbarSlot9;
+            @HotbarSlot9.canceled += instance.OnHotbarSlot9;
             @Sprint.started += instance.OnSprint;
             @Sprint.performed += instance.OnSprint;
             @Sprint.canceled += instance.OnSprint;
@@ -1638,6 +1719,33 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Next.started -= instance.OnNext;
             @Next.performed -= instance.OnNext;
             @Next.canceled -= instance.OnNext;
+            @HotbarSlot1.started -= instance.OnHotbarSlot1;
+            @HotbarSlot1.performed -= instance.OnHotbarSlot1;
+            @HotbarSlot1.canceled -= instance.OnHotbarSlot1;
+            @HotbarSlot2.started -= instance.OnHotbarSlot2;
+            @HotbarSlot2.performed -= instance.OnHotbarSlot2;
+            @HotbarSlot2.canceled -= instance.OnHotbarSlot2;
+            @HotbarSlot3.started -= instance.OnHotbarSlot3;
+            @HotbarSlot3.performed -= instance.OnHotbarSlot3;
+            @HotbarSlot3.canceled -= instance.OnHotbarSlot3;
+            @HotbarSlot4.started -= instance.OnHotbarSlot4;
+            @HotbarSlot4.performed -= instance.OnHotbarSlot4;
+            @HotbarSlot4.canceled -= instance.OnHotbarSlot4;
+            @HotbarSlot5.started -= instance.OnHotbarSlot5;
+            @HotbarSlot5.performed -= instance.OnHotbarSlot5;
+            @HotbarSlot5.canceled -= instance.OnHotbarSlot5;
+            @HotbarSlot6.started -= instance.OnHotbarSlot6;
+            @HotbarSlot6.performed -= instance.OnHotbarSlot6;
+            @HotbarSlot6.canceled -= instance.OnHotbarSlot6;
+            @HotbarSlot7.started -= instance.OnHotbarSlot7;
+            @HotbarSlot7.performed -= instance.OnHotbarSlot7;
+            @HotbarSlot7.canceled -= instance.OnHotbarSlot7;
+            @HotbarSlot8.started -= instance.OnHotbarSlot8;
+            @HotbarSlot8.performed -= instance.OnHotbarSlot8;
+            @HotbarSlot8.canceled -= instance.OnHotbarSlot8;
+            @HotbarSlot9.started -= instance.OnHotbarSlot9;
+            @HotbarSlot9.performed -= instance.OnHotbarSlot9;
+            @HotbarSlot9.canceled -= instance.OnHotbarSlot9;
             @Sprint.started -= instance.OnSprint;
             @Sprint.performed -= instance.OnSprint;
             @Sprint.canceled -= instance.OnSprint;
@@ -2014,6 +2122,69 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnNext(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "HotbarSlot1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnHotbarSlot1(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "HotbarSlot2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnHotbarSlot2(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "HotbarSlot3" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnHotbarSlot3(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "HotbarSlot4" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnHotbarSlot4(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "HotbarSlot5" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnHotbarSlot5(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "HotbarSlot6" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnHotbarSlot6(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "HotbarSlot7" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnHotbarSlot7(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "HotbarSlot8" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnHotbarSlot8(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "HotbarSlot9" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnHotbarSlot9(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Sprint" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

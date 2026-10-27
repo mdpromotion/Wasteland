@@ -41,6 +41,7 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
 
         private readonly Action<ChunkGenerationResult> _applyAction;
         private readonly Action<ChunkCoordinate> _completedAction;
+        private bool _disposed;
 
         public bool IsReady { get; private set; }
         public bool IsChunkLoaded(ChunkCoordinate coordinate) =>
@@ -82,11 +83,18 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
         /// </summary>
         public void Tick()
         {
+            if (_disposed)
+                return;
+
             _scheduler.Tick(_applyAction, _completedAction);
         }
         
         public void Dispose()
         {
+            if (_disposed)
+                return;
+
+            _disposed = true;
             _scheduler.CompleteAll();
 
             _repository.Dispose();

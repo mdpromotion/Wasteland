@@ -9,6 +9,7 @@ using _Project.Features.ProceduralWorld.Infrastructure.Landscape;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace _Project.Features.ProceduralWorld.Infrastructure.Hydrology
 {
@@ -49,11 +50,25 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Hydrology
 
         public MacroRegionData GetOrBuild(MacroRegionCoordinate coordinate)
         {
-            Lazy<MacroRegionData> lazy = _regions.GetOrAdd(
-                coordinate,
-                key => new Lazy<MacroRegionData>(() => Build(key)));
+            while (true)
+            {
+                Lazy<MacroRegionData> lazy = _regions.GetOrAdd(
+                    coordinate,
+                    key => new Lazy<MacroRegionData>(() => Build(key)));
 
-            return lazy.Value;
+                MacroRegionData region = lazy.Value;
+                if (region.IsCreated)
+                    return region;
+
+                bool removed = ((ICollection<KeyValuePair<MacroRegionCoordinate, Lazy<MacroRegionData>>>)_regions)
+                    .Remove(new KeyValuePair<MacroRegionCoordinate, Lazy<MacroRegionData>>(coordinate, lazy));
+
+                if (removed)
+                {
+                    Debug.LogWarning(
+                        $"[MacroRegionCache] Rebuilding disposed native data for region {coordinate.X}, {coordinate.Y}.");
+                }
+            }
         }
 
         private MacroRegionData Build(MacroRegionCoordinate coordinate)

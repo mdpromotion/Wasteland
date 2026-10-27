@@ -45,6 +45,15 @@ namespace _Project.Features.ProceduralWorld.Domain.Hydrology
 
         private bool _disposed;
 
+        public bool IsCreated => !_disposed &&
+                                  Heights.IsCreated &&
+                                  FlowDirection.IsCreated &&
+                                  Accumulation.IsCreated &&
+                                  WaterLevels.IsCreated &&
+                                  RiverStrengthRaw.IsCreated &&
+                                  RiverStrengthTight.IsCreated &&
+                                  RiverStrengthSmoothed.IsCreated;
+
         public MacroRegionData(
             MacroRegionCoordinate coordinate,
             int paddedSize,
