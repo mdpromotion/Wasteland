@@ -40,3 +40,4 @@ MonoBehaviour:
     _value: Tree_Chop
   _treeFall:
     _value: Tree_Fall
+  _waterSoundMaxVelocity: 25

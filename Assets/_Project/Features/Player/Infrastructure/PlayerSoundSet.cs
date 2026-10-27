@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using _Project.Features.Sound.Domain;
 
 namespace _Project.Features.Player.Infrastructure
@@ -14,6 +14,7 @@ namespace _Project.Features.Player.Infrastructure
         [SerializeField] private SoundKey _waterExit;
         [SerializeField] private SoundKey _treeChop;
         [SerializeField] private SoundKey _treeFall;
+        [SerializeField, Min(0.01f)] private float _waterSoundMaxVelocity = 10f;
         
         public SoundKey[] WalkFootsteps => _walkFootsteps;
         public SoundKey[] RunFootsteps => _runFootsteps;
@@ -23,5 +24,6 @@ namespace _Project.Features.Player.Infrastructure
         public SoundKey WaterExit => _waterExit;
         public SoundKey TreeChop => _treeChop;
         public SoundKey TreeFall => _treeFall;
+        public float WaterSoundMaxVelocity => _waterSoundMaxVelocity;
     }
 }

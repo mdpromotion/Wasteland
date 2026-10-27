@@ -196,7 +196,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 08f29fdc28b155949957f3e34ed6078d, type: 3}
     _cooldown: 0
     _maxConcurrentInstances: 10
-    _volume: 0.5
+    _volume: 1
     _volumeVariance: 0
     _pitchVariance: 0
     _spatial: 1
@@ -207,7 +207,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: fc6573bdcbe4fc54a8c0eee88c8a8107, type: 3}
     _cooldown: 0
     _maxConcurrentInstances: 10
-    _volume: 0.5
+    _volume: 1
     _volumeVariance: 0
     _pitchVariance: 0
     _spatial: 0
@@ -215,21 +215,12 @@ MonoBehaviour:
       _value: Tree_Chop
     _category: 1
     _clips:
-    - {fileID: 8300000, guid: 7131d701ae015a54aa3d856feccd513f, type: 3}
-    _cooldown: 0.18
-    _maxConcurrentInstances: 3
-    _volume: 0.65
-    _volumeVariance: 0.08
-    _pitchVariance: 0.12
-    _spatial: 1
-  - _key:
-      _value: Tree_Fall
-    _category: 1
-    _clips:
-    - {fileID: 8300000, guid: 65d9836027675574b8d070c5718f99c7, type: 3}
-    _cooldown: 0.4
-    _maxConcurrentInstances: 1
-    _volume: 0.8
-    _volumeVariance: 0.05
-    _pitchVariance: 0.05
-    _spatial: 1
+    - {fileID: 8300000, guid: cddf1aa4415802b4aad4fafd821f6a64, type: 3}
+    - {fileID: 8300000, guid: 1e479107acfd87f48a12d56071aec520, type: 3}
+    - {fileID: 8300000, guid: 261b4cb603073864baabeaeb31c587e2, type: 3}
+    _cooldown: 0
+    _maxConcurrentInstances: 10
+    _volume: 0.5
+    _volumeVariance: 0
+    _pitchVariance: 0.15
+    _spatial: 0
