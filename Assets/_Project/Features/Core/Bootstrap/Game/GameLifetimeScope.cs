@@ -82,7 +82,7 @@ namespace _Project.Features.Core.Bootstrap.Game
                 builder,
                 frameBudgetConfig);
 
-            UIInstaller.Install(builder, transform, itemCatalogAsset, hotbarHudSettings);
+            UIInstaller.Install(builder, itemCatalogAsset, hotbarHudSettings);
         }
     }
 }

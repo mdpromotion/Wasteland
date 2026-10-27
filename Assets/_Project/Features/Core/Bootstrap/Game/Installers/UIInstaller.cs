@@ -8,7 +8,6 @@ using _Project.Features.UI.Menus.DebugMenu;
 using _Project.Features.UI.Menus.InGameMenu;
 using _Project.Features.UI.Menus.SettingsMenu;
 using System;
-using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -18,7 +17,6 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
     {
         public static void Install(
             IContainerBuilder builder,
-            Transform gameSceneRoot,
             ItemCatalogAsset itemCatalogAsset,
             HotbarHudSettings hotbarHudSettings)
         {
@@ -42,7 +40,7 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
 
             builder.RegisterComponentInHierarchy<SettingsMenuPresenter>();
 
-            builder.RegisterInstance(new HotbarHudRoot(gameSceneRoot));
+            builder.RegisterComponentInHierarchy<HotbarHudView>();
             builder.RegisterInstance(new ItemIconProvider(itemCatalogAsset))
                 .As<IItemIconProvider>();
             builder.RegisterInstance(hotbarHudSettings);
