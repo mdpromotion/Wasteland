@@ -69,7 +69,7 @@ namespace _Project.Features.Player.Presentation
 
         private void FixedUpdate()
         {
-            if (_player == null || _controller == null || _input == null || _soundService == null)
+            if (_player == null || !_player.IsAvailable || _controller == null || _input == null || _soundService == null)
                 return;
 
             bool clearGroundStep = _environmentState.IsGrounded && !_environmentState.IsInWater;

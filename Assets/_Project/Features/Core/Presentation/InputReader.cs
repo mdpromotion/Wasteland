@@ -31,6 +31,8 @@ namespace _Project.Features.Core.Presentation
     {
         private readonly InputSystem_Actions _inputActions;
         private readonly InputAction[] _hotbarSlotActions = new InputAction[9];
+        private readonly Action<InputAction.CallbackContext>[] _hotbarSlotCallbacks =
+            new Action<InputAction.CallbackContext>[9];
         private bool _initialized;
 
         public InputReader(InputSystem_Actions inputActions)
@@ -62,11 +64,13 @@ namespace _Project.Features.Core.Presentation
             for (int slot = 1; slot <= 9; slot++)
             {
                 int selectedSlot = slot - 1;
-                var action = new InputAction($"HotbarSlot{slot}", InputActionType.Button);
-                action.AddBinding($"<Keyboard>/{slot}");
-                action.performed += _ => HotbarSlotSelected?.Invoke(selectedSlot);
-                action.Enable();
+                InputAction action = _inputActions.Player.Get().FindAction($"HotbarSlot{slot}", true);
+                Action<InputAction.CallbackContext> callback =
+                    _ => HotbarSlotSelected?.Invoke(selectedSlot);
+
+                action.performed += callback;
                 _hotbarSlotActions[selectedSlot] = action;
+                _hotbarSlotCallbacks[selectedSlot] = callback;
             }
 
             _inputActions.Player.RightMouse.performed += OnRightMousePerformed;
@@ -90,8 +94,11 @@ namespace _Project.Features.Core.Presentation
 
             for (int slot = 0; slot < _hotbarSlotActions.Length; slot++)
             {
-                _hotbarSlotActions[slot]?.Dispose();
+                if (_hotbarSlotActions[slot] != null && _hotbarSlotCallbacks[slot] != null)
+                    _hotbarSlotActions[slot].performed -= _hotbarSlotCallbacks[slot];
+
                 _hotbarSlotActions[slot] = null;
+                _hotbarSlotCallbacks[slot] = null;
             }
 
             _initialized = false;

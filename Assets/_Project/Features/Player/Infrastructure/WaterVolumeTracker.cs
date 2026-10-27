@@ -45,6 +45,9 @@ namespace _Project.Features.Player.Infrastructure
 
         private void Update()
         {
+            if (_player == null || !_player.IsAvailable)
+                return;
+
             Vector3 position = _player.Position;
 
             bool hasSample = _waterQuery.TryGetWaterState(

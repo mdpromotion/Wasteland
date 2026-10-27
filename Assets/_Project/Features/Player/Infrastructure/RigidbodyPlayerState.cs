@@ -8,10 +8,17 @@ namespace _Project.Features.Player.Infrastructure
     {
         [SerializeField] private Rigidbody _rb;
 
-        public Vector3 Position => _rb.position;
-        public Vector3 Velocity => _rb.linearVelocity;
-        
-        public Vector3 Forward => _rb.transform.forward;
+        public bool IsAvailable => this != null && _rb != null;
+
+        public Vector3 Position => this == null
+            ? Vector3.zero
+            : _rb != null
+                ? _rb.position
+                : transform.position;
+
+        public Vector3 Velocity => IsAvailable ? _rb.linearVelocity : Vector3.zero;
+
+        public Vector3 Forward => this != null ? transform.forward : Vector3.forward;
 
 
         private void Awake()
