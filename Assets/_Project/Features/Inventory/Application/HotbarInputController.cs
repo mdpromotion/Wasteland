@@ -3,14 +3,16 @@ using _Project.Features.Core.Domain;
 using _Project.Features.Core.Presentation;
 using _Project.Features.Items.Domain;
 using UnityEngine;
+using VContainer.Unity;
 
 namespace _Project.Features.Items.Application
 {
-    public sealed class HotbarInputController : IDisposable
+    public sealed class HotbarInputController : IInitializable, IDisposable
     {
         private readonly IPlayerInputReader _inputReader;
         private readonly IGameState _gameState;
         private readonly Inventory _inventory;
+        private bool _initialized;
 
         public HotbarInputController(
             IPlayerInputReader inputReader,
@@ -20,7 +22,14 @@ namespace _Project.Features.Items.Application
             _inputReader = inputReader;
             _gameState = gameState;
             _inventory = inventory;
+        }
 
+        public void Initialize()
+        {
+            if (_initialized)
+                return;
+
+            _initialized = true;
             _inputReader.HotbarSlotSelected += OnHotbarSlotSelected;
             _inputReader.UseItemRequested += OnUseItemRequested;
             Debug.Log("[HotbarInput] Controller subscribed to input events.");
@@ -51,8 +60,12 @@ namespace _Project.Features.Items.Application
 
         public void Dispose()
         {
+            if (!_initialized)
+                return;
+
             _inputReader.HotbarSlotSelected -= OnHotbarSlotSelected;
             _inputReader.UseItemRequested -= OnUseItemRequested;
+            _initialized = false;
         }
     }
 }
