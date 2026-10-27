@@ -85,6 +85,52 @@ namespace _Project.Tests.Items
         }
 
         [Test]
+        public void ToolDefinition_ExposesCommonAndToolSpecificInspectableFields()
+        {
+            const float miningPower = 3.5f;
+            var tool = new ToolItemDefinition(
+                ItemId.IronAxe,
+                "Iron Axe",
+                1,
+                "tool",
+                "Tool",
+                250f,
+                1.5f,
+                miningPower,
+                new ItemBehavior[] { new TreeChoppingItemBehavior(miningPower) });
+
+            Assert.That(tool.GetInspectableStats().Count, Is.EqualTo(6));
+            Assert.That(tool.GetInspectableStats()[3].Label, Is.EqualTo("Durability"));
+            Assert.That(tool.GetInspectableStats()[4].Value, Is.EqualTo("1.5"));
+            Assert.That(tool.ToolDamage, Is.EqualTo(tool.MiningPower));
+        }
+
+        [Test]
+        public void FoodAndGenericDefinitions_ExposeOnlyTheirConfiguredFields()
+        {
+            var food = new FoodItemDefinition(
+                ItemId.Apple,
+                "Apple",
+                50,
+                "food",
+                "Food",
+                4f,
+                new ItemBehavior[] { new ConsumableItemBehavior() });
+            var wood = new ItemDefinition(
+                ItemId.Wood,
+                "Wood",
+                50,
+                "material",
+                "Material",
+                Array.Empty<ItemBehavior>());
+
+            Assert.That(food.GetInspectableStats().Count, Is.EqualTo(4));
+            Assert.That(food.GetInspectableStats()[3].Label, Is.EqualTo("Saturation"));
+            Assert.That(food.Saturation, Is.EqualTo(4f));
+            Assert.That(wood.GetInspectableStats().Count, Is.EqualTo(3));
+        }
+
+        [Test]
         public void SelectSlot_ChangesSelectedItemAndNotifiesObservers()
         {
             var inventory = new Inventory(_catalog);
