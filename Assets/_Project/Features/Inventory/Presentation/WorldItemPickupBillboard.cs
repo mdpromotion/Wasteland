@@ -189,7 +189,7 @@ namespace _Project.Features.Items.Presentation
 
             _billboardTransform.position = transform.position + _settings.PickupBillboardOffset;
             _billboardTransform.rotation = Quaternion.LookRotation(
-                _camera.transform.position - _billboardTransform.position,
+                _billboardTransform.position - _camera.transform.position,
                 Vector3.up);
         }
     }
