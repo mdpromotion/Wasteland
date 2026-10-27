@@ -11,16 +11,16 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8d3c944a71f24b84947a5e35c925a001, type: 3}
   m_Name: IronAxe
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   technicalId: iron_axe
   displayName: Iron Axe
   category: {fileID: 11400000, guid: 96e85c7523fd4774840c5dc84a6b1001, type: 2}
   maxStack: 1
-  durability: 250
-  miningSpeed: 1.5
-  miningPower: 3
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: c5d0617ce7c15914e8eb2b5c7507025c, type: 3}
   heldColor: {r: 0.65, g: 0.7, b: 0.78, a: 1}
   worldPrefab: {fileID: 0}
   behaviorAssets:
   - {fileID: 11400000, guid: 67df9d90d7ba4dc3b49f0c45d5962380, type: 2}
+  durability: 250
+  miningSpeed: 1.5
+  miningPower: 3
