@@ -60,6 +60,8 @@ namespace _Project.Features.Items.Domain
             return null;
         }
 
+        public virtual float GetTreeDamage() => 1f;
+
         public virtual IReadOnlyList<ItemStat> GetInspectableStats()
         {
             return new[]

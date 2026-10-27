@@ -103,6 +103,7 @@ namespace _Project.Tests.Items
             Assert.That(tool.GetInspectableStats()[3].Label, Is.EqualTo("Durability"));
             Assert.That(tool.GetInspectableStats()[4].Value, Is.EqualTo("1.5"));
             Assert.That(tool.ToolDamage, Is.EqualTo(tool.MiningPower));
+            Assert.That(tool.GetTreeDamage(), Is.EqualTo(miningPower));
         }
 
         [Test]
@@ -128,6 +129,8 @@ namespace _Project.Tests.Items
             Assert.That(food.GetInspectableStats()[3].Label, Is.EqualTo("Saturation"));
             Assert.That(food.Saturation, Is.EqualTo(4f));
             Assert.That(wood.GetInspectableStats().Count, Is.EqualTo(3));
+            Assert.That(food.GetTreeDamage(), Is.EqualTo(1f));
+            Assert.That(wood.GetTreeDamage(), Is.EqualTo(1f));
         }
 
         [Test]

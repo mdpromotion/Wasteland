@@ -9,6 +9,8 @@ namespace _Project.Features.Items.Domain
         public float MiningSpeed { get; }
         public float MiningPower { get; }
 
+        public override float GetTreeDamage() => MiningPower;
+
         public ToolItemDefinition(ItemId id, string displayName, int maxStack, string categoryId, string categoryName,
             float durability, float miningSpeed, float miningPower, IEnumerable<ItemBehavior> behaviors)
             : base(id, displayName, maxStack, categoryId, categoryName, behaviors)

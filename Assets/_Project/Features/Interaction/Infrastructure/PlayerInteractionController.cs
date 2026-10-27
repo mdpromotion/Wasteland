@@ -101,10 +101,7 @@ namespace _Project.Features.Interaction.Infrastructure
             PlayerInteracted?.Invoke(interval);
 
             ItemDefinition selectedItem = _inventory.SelectedItem;
-            TreeChoppingItemBehavior choppingBehavior =
-                selectedItem?.GetBehavior<TreeChoppingItemBehavior>();
-            if (choppingBehavior == null)
-                return;
+            float treeDamage = selectedItem == null ? 1f : selectedItem.GetTreeDamage();
 
             if (!_interactionCamera)
                 _interactionCamera = UnityEngine.Camera.main;
@@ -124,7 +121,7 @@ namespace _Project.Features.Interaction.Infrastructure
                 if (!handler.CanHandle(rayHit))
                     continue;
 
-                handler.Handle(rayHit, choppingBehavior.Damage);
+                handler.Handle(rayHit, treeDamage);
                 break;
             }
         }
