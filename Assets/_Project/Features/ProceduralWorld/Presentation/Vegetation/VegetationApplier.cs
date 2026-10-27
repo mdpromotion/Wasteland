@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using _Project.Features.ProceduralWorld.Domain.Vegetation;
 using _Project.Features.ProceduralWorld.Infrastructure.Vegetation;
@@ -12,6 +12,8 @@ namespace _Project.Features.ProceduralWorld.Presentation.Vegetation
         private readonly ChunkGrid _chunkGrid;
 
         private readonly Dictionary<VegetationSpeciesType, IReadOnlyList<GameObject>> _prefabCache;
+        private ParticleSystem _treeImpactParticles;
+        private Material _treeImpactParticleMaterial;
         
         private const int DetailResolutionPerPatch = 64;
         private const int MaxDetailCoverage = 255;
@@ -289,6 +291,66 @@ namespace _Project.Features.ProceduralWorld.Presentation.Vegetation
 
             collider.enabled = false;
             collider.enabled = true;
+        }
+
+
+        public void ShowTreeImpact(
+            VegetationSpeciesType species,
+            ulong instanceId,
+            Vector3 position,
+            Vector3 normal)
+        {
+            IReadOnlyList<GameObject> prefabs = GetPrefabs(species);
+            if (prefabs == null || prefabs.Count == 0)
+                return;
+
+            GameObject prefab = prefabs[(int)(instanceId % (uint)prefabs.Count)];
+            Renderer treeRenderer = prefab ? prefab.GetComponentInChildren<Renderer>(true) : null;
+            Material treeMaterial = treeRenderer ? treeRenderer.sharedMaterial : null;
+            Texture treeTexture = treeMaterial ? treeMaterial.mainTexture : null;
+            if (treeTexture == null)
+                return;
+
+            EnsureTreeImpactEmitter();
+            _treeImpactParticleMaterial.mainTexture = treeTexture;
+
+            Quaternion rotation = normal.sqrMagnitude > 0f ? Quaternion.LookRotation(normal) : Quaternion.identity;
+            _treeImpactParticles.transform.SetPositionAndRotation(position, rotation);
+            _treeImpactParticles.Play();
+            _treeImpactParticles.Emit(8);
+        }
+
+        private void EnsureTreeImpactEmitter()
+        {
+            if (_treeImpactParticles != null)
+                return;
+
+            GameObject effectObject = new GameObject("Tree Impact Particles");
+            _treeImpactParticles = effectObject.AddComponent<ParticleSystem>();
+
+            ParticleSystem.MainModule main = _treeImpactParticles.main;
+            main.loop = false;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(0.18f, 0.38f);
+            main.startSpeed = new ParticleSystem.MinMaxCurve(1f, 2.5f);
+            main.startSize = new ParticleSystem.MinMaxCurve(0.025f, 0.07f);
+            main.startColor = Color.white;
+            main.gravityModifier = 0.7f;
+            main.maxParticles = 24;
+
+            ParticleSystem.EmissionModule emission = _treeImpactParticles.emission;
+            emission.enabled = false;
+
+            ParticleSystem.ShapeModule shape = _treeImpactParticles.shape;
+            shape.shapeType = ParticleSystemShapeType.Cone;
+            shape.angle = 35f;
+            shape.radius = 0.025f;
+
+            ParticleSystemRenderer renderer = _treeImpactParticles.GetComponent<ParticleSystemRenderer>();
+            renderer.renderMode = ParticleSystemRenderMode.Billboard;
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
+            _treeImpactParticleMaterial = renderer.material;
         }
 
         private IReadOnlyList<GameObject> GetPrefabs(VegetationSpeciesType species)

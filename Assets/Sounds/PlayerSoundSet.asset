@@ -36,3 +36,7 @@ MonoBehaviour:
     _value: Water_Enter
   _waterExit:
     _value: Water_Exit
+  _treeChop:
+    _value: Tree_Chop
+  _treeFall:
+    _value: Tree_Fall

@@ -211,3 +211,25 @@ MonoBehaviour:
     _volumeVariance: 0
     _pitchVariance: 0
     _spatial: 0
+  - _key:
+      _value: Tree_Chop
+    _category: 1
+    _clips:
+    - {fileID: 8300000, guid: 7131d701ae015a54aa3d856feccd513f, type: 3}
+    _cooldown: 0.18
+    _maxConcurrentInstances: 3
+    _volume: 0.65
+    _volumeVariance: 0.08
+    _pitchVariance: 0.12
+    _spatial: 1
+  - _key:
+      _value: Tree_Fall
+    _category: 1
+    _clips:
+    - {fileID: 8300000, guid: 65d9836027675574b8d070c5718f99c7, type: 3}
+    _cooldown: 0.4
+    _maxConcurrentInstances: 1
+    _volume: 0.8
+    _volumeVariance: 0.05
+    _pitchVariance: 0.05
+    _spatial: 1
