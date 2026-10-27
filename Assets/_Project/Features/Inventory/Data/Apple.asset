@@ -9,12 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 198c537a334a470394216c4c83cb9a74, type: 3}
+  m_Script: {fileID: 11500000, guid: 19587ac704324dc9ab6e49da417ac002, type: 3}
   m_Name: Apple
   m_EditorClassIdentifier:
-  itemId: apple
-  displayName: Яблоко
+  technicalId: apple
+  displayName: Apple
+  category: {fileID: 11400000, guid: 96e85c7523fd4774840c5dc84a6b1002, type: 2}
   maxStack: 50
+  saturation: 4
   icon: {fileID: 0}
   heldColor: {r: 0.85, g: 0.08, b: 0.04, a: 1}
   worldPrefab: {fileID: 0}

@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 198c537a334a470394216c4c83cb9a74, type: 3}
   m_Name: Wood
   m_EditorClassIdentifier:
-  itemId: wood
-  displayName: Древесина
+  technicalId: wood
+  displayName: Wood
+  category: {fileID: 11400000, guid: 96e85c7523fd4774840c5dc84a6b1003, type: 2}
   maxStack: 50
   icon: {fileID: 0}
   heldColor: {r: 0.48, g: 0.27, b: 0.11, a: 1}

@@ -20,6 +20,7 @@ MonoBehaviour:
   selectionToastOffset: 124
   heldItemLabelRightOffset: 24
   heldItemLabelBottomOffset: 24
+  heldItemPanelSize: {x: 360, y: 240}
   font: {fileID: 0}
   slotColor: {r: 0.08, g: 0.1, b: 0.12, a: 0.88}
   selectedSlotColor: {r: 0.16, g: 0.2, b: 0.22, a: 0.96}
@@ -41,4 +42,4 @@ MonoBehaviour:
   pickupIconSize: 54
   pickupTitleFontSize: 20
   pickupPromptFontSize: 16
-  pickupPromptText: Подобрать
+  pickupPromptText: Pick up

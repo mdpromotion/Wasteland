@@ -14,6 +14,7 @@ namespace _Project.Features.Items.Presentation
         [SerializeField] private float selectionToastOffset = 124f;
         [SerializeField] private float heldItemLabelRightOffset = 24f;
         [SerializeField] private float heldItemLabelBottomOffset = 24f;
+        [SerializeField] private Vector2 heldItemPanelSize = new Vector2(360f, 240f);
 
         [Header("Style")]
         [SerializeField] private Font font;
@@ -43,7 +44,7 @@ namespace _Project.Features.Items.Presentation
         [SerializeField] private float pickupIconSize = 54f;
         [SerializeField] private int pickupTitleFontSize = 20;
         [SerializeField] private int pickupPromptFontSize = 16;
-        [SerializeField] private string pickupPromptText = "Подобрать";
+        [SerializeField] private string pickupPromptText = "Pick up";
 
         public Vector2 ReferenceResolution => referenceResolution;
         public Vector2 HotbarSize => hotbarSize;
@@ -53,6 +54,7 @@ namespace _Project.Features.Items.Presentation
         public float SelectionToastOffset => selectionToastOffset;
         public float HeldItemLabelRightOffset => heldItemLabelRightOffset;
         public float HeldItemLabelBottomOffset => heldItemLabelBottomOffset;
+        public Vector2 HeldItemPanelSize => heldItemPanelSize;
         public Font Font => font;
         public Color SlotColor => slotColor;
         public Color SelectedSlotColor => selectedSlotColor;

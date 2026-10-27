@@ -9,12 +9,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 198c537a334a470394216c4c83cb9a74, type: 3}
+  m_Script: {fileID: 11500000, guid: 8d3c944a71f24b84947a5e35c925a001, type: 3}
   m_Name: IronAxe
   m_EditorClassIdentifier:
-  itemId: iron_axe
-  displayName: Железный топор
+  technicalId: iron_axe
+  displayName: Iron Axe
+  category: {fileID: 11400000, guid: 96e85c7523fd4774840c5dc84a6b1001, type: 2}
   maxStack: 1
+  durability: 250
+  miningSpeed: 1.5
+  miningPower: 3
   icon: {fileID: 0}
   heldColor: {r: 0.65, g: 0.7, b: 0.78, a: 1}
   worldPrefab: {fileID: 0}

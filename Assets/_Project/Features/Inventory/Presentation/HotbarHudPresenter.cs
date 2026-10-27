@@ -1,4 +1,6 @@
 using System;
+using System.Text;
+using System.Collections.Generic;
 using _Project.Features.Items.Domain;
 using UnityEngine;
 using UnityEngine.UI;
@@ -161,21 +163,28 @@ namespace _Project.Features.Items.Presentation
 
         private void CreateHeldItemLabel(Transform canvas)
         {
-            var heldItemObject = new GameObject("Held Item Label", typeof(RectTransform), typeof(Text));
+            var heldItemObject = new GameObject("Held Item Label", typeof(RectTransform), typeof(Image), typeof(Outline), typeof(Text));
             RectTransform rect = heldItemObject.GetComponent<RectTransform>();
             rect.SetParent(canvas, false);
             rect.anchorMin = new Vector2(1f, 0f);
             rect.anchorMax = new Vector2(1f, 0f);
             rect.pivot = new Vector2(1f, 0f);
-            rect.sizeDelta = new Vector2(520f, 42f);
+            rect.sizeDelta = _settings.HeldItemPanelSize;
             rect.anchoredPosition = new Vector2(
                 -_settings.HeldItemLabelRightOffset,
                 _settings.HeldItemLabelBottomOffset);
 
+            Image panel = heldItemObject.GetComponent<Image>();
+            panel.color = _settings.SlotColor;
+            panel.raycastTarget = false;
+            Outline outline = heldItemObject.GetComponent<Outline>();
+            outline.effectColor = _settings.HighlightColor;
+            outline.effectDistance = new Vector2(2f, 2f);
+
             _heldItemLabel = ConfigureLabel(
                 heldItemObject.GetComponent<Text>(),
                 _settings.HeldItemFontSize,
-                TextAnchor.LowerRight);
+                TextAnchor.UpperRight);
         }
 
         private Text CreateLabel(
@@ -209,7 +218,7 @@ namespace _Project.Features.Items.Presentation
             label.color = Color.white;
             label.alignment = alignment;
             label.horizontalOverflow = HorizontalWrapMode.Wrap;
-            label.verticalOverflow = VerticalWrapMode.Truncate;
+            label.verticalOverflow = VerticalWrapMode.Overflow;
             label.raycastTarget = false;
             return label;
         }
@@ -231,15 +240,25 @@ namespace _Project.Features.Items.Presentation
             }
 
             ItemDefinition selectedItem = _inventory.SelectedItem;
-            _heldItemLabel.text = selectedItem == null
-                ? "В руках: —"
-                : $"В руках: {selectedItem.DisplayName}";
+            _heldItemLabel.text = FormatHeldItem(selectedItem);
 
             if (_lastSelectedSlot != _inventory.SelectedSlot)
             {
                 _lastSelectedSlot = _inventory.SelectedSlot;
                 ShowSelectionToast(selectedItem);
             }
+        }
+
+        private static string FormatHeldItem(ItemDefinition item)
+        {
+            if (item == null)
+                return "Hands: Empty";
+
+            var text = new StringBuilder(item.DisplayName);
+            IReadOnlyList<ItemStat> stats = item.GetInspectableStats();
+            for (int i = 0; i < stats.Count; i++)
+                text.Append("\n").Append(stats[i].Label).Append(": ").Append(stats[i].Value);
+            return text.ToString();
         }
 
         private void ShowSelectionToast(ItemDefinition item)
