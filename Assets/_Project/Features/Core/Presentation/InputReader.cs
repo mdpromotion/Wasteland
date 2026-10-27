@@ -30,7 +30,8 @@ namespace _Project.Features.Core.Presentation
         IDisposable
     {
         private readonly InputSystem_Actions _inputActions;
-        private readonly InputAction _hotbarSlotAction = new InputAction("HotbarSlot", InputActionType.Button);
+        private readonly InputAction[] _hotbarSlotActions = new InputAction[9];
+        private bool _initialized;
 
         public InputReader(InputSystem_Actions inputActions)
         {
@@ -52,21 +53,24 @@ namespace _Project.Features.Core.Presentation
 
         public void Initialize()
         {
+            if (_initialized)
+                return;
+
+            _initialized = true;
             _inputActions.Enable();
 
             for (int slot = 1; slot <= 9; slot++)
-                _hotbarSlotAction.AddBinding($"<Keyboard>/{slot}");
+            {
+                int selectedSlot = slot - 1;
+                var action = new InputAction($"HotbarSlot{slot}", InputActionType.Button);
+                action.AddBinding($"<Keyboard>/{slot}");
+                action.performed += _ => HotbarSlotSelected?.Invoke(selectedSlot);
+                action.Enable();
+                _hotbarSlotActions[selectedSlot] = action;
+            }
 
-            _hotbarSlotAction.performed += OnHotbarSlotPerformed;
-            _hotbarSlotAction.Enable();
             _inputActions.Player.RightMouse.performed += OnRightMousePerformed;
             _inputActions.UI.InGameMenu.canceled += OnPauseReleased;
-        }
-
-        private void OnHotbarSlotPerformed(InputAction.CallbackContext context)
-        {
-            if (int.TryParse(context.control.name, out int slot))
-                HotbarSlotSelected?.Invoke(slot - 1);
         }
 
         private void OnRightMousePerformed(InputAction.CallbackContext context)
@@ -84,8 +88,13 @@ namespace _Project.Features.Core.Presentation
             _inputActions.Player.RightMouse.performed -= OnRightMousePerformed;
             _inputActions.UI.InGameMenu.canceled -= OnPauseReleased;
 
-            _hotbarSlotAction.performed -= OnHotbarSlotPerformed;
-            _hotbarSlotAction.Dispose();
+            for (int slot = 0; slot < _hotbarSlotActions.Length; slot++)
+            {
+                _hotbarSlotActions[slot]?.Dispose();
+                _hotbarSlotActions[slot] = null;
+            }
+
+            _initialized = false;
             _inputActions.Disable();
             _inputActions.Dispose();
         }

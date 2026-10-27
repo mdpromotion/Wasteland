@@ -33,6 +33,11 @@ namespace _Project.Features.Core.Bootstrap.Game
         [SerializeField] private PlayerMovementConfig playerMovementConfig;
         [SerializeField] private PlayerCameraConfig playerCameraConfig;
 
+        [Header("Inventory UI")]
+        [SerializeField] private Sprite ironAxeIcon;
+        [SerializeField] private Sprite woodIcon;
+        [SerializeField] private Sprite appleIcon;
+
         [Header("Performance")]
         [SerializeField] private FrameBudgetConfig frameBudgetConfig;
 
@@ -75,7 +80,7 @@ namespace _Project.Features.Core.Bootstrap.Game
                 builder,
                 frameBudgetConfig);
 
-            UIInstaller.Install(builder);
+            UIInstaller.Install(builder, transform, ironAxeIcon, woodIcon, appleIcon);
         }
     }
 }

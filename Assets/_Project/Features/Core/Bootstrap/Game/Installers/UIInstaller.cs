@@ -6,6 +6,7 @@ using _Project.Features.UI.Infrastructure;
 using _Project.Features.UI.Menus.DebugMenu;
 using _Project.Features.UI.Menus.InGameMenu;
 using _Project.Features.UI.Menus.SettingsMenu;
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -13,7 +14,12 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
 {
     public static class UIInstaller
     {
-        public static void Install(IContainerBuilder builder)
+        public static void Install(
+            IContainerBuilder builder,
+            Transform gameSceneRoot,
+            Sprite ironAxeIcon,
+            Sprite woodIcon,
+            Sprite appleIcon)
         {
             builder.Register<FPSCounter>(Lifetime.Singleton)
                 .As<ITickable>()
@@ -30,6 +36,9 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
 
             builder.RegisterComponentInHierarchy<SettingsMenuPresenter>();
 
+            builder.RegisterInstance(new HotbarHudRoot(gameSceneRoot));
+            builder.RegisterInstance(new ItemIconProvider(ironAxeIcon, woodIcon, appleIcon))
+                .As<IItemIconProvider>();
             builder.RegisterEntryPoint<HotbarHudPresenter>();
         }
     }
