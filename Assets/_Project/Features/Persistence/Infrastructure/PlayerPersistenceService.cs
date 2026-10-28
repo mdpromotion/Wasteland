@@ -1,5 +1,6 @@
 using System;
 using _Project.Features.Camera.Application;
+using _Project.Features.Items.Application;
 using _Project.Features.Persistence.Domain;
 using _Project.Features.Player.Application;
 using _Project.Features.Player.Domain;
@@ -15,6 +16,7 @@ namespace _Project.Features.Persistence.Application
         void SavePlayer();
         bool TryGetSaveData(out PlayerSaveData data);
         void ApplyPlayerState(Vector3 localPosition, float yaw, float pitch);
+        void ApplyInventoryState(PlayerSaveData data);
     }
 
     public sealed class PlayerPersistenceService : IPlayerPersistence
@@ -27,6 +29,7 @@ namespace _Project.Features.Persistence.Application
         private readonly IPlayerController _player;
         private readonly ICameraController _camera;
         private readonly IWorldSettings _worldSettings;
+        private readonly IInventoryStatePersistence _inventoryPersistence;
 
         public PlayerPersistenceService(
             IPlayerSaveReader reader,
@@ -36,7 +39,8 @@ namespace _Project.Features.Persistence.Application
             IFpsPlayerMotor motor,
             IPlayerController player,
             ICameraController camera,
-            IWorldSettings worldSettings)
+            IWorldSettings worldSettings,
+            IInventoryStatePersistence inventoryPersistence)
         {
             _reader = reader;
             _writer = writer;
@@ -46,6 +50,8 @@ namespace _Project.Features.Persistence.Application
             _player = player;
             _camera = camera;
             _worldSettings = worldSettings;
+            _inventoryPersistence = inventoryPersistence
+                ?? throw new ArgumentNullException(nameof(inventoryPersistence));
         }
 
         public void SavePlayer()
@@ -64,6 +70,8 @@ namespace _Project.Features.Persistence.Application
                 SavedAtTicks = DateTime.UtcNow.Ticks
             };
 
+            PlayerInventorySaveMapper.ApplyToSaveData(_inventoryPersistence.Capture(), data);
+
             _writer.SavePlayer(_worldSettings.Name, playerId, data);
         }
 
@@ -80,6 +88,15 @@ namespace _Project.Features.Persistence.Application
 
             _player.SyncYaw(yaw);
             _camera.SyncPitch(pitch);
+        }
+
+        public void ApplyInventoryState(PlayerSaveData data)
+        {
+            InventorySnapshot snapshot = PlayerInventorySaveMapper.ToSnapshot(data);
+            if (snapshot == null)
+                return; // Pre-inventory save (schema 1): keep the starting loadout.
+
+            _inventoryPersistence.Apply(snapshot);
         }
     }
 }

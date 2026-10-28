@@ -27,11 +27,11 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
             builder.RegisterInstance(itemDropSettings);
             builder.RegisterInstance(catalog).As<IItemCatalog>();
             builder.RegisterInstance(inventory);
-            builder.RegisterEntryPoint<HotbarInputController>();
+            builder.Register<InventorySaveAdapter>(Lifetime.Singleton)
+                .As<IInventoryStatePersistence>();
+            builder.RegisterEntryPoint<InventoryInputController>();
             builder.Register<ItemDropService>(Lifetime.Singleton)
                 .As<IItemDropService>();
-            builder.RegisterEntryPoint<DropItemController>();
-            builder.RegisterEntryPoint<PickupItemController>();
         }
     }
 }

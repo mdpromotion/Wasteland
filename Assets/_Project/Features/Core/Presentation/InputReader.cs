@@ -76,10 +76,24 @@ namespace _Project.Features.Core.Presentation
             _initialized = true;
             _inputActions.Enable();
 
-            for (int slot = 1; slot <= 9; slot++)
+            for (int slot = 0; slot < _hotbarSlotActions.Length; slot++)
             {
-                int selectedSlot = slot - 1;
-                InputAction action = _inputActions.Player.Get().FindAction($"HotbarSlot{slot}", true);
+                // Resolved through the generated wrapper (no string lookup at runtime).
+                InputAction action = slot switch
+                {
+                    0 => _inputActions.Player.@HotbarSlot1,
+                    1 => _inputActions.Player.@HotbarSlot2,
+                    2 => _inputActions.Player.@HotbarSlot3,
+                    3 => _inputActions.Player.@HotbarSlot4,
+                    4 => _inputActions.Player.@HotbarSlot5,
+                    5 => _inputActions.Player.@HotbarSlot6,
+                    6 => _inputActions.Player.@HotbarSlot7,
+                    7 => _inputActions.Player.@HotbarSlot8,
+                    8 => _inputActions.Player.@HotbarSlot9,
+                    _ => throw new InvalidOperationException($"Unsupported hotbar slot index {slot}.")
+                };
+
+                int selectedSlot = slot;
                 Action<InputAction.CallbackContext> callback =
                     _ => OnHotbarSlotPerformed(selectedSlot);
 

@@ -46,6 +46,7 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
             builder.RegisterInstance(hotbarHudSettings);
             builder.RegisterEntryPoint<HotbarHudPresenter>();
             builder.RegisterEntryPoint<HeldItemPresenter>();
+            builder.RegisterEntryPoint<PickupPromptPresenter>();
         }
     }
 }

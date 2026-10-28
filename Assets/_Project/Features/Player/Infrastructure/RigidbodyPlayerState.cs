@@ -8,6 +8,10 @@ namespace _Project.Features.Player.Infrastructure
     {
         [SerializeField] private Rigidbody _rb;
 
+        /// <summary>
+        /// True until this Unity reference or the rigidbody is destroyed. Guards
+        /// tick-driven consumers (world streamer, footsteps) against scene teardown.
+        /// </summary>
         public bool IsAvailable => this != null && _rb != null;
 
         public Vector3 Position => this == null

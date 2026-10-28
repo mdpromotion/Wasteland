@@ -74,7 +74,8 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
 
             builder.RegisterComponentInHierarchy<PlayerInteractionController>()
                 .As<IPlayerInteractionController>()
-                .As<IItemCollector>();
+                .As<IItemCollector>()
+                .As<IPickupPromptProvider>();
             
             builder.RegisterComponentInHierarchy<FootstepController>();
         }
