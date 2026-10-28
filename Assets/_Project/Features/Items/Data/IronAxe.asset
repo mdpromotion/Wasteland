@@ -18,7 +18,7 @@ MonoBehaviour:
   maxStack: 1
   icon: {fileID: 21300000, guid: c5d0617ce7c15914e8eb2b5c7507025c, type: 3}
   heldColor: {r: 0.65, g: 0.7, b: 0.78, a: 1}
-  worldPrefab: {fileID: 0}
+  worldPrefab: {fileID: 6529986967589400741, guid: 934675ccce2180849bf3a6df2d6f8a88, type: 3}
   behaviorAssets:
   - {fileID: 11400000, guid: 67df9d90d7ba4dc3b49f0c45d5962380, type: 2}
   durability: 250
