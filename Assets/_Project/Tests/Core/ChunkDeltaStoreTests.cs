@@ -82,6 +82,84 @@ namespace _Project.Tests.Core.Persistence
         }
 
         [Test]
+        public void SaveThenLoad_RoundTripsItemDelta()
+        {
+            var coord = new ChunkCoordinate(5, -2);
+            var original = new ChunkDelta(
+                new GeneratorVersionStamp(1),
+                new List<VegetationInstanceDelta>(),
+                new List<WorldItemDelta>
+                {
+                    new WorldItemDelta(31UL, DeltaAction.Added, "apple", 5.25f, 1.5f, -7f),
+                });
+
+            _deltaStore.Save(coord, original);
+            var loaded = _deltaStore.Load(coord);
+
+            Assert.AreEqual(1, loaded.ItemDeltas.Count);
+            Assert.AreEqual(31UL, loaded.ItemDeltas[0].Id);
+            Assert.AreEqual(DeltaAction.Added, loaded.ItemDeltas[0].Action);
+            Assert.AreEqual("apple", loaded.ItemDeltas[0].ItemKey);
+            Assert.AreEqual(5.25f, loaded.ItemDeltas[0].X);
+            Assert.AreEqual(1.5f, loaded.ItemDeltas[0].Y);
+            Assert.AreEqual(-7f, loaded.ItemDeltas[0].Z);
+        }
+
+        [Test]
+        public void Save_ItemAddedThenRemoved_FinalRecordIsRemoval()
+        {
+            var coord = new ChunkCoordinate(3, 11);
+
+            _deltaStore.Save(coord, new ChunkDelta(
+                default,
+                new List<VegetationInstanceDelta>(),
+                new List<WorldItemDelta>
+                {
+                    new WorldItemDelta(64UL, DeltaAction.Added, "wood", 1f, 2f, 3f),
+                }));
+            _deltaStore.Save(coord, new ChunkDelta(
+                default,
+                new List<VegetationInstanceDelta>(),
+                new List<WorldItemDelta>
+                {
+                    new WorldItemDelta(64UL, DeltaAction.Removed, null, 0f, 0f, 0f),
+                }));
+
+            var loaded = _deltaStore.Load(coord);
+
+            Assert.AreEqual(1, loaded.ItemDeltas.Count);
+            Assert.AreEqual(DeltaAction.Removed, loaded.ItemDeltas[0].Action);
+        }
+
+        [Test]
+        public void Save_ItemAndVegetationDeltasCoexist()
+        {
+            var coord = new ChunkCoordinate(0, 0);
+
+            _deltaStore.Save(coord, new ChunkDelta(
+                new GeneratorVersionStamp(4),
+                new List<VegetationInstanceDelta>
+                {
+                    new VegetationInstanceDelta(1UL, DeltaAction.Removed, null),
+                }));
+            _deltaStore.Save(coord, new ChunkDelta(
+                new GeneratorVersionStamp(4),
+                new List<VegetationInstanceDelta>(),
+                new List<WorldItemDelta>
+                {
+                    new WorldItemDelta(2UL, DeltaAction.Added, "apple", 1f, 2f, 3f),
+                }));
+
+            var loaded = _deltaStore.Load(coord);
+
+            Assert.AreEqual(1, loaded.VegetationDeltas.Count);
+            Assert.AreEqual(1, loaded.ItemDeltas.Count);
+            Assert.AreEqual(1UL, loaded.VegetationDeltas[0].Id);
+            Assert.AreEqual(2UL, loaded.ItemDeltas[0].Id);
+            Assert.AreEqual(4, loaded.Versions.VegetationVersion);
+        }
+
+        [Test]
         public void Save_EmptyDelta_OnNeverWrittenChunk_DoesNotCreateFile()
         {
             _deltaStore.Save(new ChunkCoordinate(2, 2), ChunkDelta.Empty);

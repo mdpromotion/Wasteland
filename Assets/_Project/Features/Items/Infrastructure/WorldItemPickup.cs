@@ -17,6 +17,7 @@ namespace _Project.Features.Items.Infrastructure
         private IItemCollector _collector;
         private Transform _collectorAnchor;
         private WorldItemPickupBillboard _billboard;
+        private DroppedItemHandle _dropHandle;
         private bool _initialized;
 
         public float Distance { get; private set; }
@@ -27,7 +28,8 @@ namespace _Project.Features.Items.Infrastructure
             HotbarHudSettings hudSettings,
             PickupBillboardPool billboardPool,
             IItemCollector collector,
-            Transform collectorAnchor)
+            Transform collectorAnchor,
+            DroppedItemHandle dropHandle = null)
         {
             _itemId = itemId;
             _definition = definition;
@@ -35,6 +37,7 @@ namespace _Project.Features.Items.Infrastructure
             _billboardPool = billboardPool;
             _collector = collector;
             _collectorAnchor = collectorAnchor;
+            _dropHandle = dropHandle;
             _initialized = true;
         }
 
@@ -81,8 +84,20 @@ namespace _Project.Features.Items.Infrastructure
             if (!collector.TryCollect(_itemId))
                 return false;
 
-            Destroy(gameObject);
+            NotifyRemovedFromWorld();
+            DestroyEntity();
             return true;
+        }
+
+        /// <summary>
+        /// Persists the fact that this drop left the world (collected or rolled
+        /// back by the drop flow). Explicit call instead of relying on
+        /// <c>OnDestroy</c>: scene teardown destroys pickups the same way as a
+        /// removal, and that must not write a Removed delta.
+        /// </summary>
+        public void NotifyRemovedFromWorld()
+        {
+            _dropHandle?.ReleaseFromWorld(this);
         }
 
         /// <summary>
@@ -145,11 +160,24 @@ namespace _Project.Features.Items.Infrastructure
 
         private void OnDestroy()
         {
+            // Scene teardown / quit: the item entity object dies exactly like a
+            // game-removed object would, so registry bookkeeping is freed but the
+            // persistence record is deliberately untouched (see DroppedItemHandle).
+            _dropHandle?.ReleaseFromScene(this);
+
             if (_collector != null)
                 _collector.UnregisterNearbyPickup(this);
 
             if (_billboard != null)
                 _billboard.Release();
+        }
+
+        private void DestroyEntity()
+        {
+            if (UnityEngine.Application.isPlaying)
+                Destroy(gameObject);
+            else
+                DestroyImmediate(gameObject);
         }
     }
 }

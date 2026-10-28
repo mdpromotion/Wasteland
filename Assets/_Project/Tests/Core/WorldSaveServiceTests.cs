@@ -21,6 +21,8 @@ namespace _Project.Tests.ProceduralWorld.Persistence
 
             public void RecordVegetationRemoved(ChunkCoordinate coord, ulong id) { }
             public void RecordVegetationModified(ChunkCoordinate coord, ulong id, byte[] extra) { }
+            public void RecordItemAdded(ChunkCoordinate coord, WorldItemDelta itemDelta) { }
+            public void RecordItemRemoved(ChunkCoordinate coord, ulong itemId) { }
 
             public ChunkDelta GetPendingDelta(ChunkCoordinate coord) =>
                 Deltas.TryGetValue(coord, out var d) ? d : ChunkDelta.Empty;
