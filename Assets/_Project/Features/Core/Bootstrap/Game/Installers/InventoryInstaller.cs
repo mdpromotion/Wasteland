@@ -29,11 +29,9 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
             builder.RegisterInstance(inventory);
             builder.Register<InventorySaveAdapter>(Lifetime.Singleton)
                 .As<IInventoryStatePersistence>();
-            builder.RegisterEntryPoint<HotbarInputController>();
+            builder.RegisterEntryPoint<InventoryInputController>();
             builder.Register<ItemDropService>(Lifetime.Singleton)
                 .As<IItemDropService>();
-            builder.RegisterEntryPoint<DropItemController>();
-            builder.RegisterEntryPoint<PickupItemController>();
         }
     }
 }
