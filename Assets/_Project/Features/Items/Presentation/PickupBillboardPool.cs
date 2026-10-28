@@ -67,185 +67,30 @@ namespace _Project.Features.Items.Presentation
 
         private PooledBillboard Create()
         {
-            var root = new GameObject(
-                "Pickup Billboard",
-                typeof(RectTransform),
-                typeof(Canvas),
-                typeof(CanvasScaler),
-                typeof(Image),
-                typeof(Outline));
+            PickupBillboardTemplate template = _settings.PickupBillboardPrefab;
+            if (template == null)
+                throw new InvalidOperationException(
+                    "Pickup Billboard prefab is not assigned in HotbarHudSettings.");
 
-            RectTransform panel = root.GetComponent<RectTransform>();
+            PickupBillboardTemplate instance = UnityEngine.Object.Instantiate(template, Root);
+            instance.name = "Pickup Billboard";
+
+            RectTransform panel = (RectTransform)instance.transform;
             panel.sizeDelta = _settings.PickupBillboardSize;
             panel.localScale = Vector3.one * _settings.PickupBillboardWorldScale;
 
-            var canvas = root.GetComponent<Canvas>();
+            Canvas canvas = instance.Canvas;
             canvas.renderMode = RenderMode.WorldSpace;
             canvas.worldCamera = UnityEngine.Camera.main;
 
-            CanvasScaler scaler = root.GetComponent<CanvasScaler>();
-            scaler.dynamicPixelsPerUnit = 10f;
-
-            var background = root.GetComponent<Image>();
-            background.raycastTarget = false;
-
-            Outline outline = root.GetComponent<Outline>();
-            outline.effectColor = _settings.HighlightColor;
-            outline.effectDistance = new Vector2(2f, 2f);
-
-            PooledImage iconBackground = CreateIconBackground(panel);
-            PooledIcon icon = CreateIcon(iconBackground.Rect);
-
-            PooledText title = CreateText(panel, "Item Name", _settings.PickupTitleFontSize, TextAnchor.MiddleLeft);
-            title.Rect.anchorMin = new Vector2(0.25f, 0.46f);
-            title.Rect.anchorMax = new Vector2(0.97f, 0.95f);
-
-            PooledImage key = CreateKeyBackground(panel);
-            PooledText keyLabel = CreateText(key.Rect, "Key E", _settings.PickupPromptFontSize, TextAnchor.MiddleCenter);
-            keyLabel.Rect.anchorMin = Vector2.zero;
-            keyLabel.Rect.anchorMax = Vector2.one;
-
-            PooledText prompt = CreateText(panel, "Pickup Text", _settings.PickupPromptFontSize, TextAnchor.MiddleLeft);
-            prompt.Rect.anchorMin = new Vector2(0.43f, 0.08f);
-            prompt.Rect.anchorMax = new Vector2(0.97f, 0.42f);
-
             return new PooledBillboard(
-                root,
+                instance.gameObject,
                 canvas,
-                background,
-                iconBackground.Image,
-                icon.Image,
-                title.Text,
-                prompt.Text);
-        }
-
-        private PooledImage CreateIconBackground(RectTransform panel)
-        {
-            var iconBackgroundObject = new GameObject(
-                "Item Icon Background",
-                typeof(RectTransform),
-                typeof(Image));
-
-            RectTransform rect = iconBackgroundObject.GetComponent<RectTransform>();
-            rect.SetParent(panel, false);
-            rect.anchorMin = new Vector2(0f, 0.5f);
-            rect.anchorMax = new Vector2(0f, 0.5f);
-            rect.pivot = new Vector2(0f, 0.5f);
-            rect.sizeDelta = Vector2.one * _settings.PickupIconSize;
-            rect.anchoredPosition = new Vector2(12f, 0f);
-
-            Image image = iconBackgroundObject.GetComponent<Image>();
-            image.raycastTarget = false;
-            return new PooledImage(rect, image);
-        }
-
-        private static PooledIcon CreateIcon(RectTransform iconBackground)
-        {
-            var iconObject = new GameObject("Item Icon", typeof(RectTransform), typeof(Image));
-            RectTransform rect = iconObject.GetComponent<RectTransform>();
-            rect.SetParent(iconBackground, false);
-            rect.anchorMin = new Vector2(0.08f, 0.08f);
-            rect.anchorMax = new Vector2(0.92f, 0.92f);
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-
-            Image image = iconObject.GetComponent<Image>();
-            image.preserveAspect = true;
-            image.raycastTarget = false;
-            image.enabled = false;
-            return new PooledIcon(rect, image);
-        }
-
-        private PooledImage CreateKeyBackground(RectTransform panel)
-        {
-            var keyObject = new GameObject(
-                "Pickup Key",
-                typeof(RectTransform),
-                typeof(Image),
-                typeof(Outline));
-
-            RectTransform rect = keyObject.GetComponent<RectTransform>();
-            rect.SetParent(panel, false);
-            rect.anchorMin = new Vector2(0.25f, 0.08f);
-            rect.anchorMax = new Vector2(0.39f, 0.42f);
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-
-            Image image = keyObject.GetComponent<Image>();
-            image.color = _settings.SelectedSlotColor;
-            image.raycastTarget = false;
-
-            Outline outline = keyObject.GetComponent<Outline>();
-            outline.effectColor = _settings.HighlightColor;
-            outline.effectDistance = Vector2.one;
-            return new PooledImage(rect, image);
-        }
-
-        private static PooledText CreateText(
-            RectTransform parent,
-            string objectName,
-            int fontSize,
-            TextAnchor alignment)
-        {
-            var textObject = new GameObject(objectName, typeof(RectTransform), typeof(Text));
-            RectTransform rect = textObject.GetComponent<RectTransform>();
-            rect.SetParent(parent, false);
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-
-            Text text = textObject.GetComponent<Text>();
-            text.font = Fonts.Resolve();
-            text.fontSize = fontSize;
-            text.color = Color.white;
-            text.alignment = alignment;
-            text.horizontalOverflow = HorizontalWrapMode.Wrap;
-            text.verticalOverflow = VerticalWrapMode.Truncate;
-            text.raycastTarget = false;
-            return new PooledText(rect, text);
-        }
-
-        private readonly struct PooledImage
-        {
-            public RectTransform Rect { get; }
-            public Image Image { get; }
-
-            public PooledImage(RectTransform rect, Image image)
-            {
-                Rect = rect;
-                Image = image;
-            }
-        }
-
-        private readonly struct PooledText
-        {
-            public RectTransform Rect { get; }
-            public Text Text { get; }
-
-            public PooledText(RectTransform rect, Text text)
-            {
-                Rect = rect;
-                Text = text;
-            }
-        }
-
-        private readonly struct PooledIcon
-        {
-            public RectTransform Rect { get; }
-            public Image Image { get; }
-
-            public PooledIcon(RectTransform rect, Image image)
-            {
-                Rect = rect;
-                Image = image;
-            }
-        }
-
-        private static class Fonts
-        {
-            public static Font Resolve()
-            {
-                return Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            }
+                instance.Background,
+                instance.IconBackground,
+                instance.Icon,
+                instance.Title,
+                instance.Prompt);
         }
     }
 

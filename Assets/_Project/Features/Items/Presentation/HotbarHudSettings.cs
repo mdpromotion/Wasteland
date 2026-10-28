@@ -38,6 +38,7 @@ namespace _Project.Features.Items.Presentation
         [SerializeField, Min(0.01f)] private float equipDuration = 0.28f;
 
         [Header("Pickup Billboard")]
+        [SerializeField] private PickupBillboardTemplate pickupBillboardPrefab;
         [SerializeField] private Vector2 pickupBillboardSize = new Vector2(310f, 96f);
         [SerializeField, Min(0.001f)] private float pickupBillboardWorldScale = 0.005f;
         [SerializeField] private Vector3 pickupBillboardOffset = new Vector3(0f, 1f, 0f);
@@ -70,6 +71,7 @@ namespace _Project.Features.Items.Presentation
         public Vector3 HeldItemScale => heldItemScale;
         public Vector3 StowedItemPosition => stowedItemPosition;
         public float EquipDuration => equipDuration;
+        public PickupBillboardTemplate PickupBillboardPrefab => pickupBillboardPrefab;
         public Vector2 PickupBillboardSize => pickupBillboardSize;
         public float PickupBillboardWorldScale => pickupBillboardWorldScale;
         public Vector3 PickupBillboardOffset => pickupBillboardOffset;

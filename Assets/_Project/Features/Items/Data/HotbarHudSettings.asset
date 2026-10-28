@@ -36,6 +36,7 @@ MonoBehaviour:
   heldItemScale: {x: 0.18, y: 0.18, z: 0.5}
   stowedItemPosition: {x: 0.42, y: -0.9, z: 0.35}
   equipDuration: 0.28
+  pickupBillboardPrefab: {fileID: 81008, guid: ef1f3f48911dab9789bc813bf0aa7252, type: 3}
   pickupBillboardSize: {x: 310, y: 96}
   pickupBillboardWorldScale: 0.005
   pickupBillboardOffset: {x: 0, y: 1, z: 0}
