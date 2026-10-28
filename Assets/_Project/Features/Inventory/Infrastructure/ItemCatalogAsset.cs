@@ -22,6 +22,8 @@ namespace _Project.Features.Items.Infrastructure
         [SerializeField] private ItemDefinitionAsset[] items = Array.Empty<ItemDefinitionAsset>();
         [SerializeField] private StartingItemEntry[] startingItems = Array.Empty<StartingItemEntry>();
 
+        private Dictionary<ItemId, ItemDefinitionAsset> _index;
+
         public ItemCatalog CreateDomainCatalog()
         {
             ItemDefinitionAsset[] configuredItems = items ?? Array.Empty<ItemDefinitionAsset>();
@@ -57,12 +59,41 @@ namespace _Project.Features.Items.Infrastructure
 
         public ItemDefinitionAsset Get(ItemId id)
         {
-            ItemDefinitionAsset[] configuredItems = items ?? Array.Empty<ItemDefinitionAsset>();
-            for (int i = 0; i < configuredItems.Length; i++)
-                if (configuredItems[i] != null && configuredItems[i].Id == id)
-                    return configuredItems[i];
+            if (TryGet(id, out ItemDefinitionAsset definition))
+                return definition;
 
             throw new InvalidOperationException($"Item catalog '{name}' has no item with ID '{id}'.");
         }
+
+        public bool TryGet(ItemId id, out ItemDefinitionAsset definition)
+        {
+            if (_index == null)
+                BuildIndex();
+
+            return _index.TryGetValue(id, out definition);
+        }
+
+        private void BuildIndex()
+        {
+            _index = new Dictionary<ItemId, ItemDefinitionAsset>();
+            ItemDefinitionAsset[] configuredItems = items ?? Array.Empty<ItemDefinitionAsset>();
+
+            // Last entry wins; duplicates are kept rather than throwing so that a
+            // mis-edited asset stays runnable in game, only flagged in the editor.
+            for (int i = 0; i < configuredItems.Length; i++)
+            {
+                if (configuredItems[i] == null)
+                    continue;
+
+                _index[configuredItems[i].Id] = configuredItems[i];
+            }
+        }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            _index = null;
+        }
+#endif
     }
 }
