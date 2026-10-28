@@ -2,125 +2,50 @@ using System;
 
 namespace _Project.Features.Items.Domain
 {
+    /// <summary>
+    /// Facade over an <see cref="ItemContainer"/> plus the player's <see cref="Hotbar"/>
+    /// selection. Keeps the historical API used by gameplay and the HUD while the
+    /// storage/selection concerns stay separately extendable (bigger containers, pages).
+    /// </summary>
     public sealed class Inventory
     {
-        public const int HotbarSize = 9;
+        public const int HotbarSize = Hotbar.Size;
 
-        private readonly IItemCatalog _itemCatalog;
-        private readonly InventoryStack[] _slots = new InventoryStack[HotbarSize];
+        private readonly ItemContainer _container;
+        private readonly Hotbar _hotbar;
 
-        public int SelectedSlot { get; private set; }
-        public ItemDefinition SelectedItem => _slots[SelectedSlot]?.Item;
+        public int SelectedSlot => _hotbar.SelectedSlot;
+        public ItemDefinition SelectedItem => GetSlot(SelectedSlot)?.Item;
 
         public event Action Changed;
 
         public Inventory(IItemCatalog itemCatalog)
+            : this(new ItemContainer(itemCatalog, Hotbar.Size), new Hotbar())
         {
-            _itemCatalog = itemCatalog ?? throw new ArgumentNullException(nameof(itemCatalog));
         }
 
-        public InventoryStack GetSlot(int slot)
+        internal Inventory(ItemContainer container, Hotbar hotbar)
         {
-            ValidateSlot(slot);
-            return _slots[slot];
+            _container = container ?? throw new ArgumentNullException(nameof(container));
+            _hotbar = hotbar ?? throw new ArgumentNullException(nameof(hotbar));
+
+            _container.Changed += NotifyChanged;
+            _hotbar.Changed += NotifyChanged;
         }
 
-        public bool SelectSlot(int slot)
-        {
-            ValidateSlot(slot);
-            if (SelectedSlot == slot)
-                return false;
+        public InventoryStack GetSlot(int slot) => _container.GetAt(slot);
 
-            SelectedSlot = slot;
-            Changed?.Invoke();
-            return true;
-        }
+        public bool SelectSlot(int slot) => _hotbar.SelectSlot(slot);
 
-        public bool TryAdd(ItemId itemId, int count)
-        {
-            if (count <= 0)
-                return false;
+        public bool TryAdd(ItemId itemId, int count) => _container.TryAdd(itemId, count);
 
-            ItemDefinition item = _itemCatalog.Get(itemId);
-            int remaining = count;
-
-            for (int i = 0; i < _slots.Length && remaining > 0; i++)
-            {
-                InventoryStack stack = _slots[i];
-                if (stack == null || stack.Item.Id != itemId)
-                    continue;
-
-                remaining -= Math.Min(remaining, item.MaxStack - stack.Count);
-            }
-
-            for (int i = 0; i < _slots.Length && remaining > 0; i++)
-            {
-                if (_slots[i] != null)
-                    continue;
-
-                remaining -= Math.Min(remaining, item.MaxStack);
-            }
-
-            if (remaining > 0)
-                return false;
-
-            remaining = count;
-            for (int i = 0; i < _slots.Length && remaining > 0; i++)
-            {
-                InventoryStack stack = _slots[i];
-                if (stack == null || stack.Item.Id != itemId)
-                    continue;
-
-                int added = Math.Min(remaining, item.MaxStack - stack.Count);
-                _slots[i] = new InventoryStack(item, stack.Count + added);
-                remaining -= added;
-            }
-
-            for (int i = 0; i < _slots.Length && remaining > 0; i++)
-            {
-                if (_slots[i] != null)
-                    continue;
-
-                int added = Math.Min(remaining, item.MaxStack);
-                _slots[i] = new InventoryStack(item, added);
-                remaining -= added;
-            }
-
-            Changed?.Invoke();
-            return true;
-        }
-
-        public bool TryConsumeSelected()
-        {
-            InventoryStack stack = _slots[SelectedSlot];
-            if (stack == null || stack.Item.GetBehavior<ConsumableItemBehavior>() == null)
-                return false;
-
-            return TryRemoveSelectedOne(out _);
-        }
+        public bool TryConsumeSelected() => _container.TryConsumeAt(_hotbar.SelectedSlot);
 
         public bool TryRemoveSelectedOne(out ItemDefinition item)
         {
-            InventoryStack stack = _slots[SelectedSlot];
-            if (stack == null)
-            {
-                item = null;
-                return false;
-            }
-
-            item = stack.Item;
-            _slots[SelectedSlot] = stack.Count == 1
-                ? null
-                : new InventoryStack(stack.Item, stack.Count - 1);
-
-            Changed?.Invoke();
-            return true;
+            return _container.TryRemoveAt(_hotbar.SelectedSlot, out item);
         }
 
-        private static void ValidateSlot(int slot)
-        {
-            if (slot < 0 || slot >= HotbarSize)
-                throw new ArgumentOutOfRangeException(nameof(slot));
-        }
+        internal void NotifyChanged() => Changed?.Invoke();
     }
 }
