@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using _Project.Features.Items.Application;
 using _Project.Features.Items.Domain;
 using NUnit.Framework;
@@ -131,6 +132,28 @@ namespace _Project.Tests.Items
             Assert.That(wood.GetInspectableStats().Count, Is.EqualTo(3));
             Assert.That(food.GetTreeDamage(), Is.EqualTo(1f));
             Assert.That(wood.GetTreeDamage(), Is.EqualTo(1f));
+        }
+
+        [Test]
+        public void GetInspectableStats_IsCachedPerDefinition()
+        {
+            const float miningPower = 2f;
+            var tool = new ToolItemDefinition(
+                ItemId.IronAxe,
+                "Iron Axe",
+                1,
+                "tool",
+                "Tool",
+                100f,
+                1f,
+                miningPower,
+                new ItemBehavior[] { new TreeChoppingItemBehavior(miningPower) });
+
+            IReadOnlyList<ItemStat> first = tool.GetInspectableStats();
+            IReadOnlyList<ItemStat> second = tool.GetInspectableStats();
+
+            Assert.That(second, Is.SameAs(first));
+            Assert.That(first.Count, Is.EqualTo(6));
         }
 
         [Test]

@@ -9,9 +9,15 @@ namespace _Project.Features.Items.Presentation
 {
     public sealed class HotbarHudPresenter : IStartable, ITickable, IDisposable
     {
+        private const string HandsEmptyText = "Hands: Empty";
+        private const string CountPrefix = "×";
+
         private readonly Inventory _inventory;
         private readonly HotbarHudView _view;
         private readonly IItemIconProvider _itemIconProvider;
+        private readonly StringBuilder _textBuffer = new StringBuilder();
+        private readonly string[] _countTexts = new string[Inventory.HotbarSize];
+        private readonly int[] _cachedCounts = new int[Inventory.HotbarSize];
         private int _lastSelectedSlot;
         private float _selectionToastTimeRemaining;
 
@@ -40,13 +46,12 @@ namespace _Project.Features.Items.Presentation
                 InventoryStack stack = _inventory.GetSlot(slot);
                 bool selected = slot == _inventory.SelectedSlot;
                 Sprite icon = stack == null ? null : _itemIconProvider.GetIcon(stack.Item.Id);
-                string count = stack == null ? string.Empty : $"×{stack.Count}";
                 _view.SetSlot(
                     slot,
                     selected ? _view.SelectedSlotColor : _view.SlotColor,
                     selected,
                     icon,
-                    count);
+                    stack == null ? string.Empty : GetCountText(slot, stack.Count));
             }
 
             ItemDefinition selectedItem = _inventory.SelectedItem;
@@ -57,6 +62,16 @@ namespace _Project.Features.Items.Presentation
 
             _lastSelectedSlot = _inventory.SelectedSlot;
             ShowSelectionToast(selectedItem);
+        }
+
+        private string GetCountText(int slot, int count)
+        {
+            if (_countTexts[slot] != null && _cachedCounts[slot] == count)
+                return _countTexts[slot];
+
+            _cachedCounts[slot] = count;
+            _countTexts[slot] = string.Concat(CountPrefix, count.ToString());
+            return _countTexts[slot];
         }
 
         private void ShowSelectionToast(ItemDefinition item)
@@ -72,16 +87,17 @@ namespace _Project.Features.Items.Presentation
             _selectionToastTimeRemaining = _view.SelectionToastDuration;
         }
 
-        private static string FormatHeldItem(ItemDefinition item)
+        private string FormatHeldItem(ItemDefinition item)
         {
             if (item == null)
-                return "Hands: Empty";
+                return HandsEmptyText;
 
-            var text = new StringBuilder(item.DisplayName);
+            _textBuffer.Clear();
+            _textBuffer.Append(item.DisplayName);
             IReadOnlyList<ItemStat> stats = item.GetInspectableStats();
             for (int i = 0; i < stats.Count; i++)
-                text.Append("\n").Append(stats[i].Label).Append(": ").Append(stats[i].Value);
-            return text.ToString();
+                _textBuffer.Append("\n").Append(stats[i].Label).Append(": ").Append(stats[i].Value);
+            return _textBuffer.ToString();
         }
 
         public void Tick()

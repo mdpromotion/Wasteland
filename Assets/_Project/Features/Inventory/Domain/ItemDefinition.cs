@@ -65,7 +65,16 @@ namespace _Project.Features.Items.Domain
             return null;
         }
 
-        public virtual IReadOnlyList<ItemStat> GetInspectableStats()
+        private IReadOnlyList<ItemStat> _cachedStats;
+
+        /// <summary>
+        /// UI-facing stat rows. The list is immutable per definition and cached, so
+        /// HUD re-renders don't rebuild it on every inventory change.
+        /// </summary>
+        public IReadOnlyList<ItemStat> GetInspectableStats() =>
+            _cachedStats ??= CreateInspectableStats();
+
+        protected virtual IReadOnlyList<ItemStat> CreateInspectableStats()
         {
             return new[]
             {
@@ -74,5 +83,6 @@ namespace _Project.Features.Items.Domain
                 new ItemStat("Max stack", MaxStack.ToString(CultureInfo.InvariantCulture))
             };
         }
+
     }
 }

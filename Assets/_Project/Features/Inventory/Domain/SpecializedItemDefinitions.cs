@@ -18,9 +18,9 @@ namespace _Project.Features.Items.Domain
             MiningPower = miningPower;
         }
 
-        public override IReadOnlyList<ItemStat> GetInspectableStats()
+        protected override IReadOnlyList<ItemStat> CreateInspectableStats()
         {
-            var stats = new List<ItemStat>(base.GetInspectableStats())
+            var stats = new List<ItemStat>(base.CreateInspectableStats())
             {
                 new ItemStat("Durability", Format(Durability)),
                 new ItemStat("Mining speed", Format(MiningSpeed)),
@@ -43,9 +43,9 @@ namespace _Project.Features.Items.Domain
             Saturation = saturation;
         }
 
-        public override IReadOnlyList<ItemStat> GetInspectableStats()
+        protected override IReadOnlyList<ItemStat> CreateInspectableStats()
         {
-            var stats = new List<ItemStat>(base.GetInspectableStats())
+            var stats = new List<ItemStat>(base.CreateInspectableStats())
             {
                 new ItemStat("Saturation", Saturation.ToString("0.##", CultureInfo.InvariantCulture))
             };
