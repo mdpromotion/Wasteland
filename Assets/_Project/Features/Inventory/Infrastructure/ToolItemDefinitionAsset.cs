@@ -13,6 +13,8 @@ namespace _Project.Features.Items.Infrastructure
         public override ItemDefinition CreateDomainDefinition()
         {
             var behaviors = CreateBehaviors();
+            // Single source of truth for chop damage: the tool's MiningPower. The behavior
+            // entry carries it so ItemDefinition.GetTreeDamage() reads one place only.
             for (int i = 0; i < behaviors.Count; i++)
                 if (behaviors[i] is TreeChoppingItemBehavior)
                     behaviors[i] = new TreeChoppingItemBehavior(miningPower);

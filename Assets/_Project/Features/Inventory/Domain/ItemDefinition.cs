@@ -14,11 +14,22 @@ namespace _Project.Features.Items.Domain
         public string CategoryName { get; }
         public IReadOnlyList<ItemBehavior> Behaviors { get; }
 
+        /// <summary>
+        /// Damage dealt with empty hands (no held item) or by items without chopping behavior.
+        /// </summary>
+        public const float FistDamage = 1f;
+
         public bool CanChopTrees => GetBehavior<TreeChoppingItemBehavior>() != null;
         public float ToolDamage => GetBehavior<TreeChoppingItemBehavior>()?.Damage ?? 0f;
         public bool CanConsume => GetBehavior<ConsumableItemBehavior>() != null;
 
-        public ItemDefinition(ItemId id, string displayName, int maxStack, IEnumerable<ItemBehavior> behaviors)
+        /// <summary>
+        /// Damage dealt to breakable trees with this item. Sourced exclusively from the
+        /// <see cref="TreeChoppingItemBehavior"/> so there is a single place defining it.
+        /// </summary>
+        public float GetTreeDamage() => GetBehavior<TreeChoppingItemBehavior>()?.Damage ?? FistDamage;
+
+        public ItemDefinition(ItemId id, string displayName, int maxStack, IEnumerable<ItemBehavior> behaviors = null)
             : this(id, displayName, maxStack, string.Empty, string.Empty, behaviors)
         {
         }
@@ -46,12 +57,6 @@ namespace _Project.Features.Items.Domain
                 throw new ArgumentException("An item's behaviors cannot contain null entries.", nameof(behaviors));
         }
 
-        public ItemDefinition(ItemId id, string displayName, int maxStack,
-            bool canChopTrees = false, float toolDamage = 0f, bool canConsume = false)
-            : this(id, displayName, maxStack, CreateLegacyBehaviors(canChopTrees, toolDamage, canConsume))
-        {
-        }
-
         public T GetBehavior<T>() where T : ItemBehavior
         {
             for (int i = 0; i < Behaviors.Count; i++)
@@ -59,8 +64,6 @@ namespace _Project.Features.Items.Domain
                     return behavior;
             return null;
         }
-
-        public virtual float GetTreeDamage() => 1f;
 
         public virtual IReadOnlyList<ItemStat> GetInspectableStats()
         {
@@ -70,16 +73,6 @@ namespace _Project.Features.Items.Domain
                 new ItemStat("Technical ID", Id.Value),
                 new ItemStat("Max stack", MaxStack.ToString(CultureInfo.InvariantCulture))
             };
-        }
-
-        private static IEnumerable<ItemBehavior> CreateLegacyBehaviors(bool canChopTrees, float toolDamage, bool canConsume)
-        {
-            var behaviors = new List<ItemBehavior>();
-            if (canChopTrees)
-                behaviors.Add(new TreeChoppingItemBehavior(toolDamage));
-            if (canConsume)
-                behaviors.Add(new ConsumableItemBehavior());
-            return behaviors;
         }
     }
 }

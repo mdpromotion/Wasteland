@@ -101,7 +101,9 @@ namespace _Project.Features.Interaction.Infrastructure
             PlayerInteracted?.Invoke(interval);
 
             ItemDefinition selectedItem = _inventory.SelectedItem;
-            float treeDamage = selectedItem == null ? 1f : selectedItem.GetTreeDamage();
+            float treeDamage = selectedItem == null
+                ? ItemDefinition.FistDamage
+                : selectedItem.GetTreeDamage();
 
             if (!_interactionCamera)
                 _interactionCamera = UnityEngine.Camera.main;

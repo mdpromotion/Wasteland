@@ -20,9 +20,13 @@ namespace _Project.Tests.Items
         {
             var catalog = new ItemCatalog(new[]
             {
-                new ItemDefinition(ItemId.IronAxe, "Iron Axe", 1, canChopTrees: true, toolDamage: 1f),
+                new ItemDefinition(
+                    ItemId.IronAxe,
+                    "Iron Axe",
+                    1,
+                    new ItemBehavior[] { new TreeChoppingItemBehavior(1f) }),
                 new ItemDefinition(ItemId.Wood, "Wood", 50),
-                new ItemDefinition(ItemId.Apple, "Apple", 50, canConsume: true)
+                new ItemDefinition(ItemId.Apple, "Apple", 50, new ItemBehavior[] { new ConsumableItemBehavior() })
             });
 
             _inventory = new Inventory(catalog);
