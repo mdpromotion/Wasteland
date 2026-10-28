@@ -43,6 +43,7 @@ namespace _Project.Tests.ProceduralWorld.Chunks
                     new ChunkNeighborConnector(
                         new FakeLandscapeFactory()),
                     new FakeDeltaStage(),
+                    new FakeWorldItemSpawnStage(),
                     new FakeWorldSaveService());
 
             ChunkCoordinate coordinate =
@@ -92,6 +93,7 @@ namespace _Project.Tests.ProceduralWorld.Chunks
                     new ChunkNeighborConnector(
                         new FakeLandscapeFactory()),
                     new FakeDeltaStage(),
+                    new FakeWorldItemSpawnStage(),
                     new FakeWorldSaveService());
 
             manager.QueueLoad(coordinate);
@@ -106,6 +108,14 @@ namespace _Project.Tests.ProceduralWorld.Chunks
 
             public void Apply(ChunkCoordinate coordinate, VegetationData vegetation) =>
                 AppliedFor.Add(coordinate);
+        }
+
+        private sealed class FakeWorldItemSpawnStage : IWorldItemSpawnStage
+        {
+            public readonly List<ChunkCoordinate> SpawnedFor = new();
+
+            public void Spawn(ChunkCoordinate coordinate) =>
+                SpawnedFor.Add(coordinate);
         }
 
         private sealed class SpyWorldSaveService : IWorldSaveService
@@ -133,11 +143,46 @@ namespace _Project.Tests.ProceduralWorld.Chunks
                 new FakeDeltaStore(),
                 new ChunkNeighborConnector(new FakeLandscapeFactory()),
                 new FakeDeltaStage(),
+                new FakeWorldItemSpawnStage(),
                 saveService);
 
             manager.Unload(new ChunkCoordinate(50, 50));
 
             Assert.IsEmpty(saveService.SavedChunks);
+        }
+
+        [Test]
+        public void Tick_AppliesCompletedGeneration_StagesRunOncePerChunk()
+        {
+            var generator = new RecordingGenerator();
+            var scheduler =
+                new ChunkGenerationScheduler(
+                    generator,
+                    new UnlimitedFrameBudget());
+
+            var repository = new ChunkRepository();
+            var deltaStage = new SpyDeltaStage();
+            var itemSpawnStage = new FakeWorldItemSpawnStage();
+
+            var manager =
+                new ChunkManager(
+                    scheduler,
+                    repository,
+                    new RecordingApplier(),
+                    new FakeLandscapeFactory(),
+                    new FakeDeltaStore(),
+                    new ChunkNeighborConnector(
+                        new FakeLandscapeFactory()),
+                    deltaStage,
+                    itemSpawnStage,
+                    new FakeWorldSaveService());
+
+            ChunkCoordinate coordinate = new ChunkCoordinate(3, 7);
+            manager.QueueLoad(coordinate);
+            manager.Tick();
+
+            Assert.That(deltaStage.AppliedFor, Does.Contain(coordinate));
+            Assert.That(itemSpawnStage.SpawnedFor, Does.Contain(coordinate));
         }
 
         private sealed class RecordingGenerator : IChunkGenerator
