@@ -54,8 +54,9 @@ namespace _Project.Features.Persistence.Application
             Vector3 safeLocalSpawnPosition = new Vector3(localOffset.x, (float)data.Y, localOffset.y);
             
             _chunkPersistence.InitializeOrigin(targetChunk);
-            
+
             _playerPersistence.ApplyPlayerState(safeLocalSpawnPosition, data.Yaw, data.Pitch);
+            _playerPersistence.ApplyInventoryState(data);
 
             return true;
         }

@@ -25,10 +25,15 @@ namespace _Project.Features.Items.Domain
 
         public ItemDefinition Get(ItemId id)
         {
-            if (_items.TryGetValue(id, out ItemDefinition definition))
+            if (TryGet(id, out ItemDefinition definition))
                 return definition;
 
             throw new KeyNotFoundException($"No item definition exists for {id}.");
+        }
+
+        public bool TryGet(ItemId id, out ItemDefinition definition)
+        {
+            return _items.TryGetValue(id, out definition);
         }
     }
 }

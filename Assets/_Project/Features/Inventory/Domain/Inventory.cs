@@ -46,6 +46,30 @@ namespace _Project.Features.Items.Domain
             return _container.TryRemoveAt(_hotbar.SelectedSlot, out item);
         }
 
+        /// <summary>Empties every slot without touching the selected slot.</summary>
+        public void Clear()
+        {
+            for (int i = 0; i < _container.Capacity; i++)
+                _container.ReplaceAt(i, null);
+
+            _container.NotifyChanged();
+        }
+
+        /// <summary>
+        /// Writes a single stack used by save/load restoration. Throws on out-of-range
+        /// slots like <see cref="GetSlot"/>, so callers validate their data first.
+        /// </summary>
+        public void SetSlotStack(int slot, ItemDefinition item, int count)
+        {
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+            if (count <= 0)
+                throw new ArgumentOutOfRangeException(nameof(count), "A stack count must be positive.");
+
+            _container.ReplaceAt(slot, new InventoryStack(item, count));
+            _container.NotifyChanged();
+        }
+
         internal void NotifyChanged() => Changed?.Invoke();
     }
 }
