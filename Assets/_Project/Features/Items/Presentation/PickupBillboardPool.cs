@@ -86,7 +86,6 @@ namespace _Project.Features.Items.Presentation
             return new PooledBillboard(
                 instance.gameObject,
                 canvas,
-                instance.Background,
                 instance.IconBackground,
                 instance.Icon,
                 instance.Title,
@@ -99,7 +98,6 @@ namespace _Project.Features.Items.Presentation
     {
         public GameObject Root { get; }
         public Canvas Canvas { get; }
-        public Image Background { get; }
         public Image IconBackground { get; }
         public Image Icon { get; }
         public Text Title { get; }
@@ -108,7 +106,6 @@ namespace _Project.Features.Items.Presentation
         public PooledBillboard(
             GameObject root,
             Canvas canvas,
-            Image background,
             Image iconBackground,
             Image icon,
             Text title,
@@ -116,7 +113,6 @@ namespace _Project.Features.Items.Presentation
         {
             Root = root;
             Canvas = canvas;
-            Background = background;
             IconBackground = iconBackground;
             Icon = icon;
             Title = title;
@@ -126,7 +122,6 @@ namespace _Project.Features.Items.Presentation
         /// <summary>Fills the billboard with a specific item's content.</summary>
         public void Configure(ItemDefinitionAsset definition, HotbarHudSettings settings)
         {
-            Background.color = settings.SlotColor;
             IconBackground.color = definition.HeldColor;
 
             if (definition.Icon != null)

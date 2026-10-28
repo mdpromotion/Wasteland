@@ -11,16 +11,12 @@ namespace _Project.Features.Items.Presentation
     public sealed class PickupBillboardTemplate : MonoBehaviour
     {
         [SerializeField] private Canvas canvas;
-        [SerializeField] private Image background;
-        [SerializeField] private Outline outline;
         [SerializeField] private Image iconBackground;
         [SerializeField] private Image icon;
         [SerializeField] private Text title;
         [SerializeField] private Text prompt;
 
         public Canvas Canvas => canvas;
-        public Image Background => background;
-        public Outline Outline => outline;
         public Image IconBackground => iconBackground;
         public Image Icon => icon;
         public Text Title => title;
