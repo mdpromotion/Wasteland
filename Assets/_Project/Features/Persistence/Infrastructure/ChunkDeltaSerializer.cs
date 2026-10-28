@@ -25,6 +25,20 @@ namespace _Project.Features.Persistence.Infrastructure
                 w.Write(extra);
             }
 
+            // Item section is appended last so that payloads written before item
+            // persistence was introduced stay readable.
+            w.Write(delta.ItemDeltas.Count);
+
+            foreach (var d in delta.ItemDeltas)
+            {
+                w.Write(d.Id);
+                w.Write((byte)d.Action);
+                w.Write(d.ItemKey ?? string.Empty);
+                w.Write(d.X);
+                w.Write(d.Y);
+                w.Write(d.Z);
+            }
+
             return ms.ToArray();
         }
 
@@ -34,19 +48,54 @@ namespace _Project.Features.Persistence.Infrastructure
             using var r = new BinaryReader(ms);
 
             var versions = new GeneratorVersionStamp(r.ReadInt32());
-            int count = r.ReadInt32();
-            var list = new List<VegetationInstanceDelta>(count);
+            int vegetationCount = r.ReadInt32();
+            var vegetation = new List<VegetationInstanceDelta>(vegetationCount);
 
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < vegetationCount; i++)
             {
                 ulong id = r.ReadUInt64();
                 var action = (DeltaAction)r.ReadByte();
                 int extraLen = r.ReadInt32();
                 byte[] extra = extraLen > 0 ? r.ReadBytes(extraLen) : null;
-                list.Add(new VegetationInstanceDelta(id, action, extra));
+                vegetation.Add(new VegetationInstanceDelta(id, action, extra));
             }
 
-            return new ChunkDelta(versions, list);
+            var items = ReadItems(r);
+
+            return new ChunkDelta(versions, vegetation, items);
+        }
+
+        /// <summary>
+        /// Reads the trailing item section. Payloads written before item
+        /// persistence was introduced end right after the vegetation deltas,
+        /// so an end of stream at the very start of the section means a legacy
+        /// payload (empty item list), not corruption.
+        /// </summary>
+        private static List<WorldItemDelta> ReadItems(BinaryReader reader)
+        {
+            var items = new List<WorldItemDelta>();
+
+            try
+            {
+                int count = reader.ReadInt32();
+
+                for (int i = 0; i < count; i++)
+                {
+                    ulong id = reader.ReadUInt64();
+                    var action = (DeltaAction)reader.ReadByte();
+                    string itemKey = reader.ReadString();
+                    float x = reader.ReadSingle();
+                    float y = reader.ReadSingle();
+                    float z = reader.ReadSingle();
+                    items.Add(new WorldItemDelta(id, action, itemKey, x, y, z));
+                }
+            }
+            catch (EndOfStreamException) when (items.Count == 0 && reader.BaseStream.Position == reader.BaseStream.Length)
+            {
+                // Legacy payload without the item section.
+            }
+
+            return items;
         }
     }
 }
