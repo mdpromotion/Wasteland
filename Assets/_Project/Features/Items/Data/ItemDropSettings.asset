@@ -17,3 +17,4 @@ MonoBehaviour:
   upwardSpeed: 1.2
   worldObjectLifetime: 90
   pickupRange: 2.5
+  maxVisibleBillboards: 6

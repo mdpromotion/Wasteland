@@ -6,7 +6,6 @@ using _Project.Features.Items.Application;
 using _Project.Features.Items.Domain;
 using UnityEngine;
 using VContainer;
-
 namespace _Project.Features.Interaction.Infrastructure
 {
     public interface IPlayerInteractionController
@@ -20,7 +19,7 @@ namespace _Project.Features.Interaction.Infrastructure
         event Action<float> PlayerInteracted;
     }
     
-    public sealed class PlayerInteractionController : MonoBehaviour, IPlayerInteractionController, IItemCollector
+    public sealed class PlayerInteractionController : MonoBehaviour, IPlayerInteractionController, IItemCollector, IPickupPromptProvider
     {
         [SerializeField] private float interval = 1f;
         [SerializeField] private float rayDistance = 5f;
@@ -67,6 +66,9 @@ namespace _Project.Features.Interaction.Infrastructure
 
             return nearestPickup != null && nearestPickup.TryCollect(this);
         }
+
+        /// <summary>Pickups currently overlapping the player, feeding the prompt cap.</summary>
+        public IReadOnlyCollection<IItemPickupTarget> NearbyPickups => _nearbyPickups;
         
         [Inject]
         public void Construct(

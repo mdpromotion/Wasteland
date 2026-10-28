@@ -10,11 +10,13 @@ namespace _Project.Features.Items.Infrastructure
         [SerializeField, Min(0f)] private float upwardSpeed = 1.2f;
         [SerializeField, Min(0f)] private float worldObjectLifetime = 90f;
         [SerializeField, Min(0.1f)] private float pickupRange = 2.5f;
+        [SerializeField, Min(1)] private int maxVisibleBillboards = 6;
 
         public Vector3 SpawnLocalOffset => spawnLocalOffset;
         public float ForwardSpeed => forwardSpeed;
         public float UpwardSpeed => upwardSpeed;
         public float WorldObjectLifetime => worldObjectLifetime;
         public float PickupRange => pickupRange;
+        public int MaxVisibleBillboards => maxVisibleBillboards;
     }
 }

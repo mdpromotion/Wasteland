@@ -15,6 +15,7 @@ namespace _Project.Features.Items.Infrastructure
         private readonly ItemDropSettings _settings;
         private readonly HotbarHudSettings _hudSettings;
         private readonly IItemCollector _itemCollector;
+        private readonly PickupBillboardPool _billboardPool;
         private UnityEngine.Camera _camera;
 
         public ItemDropService(
@@ -29,6 +30,7 @@ namespace _Project.Features.Items.Infrastructure
             _settings = settings;
             _hudSettings = hudSettings;
             _itemCollector = itemCollector ?? throw new System.ArgumentNullException(nameof(itemCollector));
+            _billboardPool = new PickupBillboardPool(hudSettings);
         }
 
         public bool TryDropSelected()
@@ -63,14 +65,16 @@ namespace _Project.Features.Items.Infrastructure
             if (pickup == null)
                 pickup = droppedObject.AddComponent<WorldItemPickup>();
 
-            WorldItemPickupBillboard billboard = droppedObject.GetComponent<WorldItemPickupBillboard>();
-            if (billboard == null)
-                billboard = droppedObject.AddComponent<WorldItemPickupBillboard>();
-            billboard.Initialize(definition, _hudSettings);
             Transform collectorAnchor = _itemCollector is Component collectorComponent
                 ? collectorComponent.transform
                 : null;
-            pickup.Initialize(stack.Item.Id, billboard, _itemCollector, collectorAnchor);
+            pickup.Initialize(
+                stack.Item.Id,
+                definition,
+                _hudSettings,
+                _billboardPool,
+                _itemCollector,
+                collectorAnchor);
 
             if (!_inventory.TryRemoveSelectedOne(out _))
             {

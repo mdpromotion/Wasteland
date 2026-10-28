@@ -11,6 +11,9 @@ namespace _Project.Features.Items.Infrastructure
     {
         private readonly HashSet<Collider> _playerColliders = new HashSet<Collider>();
         private ItemId _itemId;
+        private ItemDefinitionAsset _definition;
+        private HotbarHudSettings _hudSettings;
+        private PickupBillboardPool _billboardPool;
         private IItemCollector _collector;
         private Transform _collectorAnchor;
         private WorldItemPickupBillboard _billboard;
@@ -20,12 +23,16 @@ namespace _Project.Features.Items.Infrastructure
 
         public void Initialize(
             ItemId itemId,
-            WorldItemPickupBillboard billboard,
+            ItemDefinitionAsset definition,
+            HotbarHudSettings hudSettings,
+            PickupBillboardPool billboardPool,
             IItemCollector collector,
             Transform collectorAnchor)
         {
             _itemId = itemId;
-            _billboard = billboard;
+            _definition = definition;
+            _hudSettings = hudSettings;
+            _billboardPool = billboardPool;
             _collector = collector;
             _collectorAnchor = collectorAnchor;
             _initialized = true;
@@ -43,11 +50,8 @@ namespace _Project.Features.Items.Infrastructure
                 return;
 
             UpdateDistance(other);
-            if (_playerColliders.Count == 1)
-            {
+            if (_playerColliders.Count == 1 && _collector != null)
                 _collector.RegisterNearbyPickup(this);
-                _billboard.SetVisible(true);
-            }
         }
 
         private void OnTriggerStay(Collider other)
@@ -58,15 +62,16 @@ namespace _Project.Features.Items.Infrastructure
 
         private void OnTriggerExit(Collider other)
         {
-            if (_collector == null || !_playerColliders.Remove(other))
+            if (!_playerColliders.Remove(other))
                 return;
 
             if (_playerColliders.Count > 0)
                 return;
 
-            _collector.UnregisterNearbyPickup(this);
-            _collector = null;
-            _billboard.SetVisible(false);
+            // The collector reference is kept: the player can re-enter the zone,
+            // and re-registering on the next OnTriggerEnter requires it.
+            _collector?.UnregisterNearbyPickup(this);
+            SetPromptVisible(false);
         }
 
         public bool TryCollect(IItemCollector collector)
@@ -78,6 +83,28 @@ namespace _Project.Features.Items.Infrastructure
 
             Destroy(gameObject);
             return true;
+        }
+
+        /// <summary>
+        /// Billboard shown only on demand (see PickupPromptPresenter) and created
+        /// lazily, so distant or capped pickups never build UI at all.
+        /// </summary>
+        public void SetPromptVisible(bool visible)
+        {
+            if (!visible)
+            {
+                if (_billboard != null)
+                    _billboard.SetVisible(false);
+                return;
+            }
+
+            if (_billboard == null)
+            {
+                _billboard = gameObject.AddComponent<WorldItemPickupBillboard>();
+                _billboard.Initialize(_definition, _hudSettings, _billboardPool);
+            }
+
+            _billboard.SetVisible(true);
         }
 
         private void UpdateDistance(Collider other)
@@ -120,6 +147,9 @@ namespace _Project.Features.Items.Infrastructure
         {
             if (_collector != null)
                 _collector.UnregisterNearbyPickup(this);
+
+            if (_billboard != null)
+                _billboard.Release();
         }
     }
 }
