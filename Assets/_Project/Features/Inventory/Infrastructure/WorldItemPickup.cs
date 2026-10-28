@@ -12,15 +12,22 @@ namespace _Project.Features.Items.Infrastructure
         private readonly HashSet<Collider> _playerColliders = new HashSet<Collider>();
         private ItemId _itemId;
         private IItemCollector _collector;
+        private Transform _collectorAnchor;
         private WorldItemPickupBillboard _billboard;
         private bool _initialized;
 
         public float Distance { get; private set; }
 
-        public void Initialize(ItemId itemId, WorldItemPickupBillboard billboard)
+        public void Initialize(
+            ItemId itemId,
+            WorldItemPickupBillboard billboard,
+            IItemCollector collector,
+            Transform collectorAnchor)
         {
             _itemId = itemId;
             _billboard = billboard;
+            _collector = collector;
+            _collectorAnchor = collectorAnchor;
             _initialized = true;
         }
 
@@ -29,11 +36,9 @@ namespace _Project.Features.Items.Infrastructure
             if (!_initialized)
                 return;
 
-            IItemCollector collector = FindCollector(other);
-            if (collector == null || (_collector != null && _collector != collector))
+            if (!BelongsToCollector(other))
                 return;
 
-            _collector = collector;
             if (!_playerColliders.Add(other))
                 return;
 
@@ -81,6 +86,24 @@ namespace _Project.Features.Items.Infrastructure
                 ? other.attachedRigidbody.position
                 : other.bounds.center;
             Distance = Vector3.Distance(transform.position, collectorPosition);
+        }
+
+        private bool BelongsToCollector(Collider other)
+        {
+            if (_collectorAnchor != null)
+                return other.transform.IsChildOf(_collectorAnchor);
+
+            // Fallback for pickups placed in the scene without a wired collector:
+            // discover the collector through its components (allocating) once.
+            IItemCollector discovered = FindCollector(other);
+            if (discovered == null)
+                return false;
+
+            _collector = discovered;
+            if (discovered is Component component)
+                _collectorAnchor = component.transform;
+
+            return true;
         }
 
         private static IItemCollector FindCollector(Collider other)
