@@ -39,10 +39,21 @@ namespace _Project.Features.Items.Presentation
                 return;
 
             billboard.Canvas.enabled = false;
-            billboard.Root.transform.SetParent(Root, false);
+            Transform root = AliveRoot;
+            if (root != null)
+                billboard.Root.transform.SetParent(root, false);
+
             billboard.Root.SetActive(false);
             _free.Add(billboard);
         }
+
+        /// <summary>
+        /// The pool root transform when it already exists. Deliberately never
+        /// creates the root GameObject: re-creating it during scene teardown
+        /// (a pickup's OnDestroy releasing its billboard after the pool root was
+        /// destroyed) leaks a fresh object into a closing scene.
+        /// </summary>
+        private Transform AliveRoot => _root == null ? null : _root;
 
         private PooledBillboard TakeFree()
         {

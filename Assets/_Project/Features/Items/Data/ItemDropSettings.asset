@@ -15,6 +15,5 @@ MonoBehaviour:
   spawnLocalOffset: {x: 0, y: -0.1, z: 1.25}
   forwardSpeed: 3
   upwardSpeed: 1.2
-  worldObjectLifetime: 90
   pickupRange: 2.5
   maxVisibleBillboards: 6

@@ -1,36 +1,25 @@
 using _Project.Features.Items.Application;
 using _Project.Features.Items.Domain;
-using _Project.Features.Items.Presentation;
 using UnityEngine;
 
 namespace _Project.Features.Items.Infrastructure
 {
     public sealed class ItemDropService : IItemDropService
     {
-        private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
-        private static readonly int ColorId = Shader.PropertyToID("_Color");
-
         private readonly Inventory _inventory;
-        private readonly ItemCatalogAsset _catalog;
         private readonly ItemDropSettings _settings;
-        private readonly HotbarHudSettings _hudSettings;
-        private readonly IItemCollector _itemCollector;
-        private readonly PickupBillboardPool _billboardPool;
+        private readonly IWorldItemSpawner _spawner;
+
         private UnityEngine.Camera _camera;
 
         public ItemDropService(
             Inventory inventory,
-            ItemCatalogAsset catalog,
             ItemDropSettings settings,
-            HotbarHudSettings hudSettings,
-            IItemCollector itemCollector)
+            IWorldItemSpawner spawner)
         {
             _inventory = inventory;
-            _catalog = catalog;
             _settings = settings;
-            _hudSettings = hudSettings;
-            _itemCollector = itemCollector ?? throw new System.ArgumentNullException(nameof(itemCollector));
-            _billboardPool = new PickupBillboardPool(hudSettings);
+            _spawner = spawner ?? throw new System.ArgumentNullException(nameof(spawner));
         }
 
         public bool TryDropSelected()
@@ -44,90 +33,28 @@ namespace _Project.Features.Items.Infrastructure
             if (!_camera)
                 return false;
 
-            ItemDefinitionAsset definition = _catalog.Get(stack.Item.Id);
             Vector3 spawnPosition = _camera.transform.TransformPoint(_settings.SpawnLocalOffset);
-            GameObject droppedObject = definition.WorldPrefab != null
-                ? Object.Instantiate(definition.WorldPrefab, spawnPosition, _camera.transform.rotation)
-                : CreateFallbackItem(definition, spawnPosition);
+            Vector3 velocity = _camera.transform.forward * _settings.ForwardSpeed +
+                               Vector3.up * _settings.UpwardSpeed;
 
-            droppedObject.name = $"Dropped {definition.DisplayName}";
-            ConfigureCollider(droppedObject, _settings.PickupRange);
-            Rigidbody body = droppedObject.GetComponent<Rigidbody>();
-            if (body == null)
-                body = droppedObject.AddComponent<Rigidbody>();
-
-            body.isKinematic = false;
-            body.useGravity = true;
-            body.linearVelocity = _camera.transform.forward * _settings.ForwardSpeed +
-                                 Vector3.up * _settings.UpwardSpeed;
-
-            WorldItemPickup pickup = droppedObject.GetComponent<WorldItemPickup>();
-            if (pickup == null)
-                pickup = droppedObject.AddComponent<WorldItemPickup>();
-
-            Transform collectorAnchor = _itemCollector is Component collectorComponent
-                ? collectorComponent.transform
-                : null;
-            pickup.Initialize(
+            WorldItemPickup spawned = _spawner.SpawnFresh(
                 stack.Item.Id,
-                definition,
-                _hudSettings,
-                _billboardPool,
-                _itemCollector,
-                collectorAnchor);
+                spawnPosition,
+                _camera.transform.rotation,
+                velocity);
+
+            if (spawned == null)
+                return false;
 
             if (!_inventory.TryRemoveSelectedOne(out _))
             {
-                Object.Destroy(droppedObject);
+                // Roll back: the entity never actually left the inventory.
+                spawned.NotifyRemovedFromWorld();
+                Object.Destroy(spawned.gameObject);
                 return false;
             }
 
-            if (_settings.WorldObjectLifetime > 0f)
-                Object.Destroy(droppedObject, _settings.WorldObjectLifetime);
-
             return true;
-        }
-
-        private static GameObject CreateFallbackItem(ItemDefinitionAsset definition, Vector3 position)
-        {
-            GameObject item = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            item.transform.position = position;
-
-            Renderer renderer = item.GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                var propertyBlock = new MaterialPropertyBlock();
-                renderer.GetPropertyBlock(propertyBlock);
-                propertyBlock.SetColor(BaseColorId, definition.HeldColor);
-                propertyBlock.SetColor(ColorId, definition.HeldColor);
-                renderer.SetPropertyBlock(propertyBlock);
-            }
-
-            return item;
-        }
-
-        private static void ConfigureCollider(GameObject item, float pickupRange)
-        {
-            Collider[] colliders = item.GetComponentsInChildren<Collider>();
-            bool hasSolidCollider = false;
-            SphereCollider pickupTrigger = null;
-            for (int i = 0; i < colliders.Length; i++)
-            {
-                hasSolidCollider |= !colliders[i].isTrigger;
-                if (pickupTrigger == null && colliders[i].isTrigger && colliders[i] is SphereCollider sphere)
-                    pickupTrigger = sphere;
-            }
-
-            if (!hasSolidCollider)
-                item.AddComponent<BoxCollider>();
-
-            if (pickupTrigger == null)
-            {
-                pickupTrigger = item.AddComponent<SphereCollider>();
-                pickupTrigger.isTrigger = true;
-            }
-
-            pickupTrigger.radius = pickupRange;
         }
     }
 }
