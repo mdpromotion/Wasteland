@@ -75,6 +75,9 @@ namespace _Project.Features.ProceduralWorld.Application.World
         /// </summary>
         public void Tick()
         {
+            if (_player == null || !_player.IsAvailable)
+                return;
+
             ChunkCoordinate center = _chunkGrid.ToChunkCoordinate(_player.Position);
 
             _worldRebaseService.TryRebase(center);

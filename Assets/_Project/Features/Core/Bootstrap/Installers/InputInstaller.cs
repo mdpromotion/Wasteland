@@ -13,6 +13,8 @@ namespace _Project.Features.Core.Bootstrap.Installers
             builder.Register<InputReader>(Lifetime.Singleton)
                 .As<IPlayerInputReader>()
                 .As<IPlayerUIInputReader>()
+                .As<IPlayerDropInputReader>()
+                .As<IPlayerPickupInputReader>()
                 .As<IInitializable>();
         }
     }

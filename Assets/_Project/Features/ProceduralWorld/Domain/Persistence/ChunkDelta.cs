@@ -36,6 +36,31 @@ namespace _Project.Features.ProceduralWorld.Domain.Persistence
     }
 
     /// <summary>
+    /// A persisted change to a dropped world item (an object lying on the ground).
+    /// Position is stored relative to the owning chunk origin, so the record stays
+    /// valid across floating-origin rebases.
+    /// </summary>
+    public readonly struct WorldItemDelta
+    {
+        public readonly ulong Id;
+        public readonly DeltaAction Action;
+        public readonly string ItemKey;
+        public readonly float X;
+        public readonly float Y;
+        public readonly float Z;
+
+        public WorldItemDelta(ulong id, DeltaAction action, string itemKey, float x, float y, float z)
+        {
+            Id = id;
+            Action = action;
+            ItemKey = itemKey;
+            X = x;
+            Y = y;
+            Z = z;
+        }
+    }
+
+    /// <summary>
     /// Immutable snapshot of everything that diverges from the deterministic baseline
     /// for a single chunk.
     /// </summary>
@@ -43,37 +68,59 @@ namespace _Project.Features.ProceduralWorld.Domain.Persistence
     {
         public GeneratorVersionStamp Versions { get; }
         public IReadOnlyList<VegetationInstanceDelta> VegetationDeltas { get; }
+        public IReadOnlyList<WorldItemDelta> ItemDeltas { get; }
 
-        public ChunkDelta(GeneratorVersionStamp versions, IReadOnlyList<VegetationInstanceDelta> vegetationDeltas)
+        public ChunkDelta(
+            GeneratorVersionStamp versions,
+            IReadOnlyList<VegetationInstanceDelta> vegetationDeltas)
+            : this(versions, vegetationDeltas, Array.Empty<WorldItemDelta>())
+        {
+        }
+
+        public ChunkDelta(
+            GeneratorVersionStamp versions,
+            IReadOnlyList<VegetationInstanceDelta> vegetationDeltas,
+            IReadOnlyList<WorldItemDelta> itemDeltas)
         {
             Versions = versions;
             VegetationDeltas = vegetationDeltas;
+            ItemDeltas = itemDeltas;
         }
 
-        public bool IsEmpty => VegetationDeltas.Count == 0;
+        public bool IsEmpty => VegetationDeltas.Count == 0 && ItemDeltas.Count == 0;
 
         public static readonly ChunkDelta Empty =
             new ChunkDelta(default, Array.Empty<VegetationInstanceDelta>());
-        
+
         public ChunkDelta Merge(ChunkDelta newer)
         {
             if (this.IsEmpty) return newer;
             if (newer.IsEmpty) return this;
-            
-            var mergedDict = new Dictionary<ulong, VegetationInstanceDelta>(
-                this.VegetationDeltas.Count + newer.VegetationDeltas.Count);
 
-            foreach (var delta in this.VegetationDeltas)
-            {
-                mergedDict[delta.Id] = delta;
-            }
+            return new ChunkDelta(
+                newer.Versions,
+                MergeByNewerId(this.VegetationDeltas, newer.VegetationDeltas, delta => delta.Id),
+                MergeByNewerId(this.ItemDeltas, newer.ItemDeltas, delta => delta.Id));
+        }
 
-            foreach (var delta in newer.VegetationDeltas)
-            {
-                mergedDict[delta.Id] = delta;
-            }
-            
-            return new ChunkDelta(newer.Versions, mergedDict.Values.ToArray());
+        /// <summary>
+        /// Merges two delta lists keyed by id: entries from <paramref name="newer"/>
+        /// override entries from <paramref name="older"/> with the same id.
+        /// </summary>
+        private static List<TDelta> MergeByNewerId<TDelta>(
+            IReadOnlyList<TDelta> older,
+            IReadOnlyList<TDelta> newer,
+            Func<TDelta, ulong> keySelector)
+        {
+            var merged = new Dictionary<ulong, TDelta>(older.Count + newer.Count);
+
+            foreach (var delta in older)
+                merged[keySelector(delta)] = delta;
+
+            foreach (var delta in newer)
+                merged[keySelector(delta)] = delta;
+
+            return merged.Values.ToList();
         }
     }
 }

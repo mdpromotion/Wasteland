@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using _Project.Features.Core.Domain;
 using _Project.Features.Core.Presentation;
+using _Project.Features.Items.Application;
+using _Project.Features.Items.Domain;
 using UnityEngine;
 using VContainer;
-
 namespace _Project.Features.Interaction.Infrastructure
 {
     public interface IPlayerInteractionController
@@ -18,7 +19,7 @@ namespace _Project.Features.Interaction.Infrastructure
         event Action<float> PlayerInteracted;
     }
     
-    public sealed class PlayerInteractionController : MonoBehaviour, IPlayerInteractionController
+    public sealed class PlayerInteractionController : MonoBehaviour, IPlayerInteractionController, IItemCollector, IPickupPromptProvider
     {
         [SerializeField] private float interval = 1f;
         [SerializeField] private float rayDistance = 5f;
@@ -28,22 +29,58 @@ namespace _Project.Features.Interaction.Infrastructure
         private IPlayerInputReader _playerInputReader;
         private IEnumerable<IHitHandler> _hitHandlers;
         private UnityEngine.Camera _interactionCamera;
+        private Inventory _inventory;
+        private readonly HashSet<IItemPickupTarget> _nearbyPickups = new HashSet<IItemPickupTarget>();
 
         private float _timer;
 
-        private const float Damage = 1f; // TODO: Refactor this into Inventory/Item feature. 
-        
         public event Action<float> PlayerInteracted; 
+
+        public bool TryCollect(ItemId itemId) => _inventory != null && _inventory.TryAdd(itemId, 1);
+
+        public void RegisterNearbyPickup(IItemPickupTarget pickup)
+        {
+            if (pickup != null)
+                _nearbyPickups.Add(pickup);
+        }
+
+        public void UnregisterNearbyPickup(IItemPickupTarget pickup)
+        {
+            if (pickup != null)
+                _nearbyPickups.Remove(pickup);
+        }
+
+        public bool TryCollectNearestPickup()
+        {
+            IItemPickupTarget nearestPickup = null;
+            float nearestDistance = float.PositiveInfinity;
+
+            foreach (IItemPickupTarget pickup in _nearbyPickups)
+            {
+                if (pickup.Distance >= nearestDistance)
+                    continue;
+
+                nearestPickup = pickup;
+                nearestDistance = pickup.Distance;
+            }
+
+            return nearestPickup != null && nearestPickup.TryCollect(this);
+        }
+
+        /// <summary>Pickups currently overlapping the player, feeding the prompt cap.</summary>
+        public IReadOnlyCollection<IItemPickupTarget> NearbyPickups => _nearbyPickups;
         
         [Inject]
         public void Construct(
             IGameState gameState,
             IPlayerInputReader playerInputReader,
-            IEnumerable<IHitHandler> hitHandlers)
+            IEnumerable<IHitHandler> hitHandlers,
+            Inventory inventory)
         {
             _gameState = gameState;
             _playerInputReader = playerInputReader;
             _hitHandlers = hitHandlers;
+            _inventory = inventory;
             _interactionCamera = UnityEngine.Camera.main;
         }
 
@@ -65,6 +102,11 @@ namespace _Project.Features.Interaction.Infrastructure
         {
             PlayerInteracted?.Invoke(interval);
 
+            ItemDefinition selectedItem = _inventory.SelectedItem;
+            float treeDamage = selectedItem == null
+                ? ItemDefinition.FistDamage
+                : selectedItem.GetTreeDamage();
+
             if (!_interactionCamera)
                 _interactionCamera = UnityEngine.Camera.main;
 
@@ -83,7 +125,7 @@ namespace _Project.Features.Interaction.Infrastructure
                 if (!handler.CanHandle(rayHit))
                     continue;
 
-                handler.Handle(rayHit, Damage);
+                handler.Handle(rayHit, treeDamage);
                 break;
             }
         }

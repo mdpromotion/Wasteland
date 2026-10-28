@@ -35,12 +35,14 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
         private readonly IChunkDeltaStore _deltaStore;
         private readonly ChunkNeighborConnector _neighborConnector;
         private readonly IDeltaStage _deltaStage;
+        private readonly IWorldItemSpawnStage _worldItemSpawnStage;
         private readonly IWorldSaveService _saveService;
 
         private readonly HashSet<ChunkCoordinate> _loading = new();
 
         private readonly Action<ChunkGenerationResult> _applyAction;
         private readonly Action<ChunkCoordinate> _completedAction;
+        private bool _disposed;
 
         public bool IsReady { get; private set; }
         public bool IsChunkLoaded(ChunkCoordinate coordinate) =>
@@ -55,6 +57,7 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
             IChunkDeltaStore deltaStore,
             ChunkNeighborConnector neighborConnector,
             IDeltaStage deltaStage,
+            IWorldItemSpawnStage worldItemSpawnStage,
             IWorldSaveService saveService)
         {
             _scheduler = scheduler;
@@ -63,11 +66,13 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
             _deltaStore = deltaStore;
             _neighborConnector = neighborConnector;
             _deltaStage = deltaStage;
+            _worldItemSpawnStage = worldItemSpawnStage;
             _saveService = saveService;
             
             _applyAction = result =>
             {
                 _deltaStage.Apply(result.State.Context.Coordinate, result.State.Vegetation);
+                _worldItemSpawnStage.Spawn(result.State.Context.Coordinate);
 
                 applier.Apply(result);
 
@@ -82,11 +87,18 @@ namespace _Project.Features.ProceduralWorld.Application.Chunks
         /// </summary>
         public void Tick()
         {
+            if (_disposed)
+                return;
+
             _scheduler.Tick(_applyAction, _completedAction);
         }
         
         public void Dispose()
         {
+            if (_disposed)
+                return;
+
+            _disposed = true;
             _scheduler.CompleteAll();
 
             _repository.Dispose();

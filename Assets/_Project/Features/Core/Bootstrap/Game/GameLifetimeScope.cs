@@ -6,6 +6,8 @@ using _Project.Features.ProceduralWorld.Domain.World;
 using _Project.Features.Sound.Infrastructure;
 using _Project.Features.Camera.Infrastructure;
 using _Project.Features.Core.Infrastructure;
+using _Project.Features.Items.Infrastructure;
+using _Project.Features.Items.Presentation;
 using _Project.Features.ProceduralWorld.Infrastructure.Hydrology;
 using UnityEngine;
 using VContainer;
@@ -33,6 +35,11 @@ namespace _Project.Features.Core.Bootstrap.Game
         [SerializeField] private PlayerMovementConfig playerMovementConfig;
         [SerializeField] private PlayerCameraConfig playerCameraConfig;
 
+        [Header("Inventory UI")]
+        [SerializeField] private ItemCatalogAsset itemCatalogAsset;
+        [SerializeField] private ItemDropSettings itemDropSettings;
+        [SerializeField] private HotbarHudSettings hotbarHudSettings;
+
         [Header("Performance")]
         [SerializeField] private FrameBudgetConfig frameBudgetConfig;
 
@@ -42,6 +49,8 @@ namespace _Project.Features.Core.Bootstrap.Game
                 builder,
                 database,
                 globalMaxVoices);
+
+            InventoryInstaller.Install(builder, itemCatalogAsset, itemDropSettings);
 
             PlayerInstaller.Install(
                 builder,
@@ -73,7 +82,7 @@ namespace _Project.Features.Core.Bootstrap.Game
                 builder,
                 frameBudgetConfig);
 
-            UIInstaller.Install(builder);
+            UIInstaller.Install(builder, itemCatalogAsset, hotbarHudSettings);
         }
     }
 }

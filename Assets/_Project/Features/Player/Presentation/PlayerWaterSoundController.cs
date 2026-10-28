@@ -52,6 +52,9 @@ namespace _Project.Features.Player.Presentation
 
         private void PlayWaterSound(SoundKey key)
         {
+            if (_player == null || !_player.IsAvailable)
+                return;
+
             float maxVelocity = _playerSoundSet.WaterSoundMaxVelocity;
             float volumeScale = maxVelocity > 0f
                 ? Mathf.Clamp01(_player.Velocity.magnitude / maxVelocity) * 0.5f

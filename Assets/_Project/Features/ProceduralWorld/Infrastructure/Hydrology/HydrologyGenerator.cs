@@ -29,13 +29,20 @@ namespace _Project.Features.ProceduralWorld.Infrastructure.Hydrology
             int resolution = state.Context.Resolution;
             ChunkCoordinate coordinate = state.Context.Coordinate;
 
-            state.Hydrology = new HydrologyData(coordinate, resolution, onDispose: null);
-
             double2 absoluteChunkOrigin = GenerationSpace.AbsoluteChunkOrigin(
                 coordinate, _chunkGrid.ChunkSizeX, _chunkGrid.ChunkSizeZ);
 
             MacroRegionCoordinate regionCoordinate = _macroRegionCache.ToRegionCoordinate(coordinate);
             MacroRegionData region = _macroRegionCache.GetOrBuild(regionCoordinate);
+
+            if (!region.IsCreated)
+            {
+                throw new System.InvalidOperationException(
+                    $"Macro-region {regionCoordinate.X}, {regionCoordinate.Y} returned disposed native data " +
+                    $"for chunk {coordinate.X}, {coordinate.Y}.");
+            }
+
+            state.Hydrology = new HydrologyData(coordinate, resolution, onDispose: null);
 
             float2 chunkOrigin = GenerationSpace.LocalOffset(absoluteChunkOrigin, region.WorldOrigin);
             float2 chunkSize = new float2(_chunkGrid.ChunkSizeX, _chunkGrid.ChunkSizeZ);

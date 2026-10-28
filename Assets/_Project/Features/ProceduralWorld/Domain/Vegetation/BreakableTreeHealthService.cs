@@ -10,7 +10,7 @@ namespace _Project.Features.ProceduralWorld.Domain.Vegetation
 
     public sealed class BreakableTreeHealthService : IBreakableTreeHealthService
     {
-        private const float DefaultHealth = 3f;
+        private const float DefaultHealth = 5f;
 
         private readonly Dictionary<(ChunkCoordinate, VegetationSpeciesType, ulong), BreakableTree> _states = new();
 

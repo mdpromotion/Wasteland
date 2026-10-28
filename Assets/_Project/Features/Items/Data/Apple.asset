@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19587ac704324dc9ab6e49da417ac002, type: 3}
+  m_Name: Apple
+  m_EditorClassIdentifier: 
+  technicalId: apple
+  displayName: Apple
+  category: {fileID: 11400000, guid: 96e85c7523fd4774840c5dc84a6b1002, type: 2}
+  maxStack: 50
+  icon: {fileID: 21300000, guid: cad95dde2dfb0ce43b2b767e440008f3, type: 3}
+  heldColor: {r: 0.85, g: 0.08, b: 0.04, a: 1}
+  worldPrefab: {fileID: 8253399459707149168, guid: 21997c8032c81704a822a5d1b56a354d, type: 3}
+  behaviorAssets:
+  - {fileID: 11400000, guid: 08fb1405cb774932afcaab3262f29c7d, type: 2}
+  saturation: 4
