@@ -44,6 +44,8 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
             builder.RegisterInstance(new ItemIconProvider(itemCatalogAsset))
                 .As<IItemIconProvider>();
             builder.RegisterInstance(hotbarHudSettings);
+            builder.Register<HeldItemVisualFactory>(Lifetime.Singleton)
+                .As<IHeldItemVisualFactory>();
             builder.RegisterEntryPoint<HotbarHudPresenter>();
             builder.RegisterEntryPoint<HeldItemPresenter>();
             builder.RegisterEntryPoint<PickupPromptPresenter>();

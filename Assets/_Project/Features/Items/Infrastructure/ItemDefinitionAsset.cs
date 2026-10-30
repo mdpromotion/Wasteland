@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using _Project.Features.Items.Domain;
+using _Project.Features.Items.Presentation;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -16,6 +17,8 @@ namespace _Project.Features.Items.Infrastructure
         [SerializeField] private Sprite icon;
         [SerializeField] private Color heldColor = Color.white;
         [SerializeField] private GameObject worldPrefab;
+        [SerializeField, Tooltip("Optional view-model for the item in the player's hands.")]
+        private HeldItemConfig heldConfig;
         [SerializeField] private ItemBehaviorAsset[] behaviorAssets = Array.Empty<ItemBehaviorAsset>();
 
         public ItemId Id => new ItemId(technicalId);
@@ -26,6 +29,7 @@ namespace _Project.Features.Items.Infrastructure
         public Sprite Icon => icon;
         public Color HeldColor => heldColor;
         public GameObject WorldPrefab => worldPrefab;
+        public HeldItemConfig HeldItemConfig => heldConfig;
 
         public virtual ItemDefinition CreateDomainDefinition()
         {
