@@ -298,7 +298,8 @@ namespace _Project.Features.ProceduralWorld.Presentation.Vegetation
             VegetationSpeciesType species,
             ulong instanceId,
             Vector3 position,
-            Vector3 normal)
+            Vector3 normal,
+            float damage)
         {
             IReadOnlyList<GameObject> prefabs = GetPrefabs(species);
             if (prefabs == null || prefabs.Count == 0)
@@ -317,7 +318,7 @@ namespace _Project.Features.ProceduralWorld.Presentation.Vegetation
             Quaternion rotation = normal.sqrMagnitude > 0f ? Quaternion.LookRotation(normal) : Quaternion.identity;
             _treeImpactParticles.transform.SetPositionAndRotation(position, rotation);
             _treeImpactParticles.Play();
-            _treeImpactParticles.Emit(8);
+            _treeImpactParticles.Emit(TreeImpactParticlesPolicy.GetParticleCount(damage));
         }
 
         private void EnsureTreeImpactEmitter()
@@ -336,7 +337,7 @@ namespace _Project.Features.ProceduralWorld.Presentation.Vegetation
             main.startSize = new ParticleSystem.MinMaxCurve(0.025f, 0.07f);
             main.startColor = Color.white;
             main.gravityModifier = 0.7f;
-            main.maxParticles = 24;
+            main.maxParticles = TreeImpactParticlesPolicy.MaxParticles;
 
             ParticleSystem.EmissionModule emission = _treeImpactParticles.emission;
             emission.enabled = false;

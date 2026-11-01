@@ -72,7 +72,8 @@ namespace _Project.Features.Interaction.Infrastructure
                 breakableHit.Species,
                 breakableHit.Id,
                 hit.point,
-                hit.normal);
+                hit.normal,
+                damage);
 
             bool destroyed = _healthService.ApplyDamage(breakableHit, damage);
             if (!destroyed)
