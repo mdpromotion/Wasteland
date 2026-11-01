@@ -3,108 +3,146 @@ using _Project.Features.Items.Domain;
 using _Project.Features.Items.Infrastructure;
 using UnityEngine;
 using VContainer.Unity;
+using Object = UnityEngine.Object;
 
 namespace _Project.Features.Items.Presentation
 {
+    /// <summary>
+    /// Maps the player's inventory selection onto the held-item view: whenever
+    /// the selected item changes, the presentation layer shows that item's
+    /// visual in the player's hands, hides it for an empty slot, and releases
+    /// the previous visual back to its factory.
+    /// </summary>
+    /// <remarks>
+    /// The presenter owns no transforms and no animation state — all Unity work
+    /// is delegated to <see cref="HeldItemView"/> and <see cref="IHeldItemVisualFactory"/>;
+    /// this keeps the mapping logic thin and replaceable (e.g. hand-bone anchoring
+    /// can later re-route visuals without touching inventory reactivity).
+    /// </remarks>
     public sealed class HeldItemPresenter : IStartable, ITickable, IDisposable
     {
-        private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
-        private static readonly int ColorId = Shader.PropertyToID("_Color");
-
         private readonly Inventory _inventory;
         private readonly ItemCatalogAsset _catalog;
         private readonly HotbarHudSettings _settings;
-        private Transform _itemTransform;
-        private Renderer _itemRenderer;
-        private MaterialPropertyBlock _propertyBlock;
-        private ItemId? _displayedItemId;
-        private float _equipProgress;
-        private bool _isEquipping;
+        private readonly IHeldItemVisualFactory _visualFactory;
+
+        private HeldItemView _view;
+        /// <summary>Item the inventory currently asks to present (may be null).</summary>
+        private ItemId? _desiredItemId;
+        /// <summary>Item the active view actually presents.</summary>
+        private ItemId? _shownItemId;
+        /// <summary>True while the presented state lags behind the desired one.</summary>
+        private bool _presentationDirty;
 
         public HeldItemPresenter(
             Inventory inventory,
             ItemCatalogAsset catalog,
-            HotbarHudSettings settings)
+            HotbarHudSettings settings,
+            IHeldItemVisualFactory visualFactory)
         {
             _inventory = inventory;
             _catalog = catalog;
             _settings = settings;
+            _visualFactory = visualFactory;
         }
 
         public void Start()
         {
-            UnityEngine.Camera camera = UnityEngine.Camera.main;
-            if (camera == null)
-                return;
-
-            GameObject item = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            item.name = "Held Item View";
-            UnityEngine.Object.Destroy(item.GetComponent<Collider>());
-            _itemTransform = item.transform;
-            _itemTransform.SetParent(camera.transform, false);
-            _itemRenderer = item.GetComponent<Renderer>();
-            _propertyBlock = new MaterialPropertyBlock();
             _inventory.Changed += OnInventoryChanged;
             OnInventoryChanged();
         }
 
-        private void OnInventoryChanged()
-        {
-            if (_itemTransform == null || _itemRenderer == null)
-                return;
-
-            ItemDefinition selectedItem = _inventory.SelectedItem;
-            if (selectedItem == null)
-            {
-                _displayedItemId = null;
-                _itemRenderer.enabled = false;
-                _isEquipping = false;
-                return;
-            }
-
-            if (_displayedItemId.HasValue && _displayedItemId.Value == selectedItem.Id)
-                return;
-
-            _displayedItemId = selectedItem.Id;
-            _itemRenderer.enabled = true;
-            _itemTransform.localScale = _settings.HeldItemScale;
-
-            Color color = _catalog.Get(selectedItem.Id).HeldColor;
-            _itemRenderer.GetPropertyBlock(_propertyBlock);
-            _propertyBlock.SetColor(BaseColorId, color);
-            _propertyBlock.SetColor(ColorId, color);
-            _itemRenderer.SetPropertyBlock(_propertyBlock);
-
-            _equipProgress = 0f;
-            _isEquipping = true;
-            _itemTransform.localPosition = _settings.StowedItemPosition;
-        }
-
         public void Tick()
         {
-            if (!_isEquipping || _itemTransform == null)
-                return;
-
-            _equipProgress = Mathf.Min(1f, _equipProgress + Time.deltaTime / _settings.EquipDuration);
-            float easedProgress = _equipProgress * _equipProgress * (3f - 2f * _equipProgress);
-
-            Quaternion heldRotation = Quaternion.Euler(_settings.HeldItemRotation);
-            Quaternion stowedRotation = Quaternion.Euler(_settings.HeldItemRotation + new Vector3(70f, 0f, 0f));
-            _itemTransform.localPosition = Vector3.Lerp(
-                _settings.StowedItemPosition,
-                _settings.HeldItemPosition,
-                easedProgress);
-            _itemTransform.localRotation = Quaternion.Slerp(stowedRotation, heldRotation, easedProgress);
-
-            if (_equipProgress >= 1f)
-                _isEquipping = false;
+            // No view present / camera not yet available: retry the delayed
+            // presentation every frame until it succeeds. When everything is
+            // settled this costs a single comparison per frame.
+            if (_presentationDirty || (_view == null && _desiredItemId != null))
+                RefreshPresentation();
         }
 
         public void Dispose()
         {
             _inventory.Changed -= OnInventoryChanged;
-            if (_itemTransform != null)
-                UnityEngine.Object.Destroy(_itemTransform.gameObject);
+            _visualFactory.Dispose();
+
+            if (_view != null && UnityEngine.Application.isPlaying)
+                Object.Destroy(_view.gameObject);
+            else if (_view != null)
+                Object.DestroyImmediate(_view.gameObject);
+        }
+
+        private void OnInventoryChanged()
+        {
+            _desiredItemId = ResolveSelectedItemId();
+            _presentationDirty = true;
+            RefreshPresentation();
+        }
+
+        private void RefreshPresentation()
+        {
+            if (_desiredItemId == _shownItemId && _view != null)
+            {
+                _presentationDirty = false;
+                return;
+            }
+
+            ReleaseShownVisual();
+            if (_desiredItemId == null)
+            {
+                _presentationDirty = false;
+                return;
+            }
+
+            if (!EnsureView())
+                return;
+
+            if (!_catalog.TryGet(_desiredItemId.Value, out ItemDefinitionAsset definition))
+            {
+                _presentationDirty = false;
+                return;
+            }
+
+            GameObject visual = _visualFactory.Acquire(definition, definition.HeldItemConfig);
+            _view.Show(visual, definition.HeldItemConfig);
+            _shownItemId = _desiredItemId;
+            _presentationDirty = false;
+        }
+
+        private ItemId? ResolveSelectedItemId()
+        {
+            return _inventory.SelectedItem?.Id;
+        }
+
+        private void ReleaseShownVisual()
+        {
+            if (_shownItemId.HasValue)
+            {
+                _visualFactory.Release(_shownItemId.Value);
+                _shownItemId = null;
+            }
+
+            if (_view != null)
+                _view.Hide();
+        }
+
+        private bool EnsureView()
+        {
+            if (_view != null)
+                return true;
+
+            UnityEngine.Camera camera = UnityEngine.Camera.main;
+            if (camera == null)
+                return false;
+
+            GameObject viewObject = new GameObject("Held Item View");
+            viewObject.transform.SetParent(camera.transform, false);
+            viewObject.transform.localPosition = Vector3.zero;
+            viewObject.transform.localRotation = Quaternion.identity;
+
+            _view = viewObject.AddComponent<HeldItemView>();
+            _view.Construct(_settings);
+            return true;
         }
     }
 }
