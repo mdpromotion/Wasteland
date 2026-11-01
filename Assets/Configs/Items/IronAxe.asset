@@ -24,4 +24,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 67df9d90d7ba4dc3b49f0c45d5962380, type: 2}
   durability: 250
   miningSpeed: 1.5
-  miningPower: 3
+  miningPower: 2
