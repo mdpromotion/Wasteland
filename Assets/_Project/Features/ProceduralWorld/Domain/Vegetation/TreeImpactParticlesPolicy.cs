@@ -17,16 +17,17 @@ namespace _Project.Features.ProceduralWorld.Domain.Vegetation
             if (damage <= 0f)
                 return MinParticles;
 
-            int count = RoundToInt(damage * ParticlesPerDamagePoint);
-            return Clamp(count, MinParticles, MaxParticles);
+            float scaled = damage * ParticlesPerDamagePoint;
+
+            // Clamp as float BEFORE the int cast: an int cast of a value beyond
+            // int range (or of +Infinity) is undefined and can yield int.MinValue.
+            if (scaled >= MaxParticles)
+                return MaxParticles;
+
+            if (scaled <= MinParticles)
+                return MinParticles;
+
+            return (int)(scaled + 0.5f);
         }
-
-        private static int RoundToInt(float value) =>
-            value < 0f
-                ? -(int)(-value + 0.5f)
-                : (int)(value + 0.5f);
-
-        private static int Clamp(int value, int min, int max) =>
-            value < min ? min : (value > max ? max : value);
     }
 }
