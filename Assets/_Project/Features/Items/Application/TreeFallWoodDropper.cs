@@ -2,6 +2,7 @@ using System;
 using _Project.Features.Interaction.Infrastructure;
 using _Project.Features.Items.Domain;
 using _Project.Features.Items.Infrastructure;
+using _Project.Features.ProceduralWorld.Domain.Vegetation;
 using UnityEngine;
 using VContainer.Unity;
 
