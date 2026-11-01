@@ -32,6 +32,7 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
             builder.Register<InventorySaveAdapter>(Lifetime.Singleton)
                 .As<IInventoryStatePersistence>();
             builder.RegisterEntryPoint<InventoryInputController>();
+            builder.RegisterEntryPoint<TreeFallWoodDropper>();
 
             // Dropped item persistence: entity factory shared by the player drop
             // flow and the chunk respawn pipeline, plus a rebase participant that
