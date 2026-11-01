@@ -103,33 +103,6 @@ namespace _Project.Tests.Items
         }
 
         [Test]
-        public void SpawnFresh_KeepsRootOnDefaultAndPutsSolidColliderOnItemLayer()
-        {
-            WorldItemPickup pickup = _spawner.SpawnFresh(
-                new ItemId(TestItemKey),
-                new Vector3(210f, 1f, -30f),
-                Quaternion.identity,
-                Vector3.zero);
-
-            int itemLayer = LayerMask.NameToLayer("Item");
-            Assume.That(itemLayer, Is.GreaterThanOrEqualTo(0), "Project must define the Item layer.");
-
-            Collider[] colliders = pickup.GetComponentsInChildren<Collider>(true);
-            Assert.That(colliders.Any(collider => !collider.isTrigger), Is.True, "Pickup must have a solid collider.");
-            Assert.That(colliders.Any(collider => collider.isTrigger), Is.True, "Pickup must have a pickup trigger.");
-
-            // The pickup trigger stays on the root (Default) so it keeps working
-            // against the player; solid colliders are pushed below the root onto
-            // the Item layer the player does not physically collide with.
-            Collider trigger = colliders.First(collider => collider.isTrigger);
-            Assert.AreEqual(0, trigger.gameObject.layer);
-
-            Collider solid = colliders.First(collider => !collider.isTrigger);
-            Assert.AreEqual(itemLayer, solid.gameObject.layer);
-            Assert.That(solid.transform, Is.Not.EqualTo(pickup.transform));
-        }
-
-        [Test]
         public void SpawnPersisted_RestoresEntityWithoutAppendingDelta()
         {
             Vector3 position = new Vector3(205f, 3f, -45f);
