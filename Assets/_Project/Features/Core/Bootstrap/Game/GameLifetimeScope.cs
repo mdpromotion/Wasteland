@@ -38,6 +38,7 @@ namespace _Project.Features.Core.Bootstrap.Game
         [Header("Inventory UI")]
         [SerializeField] private ItemCatalogAsset itemCatalogAsset;
         [SerializeField] private ItemDropSettings itemDropSettings;
+        [SerializeField] private HarvestDropTable treeHarvestDropTable;
         [SerializeField] private HotbarHudSettings hotbarHudSettings;
 
         [Header("Performance")]
@@ -50,7 +51,7 @@ namespace _Project.Features.Core.Bootstrap.Game
                 database,
                 globalMaxVoices);
 
-            InventoryInstaller.Install(builder, itemCatalogAsset, itemDropSettings);
+            InventoryInstaller.Install(builder, itemCatalogAsset, itemDropSettings, treeHarvestDropTable);
 
             PlayerInstaller.Install(
                 builder,

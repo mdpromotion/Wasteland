@@ -2381,6 +2381,7 @@ MonoBehaviour:
   playerCameraConfig: {fileID: 11400000, guid: 35e02f3997b27394ea5df05e5d138461, type: 2}
   itemCatalogAsset: {fileID: 11400000, guid: c16f290561354d99b9ab4cdb8d50aba1, type: 2}
   itemDropSettings: {fileID: 11400000, guid: 91848c9a299c4b619168d8a11bac0bc0, type: 2}
+  treeHarvestDropTable: {fileID: 11400000, guid: 34587735d8af422790751b228acfeb22, type: 2}
   hotbarHudSettings: {fileID: 11400000, guid: 81f99cdb94b34bf4898330c7fbd2fa42, type: 2}
   frameBudgetConfig: {fileID: 11400000, guid: e40bd9147fe5bad4a8625ae5ebf358cb, type: 2}
 --- !u!1 &1508698440
@@ -3130,3 +3131,4 @@ SceneRoots:
   - {fileID: 1312557002}
   - {fileID: 1059603775}
   - {fileID: 1652573607}
+

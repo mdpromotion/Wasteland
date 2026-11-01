@@ -14,12 +14,15 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
         public static void Install(
             IContainerBuilder builder,
             ItemCatalogAsset catalogAsset,
-            ItemDropSettings itemDropSettings)
+            ItemDropSettings itemDropSettings,
+            HarvestDropTable treeHarvestDropTable)
         {
             if (catalogAsset == null)
                 throw new ArgumentNullException(nameof(catalogAsset));
             if (itemDropSettings == null)
                 throw new ArgumentNullException(nameof(itemDropSettings));
+            if (treeHarvestDropTable == null)
+                throw new ArgumentNullException(nameof(treeHarvestDropTable));
 
             ItemCatalog catalog = catalogAsset.CreateDomainCatalog();
 
@@ -32,7 +35,8 @@ namespace _Project.Features.Core.Bootstrap.Game.Installers
             builder.Register<InventorySaveAdapter>(Lifetime.Singleton)
                 .As<IInventoryStatePersistence>();
             builder.RegisterEntryPoint<InventoryInputController>();
-            builder.RegisterEntryPoint<TreeFallWoodDropper>();
+            builder.RegisterInstance(treeHarvestDropTable);
+            builder.RegisterEntryPoint<HarvestDropper>();
 
             // Dropped item persistence: entity factory shared by the player drop
             // flow and the chunk respawn pipeline, plus a rebase participant that
