@@ -28,7 +28,7 @@ namespace _Project.Features.Interaction.Infrastructure
         private readonly float _searchRadius;
 
         public event Action<BreakableHit> OnBreakableFound;
-        public event Action<BreakableHit, float, Vector3> OnBreakableDamaged;
+        public event Action<BreakableHit, float, Vector3, Vector3> OnBreakableDamaged;
         public event Action OnNothingFound;
         public event Action<BreakableHit> OnBreakableDestroyed;
 
@@ -77,7 +77,7 @@ namespace _Project.Features.Interaction.Infrastructure
                 damage);
 
             bool destroyed = _healthService.ApplyDamage(breakableHit, damage);
-            OnBreakableDamaged?.Invoke(breakableHit, damage, hit.point);
+            OnBreakableDamaged?.Invoke(breakableHit, damage, hit.point, hit.normal);
             if (!destroyed)
                 return;
 

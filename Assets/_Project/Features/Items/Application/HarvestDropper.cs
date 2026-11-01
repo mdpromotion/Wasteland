@@ -34,7 +34,7 @@ namespace _Project.Features.Items.Application
             _hitHandler.OnBreakableDestroyed -= OnDestroyed;
         }
 
-        private void OnDamaged(BreakableHit hit, float damage, Vector3 hitPoint)
+        private void OnDamaged(BreakableHit hit, float damage, Vector3 hitPoint, Vector3 hitNormal)
         {
             var key = (hit.Coordinate, hit.Species, hit.Id);
             if (!_damageAccumulators.TryGetValue(key, out DamageStepAccumulator accumulator))
@@ -52,7 +52,11 @@ namespace _Project.Features.Items.Application
                 Vector3 position = hitPoint + Vector3.up * 0.25f + lateral;
                 spawnedFromHit++;
 
-                WorldItemPickup pickup = _spawner.SpawnFresh(itemId, position, Quaternion.identity, Vector3.zero);
+                Vector3 faceDirection = Vector3.ProjectOnPlane(hitNormal, Vector3.up);
+                Quaternion rotation = faceDirection.sqrMagnitude > 0.0001f
+                    ? Quaternion.LookRotation(faceDirection.normalized, Vector3.up)
+                    : Quaternion.identity;
+                WorldItemPickup pickup = _spawner.SpawnFresh(itemId, position, rotation, Vector3.zero);
                 if (pickup == null) return;
                 Rigidbody body = pickup.GetComponent<Rigidbody>();
                 if (body == null) return;
