@@ -19,7 +19,18 @@ namespace _Project.Features.Items.Infrastructure
 
         [SerializeField] private Entry[] entries = Array.Empty<Entry>();
         [SerializeField, Min(0.01f)] private float damageStep = 1f;
+        [Header("Drop Motion")]
+        [SerializeField, Min(0f)] private float minimumUpwardImpulse = 1.4f;
+        [SerializeField, Min(0f)] private float maximumUpwardImpulse = 2.6f;
+        [SerializeField, Min(0f)] private float horizontalImpulse = 1.1f;
+        [SerializeField, Min(0f)] private float spinImpulse = 1.8f;
+        [SerializeField, Min(0f)] private float spawnSpreadRadius = 0.18f;
         public float DamageStep => Mathf.Max(0.01f, damageStep);
+        public float MinimumUpwardImpulse => Mathf.Max(0f, minimumUpwardImpulse);
+        public float MaximumUpwardImpulse => Mathf.Max(MinimumUpwardImpulse, maximumUpwardImpulse);
+        public float HorizontalImpulse => Mathf.Max(0f, horizontalImpulse);
+        public float SpinImpulse => Mathf.Max(0f, spinImpulse);
+        public float SpawnSpreadRadius => Mathf.Max(0f, spawnSpreadRadius);
 
         public void Roll(float damage, Action<ItemId> onDrop)
         {

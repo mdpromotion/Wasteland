@@ -18,3 +18,8 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: a542eb7d52e14409a982c06d7fb43e10, type: 2}
     chance: 10
   damageStep: 2
+  minimumUpwardImpulse: 1.4
+  maximumUpwardImpulse: 2.6
+  horizontalImpulse: 1.1
+  spinImpulse: 1.8
+  spawnSpreadRadius: 0.18
