@@ -5,6 +5,7 @@ using _Project.Features.ProceduralWorld.Application.Persistence;
 using _Project.Features.ProceduralWorld.Domain.Chunks;
 using _Project.Features.ProceduralWorld.Domain.Persistence;
 using System;
+using System.Linq;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -48,6 +49,9 @@ namespace _Project.Features.Items.Infrastructure
         private readonly IChunkMutationTracker _mutationTracker;
         private readonly ChunkGrid _chunkGrid;
 
+        private const int DefaultLayer = 0;
+        private readonly int _itemLayer;
+
         private PickupBillboardPool _billboardPool;
 
         public WorldItemSpawner(
@@ -66,6 +70,7 @@ namespace _Project.Features.Items.Infrastructure
             _registry = registry ?? throw new System.ArgumentNullException(nameof(registry));
             _mutationTracker = mutationTracker ?? throw new System.ArgumentNullException(nameof(mutationTracker));
             _chunkGrid = chunkGrid ?? throw new System.ArgumentNullException(nameof(chunkGrid));
+            _itemLayer = LayerMask.NameToLayer("Item");
         }
 
         public WorldItemPickup SpawnFresh(
@@ -115,6 +120,7 @@ namespace _Project.Features.Items.Infrastructure
 
             body.name = $"Dropped {definition.DisplayName}";
             ConfigureCollider(body, _settings.PickupRange);
+            ApplyPickupLayerConvention(body);
 
             Rigidbody rigidbody = body.GetComponent<Rigidbody>();
             if (rigidbody == null)
@@ -189,6 +195,57 @@ namespace _Project.Features.Items.Infrastructure
             }
 
             return item;
+        }
+
+        /// <summary>
+        /// Enforces the pickup layer convention: the root stays on Default — the
+        /// pickup trigger lives there and keeps working against the player —
+        /// while every solid physics collider is lifted onto the Item layer,
+        /// which is excluded from player collisions so the player walks through
+        /// drops.
+        /// </summary>
+        private void ApplyPickupLayerConvention(GameObject body)
+        {
+            body.layer = DefaultLayer;
+
+            if (_itemLayer < 0)
+                return;
+
+            MoveRootSolidCollidersToItemChild(body);
+
+            for (int i = 0; i < body.transform.childCount; i++)
+            {
+                Transform child = body.transform.GetChild(i);
+                SetLayerRecursively(child.gameObject, _itemLayer);
+            }
+        }
+
+        private static void MoveRootSolidCollidersToItemChild(GameObject body)
+        {
+            Collider[] rootColliders = body.GetComponents<Collider>();
+            bool needPhysicsChild = rootColliders.Any(collider => !collider.isTrigger);
+            if (!needPhysicsChild)
+                return;
+
+            GameObject physicsBody = new GameObject("Physics");
+            Transform physicsTransform = physicsBody.transform;
+            physicsTransform.SetParent(body.transform, false);
+
+            foreach (Collider collider in rootColliders)
+            {
+                if (collider.isTrigger)
+                    continue;
+
+                collider.transform.SetParent(physicsTransform, false);
+            }
+        }
+
+        private static void SetLayerRecursively(GameObject gameObject, int layer)
+        {
+            gameObject.layer = layer;
+
+            for (int i = 0; i < gameObject.transform.childCount; i++)
+                SetLayerRecursively(gameObject.transform.GetChild(i).gameObject, layer);
         }
 
         private static void ConfigureCollider(GameObject item, float pickupRange)
